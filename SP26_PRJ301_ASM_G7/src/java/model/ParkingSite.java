@@ -12,23 +12,27 @@ public class ParkingSite {
     private Region region;
     private Status siteStatus;
     private int managerId;
+    private int totalSlots;
 
-    public ParkingSite(String siteName, String address, Region region, Status siteStatus, int managerId) {
+    public ParkingSite(String siteName, String address, Region region, Status siteStatus, int managerId, int totalSlots) {
         this.siteName = siteName;
         this.address = address;
         this.region = region;
         this.siteStatus = siteStatus;
         this.managerId = managerId;
+        this.totalSlots = totalSlots;
     }
     
-    public ParkingSite(int siteId, String siteName, String address, Region region, Status siteStatus, int managerId) {
+    public ParkingSite(int siteId, String siteName, String address, Region region, Status siteStatus, int managerId, int totalSlots) {
         this.siteId = siteId;
         this.siteName = siteName;
         this.address = address;
         this.region = region;
         this.siteStatus = siteStatus;
         this.managerId = managerId;
+        this.totalSlots = totalSlots;
     }
+    
 
     public int getSiteId() {
         return siteId;
@@ -78,6 +82,15 @@ public class ParkingSite {
         this.managerId = managerId;
     }
 
+    public int getTotalSlots() {
+        return totalSlots;
+    }
+
+    public void setTotalSlots(int totalSlots) {
+        this.totalSlots = totalSlots;
+    }
+    
+    
     public enum Region {
         NORTH("Miền Bắc"),
         MIDDLE("Miền Trung"),

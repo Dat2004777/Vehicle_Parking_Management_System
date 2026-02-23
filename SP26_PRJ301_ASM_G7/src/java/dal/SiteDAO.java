@@ -63,15 +63,27 @@ public class SiteDAO extends DBContext {
             System.out.println("Error delete: " + e.getMessage());
         }
     }
-    
+
     public List<ParkingSite> getAll() {
         List<ParkingSite> list = new ArrayList<>();
-        String sql = "SELECT * FROM ParkingSites";
-        
+        String sql
+                = """
+                SELECT s.site_id, s.site_name,s.address, s.region, s.manager_id, s.status,SUM(a.totalSlots) AS total_slots
+                    FROM ParkingSites s
+                    JOIN ParkingAreas a ON s.site_id = a.site_id 
+                    GROUP BY 
+                        s.site_id,
+                        s.site_name,
+                        s.address,
+                        s.region,
+                        s.manager_id,
+                        s.status;
+                """;
+
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
-            
+
             while (rs.next()) {
                 ParkingSite site = mapRowToSite(rs);
                 list.add(site);
@@ -84,7 +96,22 @@ public class SiteDAO extends DBContext {
 
     public List<ParkingSite> searchByName(String keyword) {
         List<ParkingSite> list = new ArrayList<>();
-        String sql = "SELECT * FROM ParkingSites WHERE site_name LIKE ?";
+//        String sql = "SELECT * FROM ParkingSites WHERE site_name LIKE ?";
+
+        String sql
+                = """
+                SELECT s.site_id, s.site_name,s.address, s.region, s.manager_id, s.status,SUM(a.totalSlots) AS total_slots
+                    FROM ParkingSites s
+                    JOIN ParkingAreas a ON s.site_id = a.site_id 
+                    WHERE s.site_name LIKE ?
+                    GROUP BY 
+                        s.site_id,
+                        s.site_name,
+                        s.address,
+                        s.region,
+                        s.manager_id,
+                        s.status;
+                """;
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -107,7 +134,7 @@ public class SiteDAO extends DBContext {
         String regionStr = rs.getString("region");
         String statusStr = rs.getString("status");
         int managerId = rs.getInt("manager_id");
-
+        int totalSlots = rs.getInt("total_slots");
         ParkingSite.Region region = ParkingSite.Region.NORTH; // Default
         try {
             if (regionStr != null) {
@@ -126,6 +153,48 @@ public class SiteDAO extends DBContext {
             System.out.println("Lỗi convert Status: " + statusStr);
         }
 
-        return new ParkingSite(id, name, address, region, status, managerId);
+        return new ParkingSite(id, name, address, region, status, managerId, totalSlots);
+    }
+
+    public List<ParkingSite> getSpecificSites(String siteRegion, String querySite) {
+        String sql
+                = """
+                SELECT s.site_id, s.site_name,s.address, s.region, s.manager_id, s.status,SUM(a.totalSlots) AS total_slots
+                    FROM ParkingSites s
+                    JOIN ParkingAreas a ON s.site_id = a.site_id 
+                    WHERE (? = '' OR s.region = ?) AND (
+                        ? = '' 
+                        OR s.site_name COLLATE Latin1_General_CI_AI LIKE ?
+                        OR s.address COLLATE Latin1_General_CI_AI LIKE ?
+                    )
+                    GROUP BY 
+                        s.site_id,
+                        s.site_name,
+                        s.address,
+                        s.region,
+                        s.manager_id,
+                        s.status;
+                """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, siteRegion);
+            ps.setString(2, siteRegion);
+
+            ps.setString(3, querySite);
+            ps.setString(4, "%" + querySite + "%");
+            ps.setString(5, "%" + querySite + "%");
+
+            ResultSet rs = ps.executeQuery();
+            List<ParkingSite> listSites = new ArrayList<>();
+
+            while (rs.next()) {
+                listSites.add(mapRowToSite(rs));
+            }
+            return listSites;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Lỗi lấy dữ liệu sites cụ thể");
+            return null;
+        }
     }
 }
