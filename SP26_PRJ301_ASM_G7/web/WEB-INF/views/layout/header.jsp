@@ -70,7 +70,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-3">
                 <li class="nav-item">
-                    <a class="nav-link active" href="">Trang chủ</a>
+                    <a class="nav-link active" href="${pageContext.request.contextPath}">Trang chủ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Đặt chỗ</a>
@@ -80,8 +80,8 @@
                 </li>
             </ul>
             <div class="d-flex align-items-center mt-3 mt-lg-0">
-                <a href="#" class="btn-login">Đăng nhập</a>
-                <a href="#" class="btn btn-primary btn-register">Đăng ký</a>
+                <a href="${pageContext.request.contextPath}/login" class="btn-login">Đăng nhập</a>
+                <a href="${pageContext.request.contextPath}/signup" class="btn btn-primary btn-register">Đăng ký</a>
             </div>
         </div>
     </div>

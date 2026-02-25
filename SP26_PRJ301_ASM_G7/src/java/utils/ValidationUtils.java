@@ -150,4 +150,28 @@ public class ValidationUtils {
             throw new IllegalArgumentException(errorMessage + " (Giá trị lựa chọn không hợp lệ)");
         }
     }
+    
+    /**
+     * Kiểm tra phonenumber xem đúng format là gồm 10 chữ số và bắt đầu bằng chữ số 0 (theo VN)
+     * @param phone
+     * @return true if matching regex
+     */
+    public static boolean checkPhone(String phone) {
+        if (phone == null) {
+            return false;
+        }
+        return phone.matches("^0\\d{9}$");
+    }
+    
+    /**
+     * Check email xem viết đúng format chưa
+     * @param email
+     * @return true if matching regex
+     */
+    public static boolean checkEmail(String email) {
+        if (email == null) {
+            return false;
+        }
+        return email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$");
+    }
 }

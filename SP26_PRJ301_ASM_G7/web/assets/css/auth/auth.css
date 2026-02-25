@@ -1,0 +1,409 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Feb 24, 2026, 9:08:57 PM
+    Author     : ADMIN
+*/
+
+:root {
+    --bs-primary: #1a56db;
+    --bs-primary-rgb: 26, 86, 219;
+    --bs-font-sans-serif: 'Inter', sans-serif;
+}
+
+body {
+    font-family: var(--bs-font-sans-serif);
+    background-color: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* --- Main Wrapper --- */
+.auth-wrapper {
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 1100px;
+    height: 750px;
+    /* Fixed height for sliding effect */
+    max-height: 95vh;
+}
+
+/* --- Form Containers --- */
+.form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar for forms */
+.form-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.form-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.form-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+/* --- Top Logo & Header (Inside Forms) --- */
+.auth-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.brand-logo {
+    width: 32px;
+    height: 32px;
+    background-color: var(--bs-primary);
+    color: white;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-right: 0.75rem;
+}
+
+/* --- Form Elements --- */
+.form-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.form-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+}
+
+.form-subtitle a {
+    color: var(--bs-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.4rem;
+}
+
+.form-control {
+    padding: 0.6rem 1rem;
+    border-color: #d1d5db;
+    font-size: 0.95rem;
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #9ca3af;
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border: none;
+    padding: 0.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: #1e40af;
+}
+
+/* --- Social Buttons & Divider --- */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.divider:not(:empty)::before {
+    margin-right: 1em;
+}
+
+.divider:not(:empty)::after {
+    margin-left: 1em;
+}
+
+.btn-social {
+    background-color: white;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    font-weight: 600;
+    padding: 0.6rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-social:hover {
+    background-color: #f9fafb;
+}
+
+.social-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* --- Overlay Sliding Image Panel --- */
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+}
+
+.overlay {
+    background: linear-gradient(to bottom, rgba(17, 24, 39, 0.1), rgba(17, 24, 39, 0.8)), url('https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&q=80&w=1920') no-repeat center;
+    background-size: cover;
+    color: #ffffff;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: flex-end;
+    /* Align text to bottom */
+    justify-content: flex-start;
+    flex-direction: column;
+    padding: 4rem 3rem;
+    text-align: left;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+    pointer-events: none;
+}
+
+.overlay-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+.overlay-left {
+    left: 0;
+    transform: translateX(-20%);
+}
+
+/* Links inside image */
+.overlay-nav {
+    position: absolute;
+    top: 2rem;
+    right: 3rem;
+    display: flex;
+    gap: 1.5rem;
+    z-index: 1000;
+}
+
+.overlay-nav a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.overlay-nav a:hover {
+    color: white;
+}
+
+.overlay h2 {
+    font-weight: 700;
+    font-size: 2.25rem;
+    margin-bottom: 1rem;
+}
+
+.overlay p {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #e5e7eb;
+    line-height: 1.6;
+    margin-bottom: 0;
+    max-width: 400px;
+}
+
+/* --- Animation Triggers (.right-panel-active) --- */
+/* Move Sign In to right */
+.auth-wrapper.right-panel-active .sign-in-container {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+/* Move Sign Up to right and show */
+.auth-wrapper.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: show 0.6s;
+}
+
+/* Move overlay container to left */
+.auth-wrapper.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+/* Counter-move overlay back to center */
+.auth-wrapper.right-panel-active .overlay {
+    transform: translateX(50%);
+}
+
+/* Internal text animation */
+.auth-wrapper.right-panel-active .overlay-left {
+    transform: translateX(0);
+}
+
+.auth-wrapper.right-panel-active .overlay-right {
+    transform: translateX(20%);
+}
+
+@keyframes show {
+
+    0%,
+    49.99% {
+        opacity: 0;
+        z-index: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+/* --- Mobile Responsive --- */
+@media (max-width: 992px) {
+    body {
+        padding: 1rem;
+        overflow: auto;
+    }
+
+    .auth-wrapper {
+        min-height: auto;
+        height: auto;
+        max-height: none;
+        flex-direction: column;
+        display: flex;
+    }
+
+    .form-container {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 2rem;
+        transform: none !important;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    /* Show Login, Hide Register by default on mobile */
+    .sign-in-container {
+        opacity: 1;
+        display: flex;
+        z-index: 2;
+    }
+
+    .sign-up-container {
+        opacity: 0;
+        display: none;
+        z-index: 1;
+    }
+
+    /* Toggle display on mobile */
+    .auth-wrapper.right-panel-active .sign-in-container {
+        display: none;
+        opacity: 0;
+    }
+
+    .auth-wrapper.right-panel-active .sign-up-container {
+        display: flex;
+        opacity: 1;
+        animation: none;
+    }
+
+    /* Hide sliding image panel on small screens to save space */
+    .overlay-container {
+        position: relative;
+        width: 100%;
+        height: 250px;
+        left: 0;
+        transform: none !important;
+        display: none;
+    }
+}
