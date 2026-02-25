@@ -124,7 +124,7 @@
 
             /* Màu nền xanh lá, chữ trắng cho toàn bộ Tab RA BÃI */
             .tab-switch button#tabOut.active {
-                background: #10b981;
+                background: #ef4444;
                 color: #fff;
                 box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
             }
@@ -251,7 +251,7 @@
 
                 <div class="d-flex align-items-center gap-4">
 
-                    
+
                 </div>
             </div>
         </nav>
@@ -314,6 +314,71 @@
                                     <input type="text" id="licensePlate" name="licensePlate" placeholder="NHẬP BIỂN SỐ (VD: 30A-123.45)" required autocomplete="off" class="form-control-lg fs-5 text-uppercase">
                                 </div>
 
+                                <div id="vehicleTypeContainer" class="mb-4">
+                                    <label class="form-label text-secondary fw-bold" style="font-size: 0.85rem;">LOẠI XE <span class="text-muted fw-normal text-lowercase">(Dành cho vé lượt)</span></label>
+
+                                    <c:set var="hasSelected" value="false" />
+                                    <input type="hidden" name="vehicleTypeId" id="vehicleTypeId" value="-1">
+
+                                    <div class="d-flex gap-3">
+                                        <c:forEach var="entry" items="${overview.slotPerVehicle}">
+
+                                            <c:set var="vType" value="${entry.key}" />
+                                            <c:set var="availableSlots" value="${entry.value}" />
+                                            <c:set var="isAvailable" value="${availableSlots > 0}" />
+
+                                            <c:choose>
+                                                <c:when test="${vType.vehicleTypeName.toLowerCase().contains('motorbike')}">
+                                                    <c:set var="icon" value="bi-bicycle" />
+                                                    <c:set var="label" value="XE MÁY" />
+                                                </c:when>
+                                                <c:when test="${vType.vehicleTypeName.toLowerCase().contains('car')}">
+                                                    <c:set var="icon" value="bi-car-front-fill" />
+                                                    <c:set var="label" value="Ô TÔ" />
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:set var="icon" value="bi-truck" />
+                                                    <c:set var="label" value="${vType.vehicleTypeName}" />
+                                                </c:otherwise>
+                                            </c:choose>
+
+                                            <c:choose>
+                                                <c:when test="${isAvailable}">
+                                                    <div id="boxType_${vType.vehicleTypeId}" 
+                                                         class="vehicle-box flex-fill py-3 text-center fw-bold border rounded-3 cursor-pointer ${!hasSelected ? 'bg-primary border-primary text-white active-box' : 'bg-light border-secondary text-secondary'}" 
+                                                         onclick="selectVehicleType(${vType.vehicleTypeId}, 'boxType_${vType.vehicleTypeId}')" 
+                                                         style="cursor: pointer; transition: all 0.2s; user-select: none;">
+
+                                                        <i class="bi ${icon} fs-4 d-block mb-1"></i> ${label}
+                                                        <small class="d-block fw-normal subtitle-text ${!hasSelected ? 'text-white-50' : 'text-muted'}" style="font-size: 0.7rem;">(Còn ${availableSlots} chỗ)</small>
+                                                    </div>
+
+                                                    <c:if test="${!hasSelected}">
+                                                        <script>document.getElementById('vehicleTypeId').value = '${vType.vehicleTypeId}';</script>
+                                                        <c:set var="hasSelected" value="true" />
+                                                    </c:if>
+                                                </c:when>
+
+                                                <c:otherwise>
+                                                    <div class="flex-fill py-3 text-center fw-bold border rounded-3" 
+                                                         style="background-color: #e2e8f0; opacity: 0.6; cursor: not-allowed; user-select: none; border-color: #cbd5e1;">
+
+                                                        <i class="bi ${icon} fs-4 d-block mb-1 text-muted"></i> 
+                                                        <span class="text-muted">${label} <small class="d-block fw-normal text-danger" style="font-size: 0.7rem;">(Đầy)</small></span>
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+
+                                        </c:forEach>
+                                    </div>
+
+                                    <c:if test="${!hasSelected}">
+                                        <div class="alert alert-danger mt-3 py-2 text-center" style="font-size: 0.85rem;">
+                                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Bãi xe đã hết sức chứa cho mọi loại xe!
+                                        </div>
+                                    </c:if>
+                                </div>
+
                                 <div class="d-flex align-items-center gap-2 mb-4 mt-3">
                                     <i class="bi bi-info-circle text-muted"></i>
                                     <small class="text-muted">Nhấn phím <b>Enter</b> để xác nhận và gửi thông tin.</small>
@@ -361,12 +426,12 @@
                                     <c:forEach items="${overview.areas}" var="area">
 
                                         <c:choose>
-                                            <c:when test="${area.vehicleTypeName.toLowerCase().contains('car')}">
+                                            <c:when test="${area.vehicleType.vehicleTypeName.toLowerCase().contains('car')}">
                                                 <c:set var="borderColor" value="#3b82f6" />
                                                 <c:set var="iconClass" value="bi-car-front-fill" />
                                                 <c:set var="textColor" value="text-primary" />
                                             </c:when>
-                                            <c:when test="${area.vehicleTypeName.toLowerCase().contains('motorbike')}">
+                                            <c:when test="${area.vehicleType.vehicleTypeName.toLowerCase().contains('motorbike')}">
                                                 <c:set var="borderColor" value="#eab308" />
                                                 <c:set var="iconClass" value="bi-bicycle" />
                                                 <c:set var="textColor" value="text-warning" />
@@ -500,6 +565,10 @@
                                         const cardIdInput = document.getElementById('cardId');
                                         const plateInput = document.getElementById('licensePlate');
                                         const btnSubmit = document.getElementById('btnSubmitForm');
+
+                                        // Kéo Element chứa hộp chọn loại xe vào đây
+                                        const vehicleTypeSelector = document.getElementById('vehicleTypeSelector');
+
                                         const ctx = "${ctx}";
 
                                         // Tự động focus vào ô Mã thẻ khi vừa vào trang
@@ -507,32 +576,41 @@
                                             cardIdInput.focus();
 
                                         // 2. Logic Đổi Tab (Vào/Ra)
-                                        // Gắn vào window để gọi được từ onclick trong HTML
                                         window.switchMode = function (mode) {
+                                            const vehicleContainer = document.getElementById('vehicleTypeContainer'); // Gọi cái bọc bên ngoài
+
                                             if (mode === 'in') {
                                                 tabIn.classList.add('active');
                                                 tabOut.classList.remove('active');
                                                 actionType.value = 'checkin';
                                                 form.action = ctx + '/parking/checkin';
 
-                                                btnSubmit.classList.remove('btn-checkout');
+                                                btnSubmit.style.backgroundColor = '#3b82f6'; // Xanh
                                                 btnSubmit.innerHTML = '<span>XÁC NHẬN VÀO</span> <i class="bi bi-box-arrow-in-right ms-2"></i>';
+
+                                                // Hiện lại nguyên cụm chọn xe
+                                                if (vehicleContainer)
+                                                    vehicleContainer.classList.remove('d-none');
+
                                             } else {
                                                 tabOut.classList.add('active');
                                                 tabIn.classList.remove('active');
                                                 actionType.value = 'checkout';
                                                 form.action = ctx + '/parking/checkout';
 
-                                                btnSubmit.classList.add('btn-checkout');
+                                                btnSubmit.style.backgroundColor = '#ef4444'; // Đỏ
                                                 btnSubmit.innerHTML = '<span>XÁC NHẬN RA</span> <i class="bi bi-box-arrow-right ms-2"></i>';
+
+                                                // Ẩn sạch cụm chọn xe đi
+                                                if (vehicleContainer)
+                                                    vehicleContainer.classList.add('d-none');
                                             }
 
-                                            // Xóa trắng & Tự động Focus lại ô đầu tiên
                                             cardIdInput.value = '';
                                             plateInput.value = '';
                                             cardIdInput.focus();
                                         };
-
+                                        
                                         // 3. Phím tắt F1 / F2 toàn cục
                                         document.addEventListener('keydown', function (e) {
                                             if (e.key === 'F1') {
@@ -571,10 +649,8 @@
                                         };
 
                                         // 5. Auto focus thông minh & an toàn
-                                        // (Chỉ focus lại nếu click ra ngoài các vùng tương tác)
                                         document.addEventListener('click', function (e) {
-                                            // Kiểm tra xem user có đang click vào Nút, Link, Input hay Offcanvas không
-                                            const isInteractiveArea = e.target.closest('button, a, input, .offcanvas');
+                                            const isInteractiveArea = e.target.closest('button, a, input, .offcanvas, .vehicle-box');
 
                                             if (!isInteractiveArea) {
                                                 if (cardIdInput.value === '') {
@@ -585,7 +661,44 @@
                                             }
                                         });
 
-                                        // 6. Đồng hồ Realtime
+                                        // 6. SỬA LỖI KHÔNG ĐỔI MÀU DIV TẠI ĐÂY: Gắn thẳng hàm vào "window"
+                                        window.selectVehicleType = function (typeId, boxId) {
+                                            const hiddenInput = document.getElementById('vehicleTypeId');
+                                            if (hiddenInput)
+                                                hiddenInput.value = typeId;
+
+                                            const allBoxes = document.querySelectorAll('.vehicle-box');
+
+                                            // 1. Reset tất cả các hộp về trạng thái CHƯA CHỌN (Màu xám nhạt bg-light)
+                                            allBoxes.forEach(box => {
+                                                box.classList.remove('bg-primary', 'border-primary', 'text-white', 'active-box');
+                                                box.classList.add('bg-light', 'border-secondary', 'text-secondary');
+
+                                                const subtitle = box.querySelector('.subtitle-text');
+                                                if (subtitle) {
+                                                    subtitle.classList.remove('text-white-50');
+                                                    subtitle.classList.add('text-muted');
+                                                }
+                                            });
+
+                                            // 2. Kích hoạt hộp VỪA BẤM thành trạng thái ĐÃ CHỌN (Màu xanh bg-primary)
+                                            const selectedBox = document.getElementById(boxId);
+                                            if (selectedBox) {
+                                                selectedBox.classList.remove('bg-light', 'border-secondary', 'text-secondary');
+                                                selectedBox.classList.add('bg-primary', 'border-primary', 'text-white', 'active-box');
+
+                                                const selectedSubtitle = selectedBox.querySelector('.subtitle-text');
+                                                if (selectedSubtitle) {
+                                                    selectedSubtitle.classList.remove('text-muted');
+                                                    selectedSubtitle.classList.add('text-white-50');
+                                                }
+                                            }
+
+                                            // Tự động nhảy sang ô nhập biển số
+                                            cardIdInput.focus();
+                                        };
+
+                                        // 7. Đồng hồ Realtime
                                         function updateClock() {
                                             const clockEl = document.getElementById('realtimeClock');
                                             const dateEl = document.getElementById('realtimeDate');

@@ -16,10 +16,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter; // IMPORT BỘ FORMAT MỚI
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Employee;
 import model.ParkingArea;
 import model.ParkingSite;
+import model.VehicleType;
 import model.dto.AreaDetailDTO;
 import model.dto.SiteOverviewDTO;
 
@@ -114,40 +117,49 @@ public class StaffDashboardController extends HttpServlet {
         // Lấy Entity Site
         ParkingSite site = siteDAO.getById(siteId);
 
-        // 1. Lấy danh sách Entity Khu vực từ DAO (Đã có sẵn vehicleTypeName)
+        // 1. Lấy danh sách Entity Khu vực từ DAO
         List<ParkingArea> rawAreas = areaDAO.getAreasBySite(siteId);
+
+        // Chuẩn bị 2 cấu trúc dữ liệu để nhét vào SiteOverviewDTO
         List<AreaDetailDTO> areaList = new ArrayList<>();
+        Map<VehicleType, Integer> slotPerVehicleMap = new HashMap<>();
 
-        // 2. Vòng lặp lắp ráp dữ liệu
+        // 2. Vòng lặp lắp ráp và tính toán dữ liệu
         for (ParkingArea area : rawAreas) {
-
-            // TỐI ƯU: Lấy trực tiếp tên loại xe từ Entity, không cần query thêm
-            String vehicleTypeName = area.getVehicleTypeName();
-            if (vehicleTypeName == null || vehicleTypeName.isEmpty()) {
-                vehicleTypeName = "Chưa phân loại";
-            }
-
-            // Lấy số lượng xe đang đỗ tại khu này
+            // Đếm số xe đang đỗ và tính chỗ trống
             int occupiedSlots = sessionDAO.countActiveSessionsByArea(area.getAreaId());
+            int availableInArea = area.getTotalSlots() - occupiedSlots;
 
-            // Đóng gói vào DTO
+            // TẠO ĐỐI TƯỢNG VEHICLE TYPE (Dùng chung cho cả Map và AreaDetailDTO)
+            // Lưu ý: Đảm bảo class VehicleType đã có hàm equals() và hashCode() theo vehicleTypeId
+            VehicleType vt = new VehicleType(area.getVehicleTypeId(), area.getVehicleTypeName());
+
+            // CỘNG DỒN VÀO MAP
+            int currentAvailable = slotPerVehicleMap.getOrDefault(vt, 0);
+            slotPerVehicleMap.put(vt, currentAvailable + availableInArea);
+
+            // ĐÓNG GÓI VÀO DTO CHI TIẾT KHU VỰC
             AreaDetailDTO dto = new AreaDetailDTO(
                     area.getAreaId(),
                     area.getAreaName(),
-                    vehicleTypeName,
+                    vt, // Truyền luôn object vt vừa tạo ở trên vào đây cho đồng bộ
                     area.getTotalSlots(),
                     occupiedSlots
             );
             areaList.add(dto);
         }
 
-        // 3. Trả về DTO tổng hợp
-        return new SiteOverviewDTO(
+        // 3. Khởi tạo DTO tổng hợp
+        SiteOverviewDTO overview = new SiteOverviewDTO(
                 site.getSiteName(),
                 site.getAddress(),
-                site.getSiteStatus(),
+                site.getSiteStatus(), // Dựa theo DB của bạn là operating_state
                 areaList
         );
-    }
 
+        // 4. Nạp cái Map vừa tính toán xong vào DTO
+        overview.setSlotPerVehicle(slotPerVehicleMap);
+
+        return overview;
+    }
 }

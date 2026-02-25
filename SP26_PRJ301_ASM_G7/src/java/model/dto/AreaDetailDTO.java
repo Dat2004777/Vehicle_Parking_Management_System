@@ -1,18 +1,20 @@
 package model.dto;
 
+import model.VehicleType;
+
 public class AreaDetailDTO {
 
     private int areaId;
     private String areaName;
-    private String vehicleTypeName; // Tên loại xe (Ô tô, Xe máy...)
+    private VehicleType vehicleType; // Tên loại xe (Ô tô, Xe máy...)
     private int totalSlots;
     private int occupiedSlots;
     private int availableSlots;
 
-    public AreaDetailDTO(int areaId, String areaName, String vehicleTypeName, int totalSlots, int occupiedSlots) {
+    public AreaDetailDTO(int areaId, String areaName, VehicleType vehicleType, int totalSlots, int occupiedSlots) {
         this.areaId = areaId;
         this.areaName = areaName;
-        this.vehicleTypeName = vehicleTypeName;
+        this.vehicleType = vehicleType;
         this.totalSlots = totalSlots;
         this.occupiedSlots = occupiedSlots;
         this.availableSlots = Math.max(0, totalSlots - occupiedSlots);
@@ -27,8 +29,8 @@ public class AreaDetailDTO {
         return areaName;
     }
 
-    public String getVehicleTypeName() {
-        return vehicleTypeName;
+    public VehicleType getVehicleType() {
+        return vehicleType;
     }
 
     public int getTotalSlots() {

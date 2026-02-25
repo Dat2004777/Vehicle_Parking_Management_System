@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Employee;
 import model.ParkingArea;
 import model.ParkingSite;
+import model.VehicleType;
 import model.dto.AreaDetailDTO;
 import model.dto.SiteOverviewDTO;
 import utils.UrlConstants;
@@ -107,7 +108,7 @@ public class StaffSiteOverview extends HttpServlet {
             AreaDetailDTO dto = new AreaDetailDTO(
                     area.getAreaId(), 
                     area.getAreaName(), 
-                    vehicleTypeName, 
+                    new VehicleType(area.getVehicleTypeId(), vehicleTypeName), 
                     area.getTotalSlots(), 
                     occupiedSlots
             );
