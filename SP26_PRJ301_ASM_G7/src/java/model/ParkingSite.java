@@ -10,29 +10,40 @@ public class ParkingSite {
     private String siteName;
     private String address;
     private Region region;
-    private Status siteStatus;
+    private State siteState;
     private int managerId;
     private int totalSlots;
 
-    public ParkingSite(String siteName, String address, Region region, Status siteStatus, int managerId, int totalSlots) {
+    public ParkingSite(String siteName, String address, Region region, State siteState, int managerId, int totalSlots) {
         this.siteName = siteName;
         this.address = address;
         this.region = region;
-        this.siteStatus = siteStatus;
+        this.siteState = siteState;
         this.managerId = managerId;
         this.totalSlots = totalSlots;
     }
-    
-    public ParkingSite(int siteId, String siteName, String address, Region region, Status siteStatus, int managerId, int totalSlots) {
+
+    public ParkingSite(int siteId, String siteName, String address, Region region, State siteState, int managerId, int totalSlots) {
         this.siteId = siteId;
         this.siteName = siteName;
         this.address = address;
         this.region = region;
-        this.siteStatus = siteStatus;
+        this.siteState = siteState;
         this.managerId = managerId;
         this.totalSlots = totalSlots;
     }
-    
+
+    public ParkingSite() {
+    }
+
+    public ParkingSite(int siteId, String siteName, String address, Region region, State siteState, int managerId) {
+        this.siteId = siteId;
+        this.siteName = siteName;
+        this.address = address;
+        this.region = region;
+        this.siteState = siteState;
+        this.managerId = managerId;
+    }
 
     public int getSiteId() {
         return siteId;
@@ -66,12 +77,12 @@ public class ParkingSite {
         this.region = region;
     }
 
-    public Status getSiteStatus() {
-        return siteStatus;
+    public State getSiteState() {
+        return siteState;
     }
 
-    public void setSiteStatus(Status siteStatus) {
-        this.siteStatus = siteStatus;
+    public void setSiteState(State siteState) {
+        this.siteState = siteState;
     }
 
     public int getManagerId() {
@@ -89,8 +100,7 @@ public class ParkingSite {
     public void setTotalSlots(int totalSlots) {
         this.totalSlots = totalSlots;
     }
-    
-    
+
     public enum Region {
         NORTH("Miền Bắc"),
         MIDDLE("Miền Trung"),
@@ -108,14 +118,14 @@ public class ParkingSite {
 
     }
 
-    public enum Status {
-        ACTIVE("Đang hoạt động"),
+    public enum State {
+        OPERATING("Đang hoạt động"),
         MAINTENANCE("Bảo trì"),
         CLOSED("Đóng cửa");
 
         private final String label;
 
-        private Status(String label) {
+        private State(String label) {
             this.label = label;
         }
 

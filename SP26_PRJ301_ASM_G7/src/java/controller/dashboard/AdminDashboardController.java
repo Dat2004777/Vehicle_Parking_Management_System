@@ -4,46 +4,27 @@
  */
 package controller.dashboard;
 
+import dal.ParkingSessionDAO;
+import dal.PaymentTransactionDAO;
+import dal.SiteDAO;
+import dal.SubscriptionDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import model.dto.DashboardDTO;
+import utils.UrlConstants;
+import utils.ValidationUtils;
 
 /**
  *
  * @author dat20
  */
-@WebServlet(name = "AdminDashboardController", urlPatterns = {"/admin/dashboard"})
+@WebServlet(name = "AdminDashboardController", urlPatterns = {UrlConstants.URL_ADMIN + "/dashboard"})
 public class AdminDashboardController extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AdminDashboardController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AdminDashboardController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -57,6 +38,41 @@ public class AdminDashboardController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        ValidationUtils validationUtils = new ValidationUtils();
+
+        PaymentTransactionDAO paymentTransactionDAO = new PaymentTransactionDAO();
+        SiteDAO siteDAO = new SiteDAO();
+        SubscriptionDAO subscriptionDAO = new SubscriptionDAO();
+        ParkingSessionDAO parkingSessionDAO = new ParkingSessionDAO();
+
+        String siteIdStr = request.getParameter("siteId");
+
+        if (siteIdStr == null || siteIdStr.equalsIgnoreCase("0")) {
+            DashboardDTO dashboardDTO = new DashboardDTO(
+                    paymentTransactionDAO.getTotalAmountInCurrentMonth(),
+                    parkingSessionDAO.getCurrentParkedVehiclesInCurrentMonth(),
+                    subscriptionDAO.getTotalSubscriptionByCurrentMonth(),
+                    siteDAO.getAllActiveSites());
+            List<Long> chartData = paymentTransactionDAO.getWeeklyRevenue();
+            request.setAttribute("chartData", chartData);
+            request.setAttribute("dashboardDTO", dashboardDTO);
+        } else {
+            try {
+                int siteId = validationUtils.requireValidInt(siteIdStr, "Error from parseInt siteId in AdminDashboardController");
+                DashboardDTO dashboardDTO = new DashboardDTO(
+                        paymentTransactionDAO.getTotalAmountInCurrentMonthById(siteId),
+                        parkingSessionDAO.getCurrentParkedVehiclesInCurrentMonthById(siteId),
+                        subscriptionDAO.getTotalSubscriptionByCurrentMonth(siteId),
+                        siteDAO.getAllActiveSites());
+                List<Long> chartData = paymentTransactionDAO.getWeeklyRevenue();
+                request.setAttribute("chartData", chartData);
+                request.setAttribute("dashboardDTO", dashboardDTO);
+                request.setAttribute("siteId", siteId);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
         request.getRequestDispatcher("/WEB-INF/views/dashboard/dashboard.jsp").forward(request, response);
     }
 
@@ -71,17 +87,7 @@ public class AdminDashboardController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
-    }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    }
 
 }

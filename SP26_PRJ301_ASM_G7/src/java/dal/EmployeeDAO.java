@@ -123,7 +123,7 @@ public class EmployeeDAO extends DBContext {
                 """
                 SELECT e.employee_id
                 FROM Employees e 
-                JOIN Account a ON e.account_id = a.account_id
+                JOIN Accounts a ON e.account_id = a.account_id
                 WHERE a.role = ? AND a.account_id = ?
                 """;
         

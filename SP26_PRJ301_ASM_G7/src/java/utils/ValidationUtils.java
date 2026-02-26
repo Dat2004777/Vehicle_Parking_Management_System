@@ -153,6 +153,9 @@ public class ValidationUtils {
     
     /**
      * Kiểm tra phonenumber xem đúng format là gồm 10 chữ số và bắt đầu bằng chữ số 0 (theo VN)
+     * Kiểm tra phonenumber xem đúng format là gồm 10 chữ số và bắt đầu bằng chữ
+     * số 0 (theo VN)
+     *
      * @param phone
      * @return true if matching regex
      */
@@ -162,9 +165,11 @@ public class ValidationUtils {
         }
         return phone.matches("^0\\d{9}$");
     }
+
     
     /**
      * Check email xem viết đúng format chưa
+     *
      * @param email
      * @return true if matching regex
      */
