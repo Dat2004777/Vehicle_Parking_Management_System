@@ -86,19 +86,31 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("username").trim();
-        String password = request.getParameter("password").trim();
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        // Check null trước
+        if (username == null || password == null) {
+            request.setAttribute("errorMessage", "Thiếu thông tin đăng nhập");
+            request.setAttribute("authMode", "login");
+            request.getRequestDispatcher("/WEB-INF/views/public/login-signup.jsp")
+                    .forward(request, response);
+            return;
+        }
+        
+        username = username.trim();
+        password = password.trim();
         
         AccountDAO accDAO = new AccountDAO();
         Account acc = accDAO.checkAccount(username, password);
-        
+
         HttpSession session = request.getSession();
-        
-        if(acc != null){
+
+        if (acc != null) {
             EmployeeDAO empDAO = new EmployeeDAO();
             String contextPath = request.getContextPath();
-            session.setAttribute("account",acc);
-            switch(acc.getRole()){
+            session.setAttribute("account", acc);
+            switch (acc.getRole()) {
                 case ADMIN:
                     int adminId = empDAO.getEmployeeId(acc.getAccount_id(), "admin");
                     acc.setEmployeeId(adminId);
@@ -123,15 +135,15 @@ public class LoginController extends HttpServlet {
                 case CUSTOMER:
                     CustomerDAO customerDAO = new CustomerDAO();
                     Customer customer = customerDAO.getCustomerProfile(acc.getAccount_id());
-                    session.setAttribute("customer",customer);
+                    session.setAttribute("customer", customer);
                     response.sendRedirect(contextPath);
                     return;
-                          
+
             }
         }
-        
-        request.setAttribute("errorMessage","Hãy đăng nhập lại");
-        request.setAttribute("authMode","login");
+
+        request.setAttribute("errorMessage", "Hãy đăng nhập lại");
+        request.setAttribute("authMode", "login");
         request.setAttribute("username", username);
         request.getRequestDispatcher("/WEB-INF/views/public/login-signup.jsp").forward(request, response);
     }

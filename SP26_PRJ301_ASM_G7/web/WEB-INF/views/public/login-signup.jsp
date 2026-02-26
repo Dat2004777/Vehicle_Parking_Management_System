@@ -67,7 +67,7 @@
                         <div class="mb-3">
                             <label class="form-label fw-bold">Email</label>
                             <input name="email" 
-                                  value="${email}" id="email" type="email" class="form-control" placeholder="Enter Email" required>
+                                   value="${email}" id="email" type="email" class="form-control" placeholder="Enter Email" required>
                             <span id="emailError" class="text-danger d-block mt-2">${errorEmail}</span>
                         </div>
 
@@ -97,9 +97,14 @@
                             </div>
                             <span id="confirmPasswordError" class="text-danger d-block mt-2">${errorPassConfirm}</span>
                         </div>
-
+                        <a href="${pageContext.request.contextPath}" class="text-primary text-decoration-none fw-medium"
+                           style="font-size: 0.875rem;">Quay lại trang chủ</a>
                         <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
                     </form>
+                    <!--Error message-->
+                    <div class="text-center mt-3">
+                        <span class="text-danger fw-semibold">${errorMessage}</span>
+                    </div>
                 </div>
             </div>
 
@@ -128,9 +133,9 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <a href="#" class="text-primary text-decoration-none fw-medium"
+                            <a href="${pageContext.request.contextPath}" class="text-primary text-decoration-none fw-medium"
                                style="font-size: 0.875rem;">Quay lại trang chủ</a>
-                               
+
                             <a href="#" class="text-primary text-decoration-none fw-medium"
                                style="font-size: 0.875rem;">Quên mật khẩu?</a>
                         </div>
