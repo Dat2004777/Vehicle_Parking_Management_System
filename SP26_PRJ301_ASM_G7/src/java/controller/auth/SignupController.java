@@ -111,6 +111,17 @@ public class SignupController extends HttpServlet {
         password = password.trim();
         confirmPassword = confirmPassword.trim();
 
+        //Check Rỗng
+        if (username.isBlank() || firstname.isBlank() || lastname.isBlank()
+                || email.isBlank() || phone.isBlank()
+                || password.isBlank() || confirmPassword.isBlank()) {
+            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ thông tin!");
+            request.setAttribute("authMode", "signup");
+            request.getRequestDispatcher("/WEB-INF/views/public/login-signup.jsp")
+                    .forward(request, response);
+            return;
+        }
+
         AccountDAO accDAO = new AccountDAO();
         CustomerDAO customerDAO = new CustomerDAO();
 

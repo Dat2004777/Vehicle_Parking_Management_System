@@ -90,7 +90,7 @@ public class LoginController extends HttpServlet {
         String password = request.getParameter("password");
 
         // Check null trước
-        if (username == null || password == null) {
+        if (username == null || password == null || username.isBlank() || password.isBlank()) {
             request.setAttribute("errorMessage", "Thiếu thông tin đăng nhập");
             request.setAttribute("authMode", "login");
             request.getRequestDispatcher("/WEB-INF/views/public/login-signup.jsp")
