@@ -239,26 +239,28 @@
                     <button class="btn btn-light border-0 bg-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
                         <i class="bi bi-list fs-4"></i>
                     </button>
-                    <div class="d-none d-sm-block">
+                    <div class="d-sm-block">
                         <div class="fw-bold fs-5" style="line-height: 1.2; color: #1e293b;">${stats.siteName}</div>
                     </div>
                 </div>
 
-                <div class="header-clock d-none d-md-flex align-items-center gap-2">
+                <div class="header-clock d-md-flex align-items-center gap-2">
                     <i class="bi bi-clock"></i>
                     <span id="realtimeClock">00:00:00</span> - <span id="realtimeDate">--/--/----</span>
                 </div>
 
                 <div class="d-flex align-items-center gap-4">
-                    ${errorMsg}
-                    ${successMsg}
 
                 </div>
             </div>
         </nav>
 
         <main class="container-fluid d-flex align-items-center justify-content-center" style="max-width: 1400px; min-height: calc(100vh - 80px); padding: 2rem 15px;">
-
+            <%-- [QUAN TRỌNG] Trích xuất message ra biến cục bộ và xóa session ngay lập tức --%>
+            <c:set var="errMsg" value="${sessionScope.errorMsg}" />
+            <c:set var="sucMsg" value="${sessionScope.successMsg}" />
+            <c:remove var="errorMsg" scope="session"/>
+            <c:remove var="successMsg" scope="session"/>
             <div class="row g-4 w-100 align-items-center">
 
                 <div class="col-12 d-lg-none order-1">
@@ -284,6 +286,29 @@
                             </div>
                         </div>
                     </div>
+
+                    <c:if test="${not empty errMsg or not empty sucMsg}">
+                        <div class="alert-wrapper mb-2" style="max-height: 120px; overflow-y: auto; scrollbar-width: thin;">
+                            <c:if test="${not empty errMsg}">
+                                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-start mb-0 py-2 px-3 shadow-sm" role="alert" style="border-radius: 10px; border-left: 4px solid #dc3545;">
+                                    <i class="bi bi-exclamation-triangle-fill fs-5 me-2 text-danger mt-1"></i>
+                                    <div class="flex-grow-1 pe-3">
+                                        <span style="font-size: 0.9rem; line-height: 1.3; display: block;" class="mt-1 fw-medium">${errMsg}</span>
+                                    </div>
+                                    <button type="button" class="btn-close p-2 m-1" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                                </div>
+                            </c:if>
+                            <c:if test="${not empty sucMsg}">
+                                <div class="alert alert-success alert-dismissible fade show d-flex align-items-start mb-0 py-2 px-3 shadow-sm" role="alert" style="border-radius: 10px; border-left: 4px solid #198754;">
+                                    <i class="bi bi-check-circle-fill fs-5 me-2 text-success mt-1"></i>
+                                    <div class="flex-grow-1 pe-3">
+                                        <span style="font-size: 0.9rem; line-height: 1.3; display: block;" class="mt-1 fw-medium">${sucMsg}</span>
+                                    </div>
+                                    <button type="button" class="btn-close p-2 m-1" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                                </div>
+                            </c:if>
+                        </div>
+                    </c:if>
                 </div>
 
                 <div class="col-lg-8 order-2 order-lg-1">
@@ -398,12 +423,65 @@
                                 </button>
                             </form>
 
+
+
                         </div>
+
                     </div>
 
                 </div>
 
                 <div class="col-lg-4 order-3 order-lg-2 d-flex flex-column gap-3">
+                    <c:if test="${not empty errMsg or not empty sucMsg}">
+                        <div class="alert-wrapper d-none d-lg-block" style="max-height: 120px; overflow-y: auto; scrollbar-width: thin;">
+                            <c:if test="${not empty errMsg}">
+                                <div class="alert alert-danger alert-dismissible fade show d-flex align-items-start mb-0 py-2 px-3 shadow-sm" role="alert" style="border-radius: 10px; border-left: 4px solid #dc3545;">
+                                    <i class="bi bi-exclamation-triangle-fill fs-5 me-2 text-danger mt-1"></i>
+                                    <div class="flex-grow-1 pe-3">
+                                        <span style="font-size: 0.95rem; line-height: 1.3; display: block;" class="mt-1 fw-medium">${errMsg}</span>
+                                    </div>
+                                    <button type="button" class="btn-close p-2 m-1" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                                </div>
+                            </c:if>
+                            <c:if test="${not empty sucMsg}">
+                                <div class="alert alert-success alert-dismissible fade show d-flex align-items-start mb-0 py-2 px-3 shadow-sm" role="alert" style="border-radius: 10px; border-left: 4px solid #198754;">
+                                    <i class="bi bi-check-circle-fill fs-5 me-2 text-success mt-1"></i>
+                                    <div class="flex-grow-1 pe-3">
+                                        <span style="font-size: 0.95rem; line-height: 1.3; display: block;" class="mt-1 fw-medium">${sucMsg}</span>
+                                    </div>
+                                    <button type="button" class="btn-close p-2 m-1" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                                </div>
+                            </c:if>
+                        </div>
+                    </c:if>
+                    <div class="alert-wrapper mt-lg-0 mt-3" style="max-height: 120px; overflow-y: auto; scrollbar-width: thin;">
+
+                        <%-- Bắt lỗi (Error) --%>
+                        <c:if test="${not empty sessionScope.errorMsg}">
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-start mb-0 py-2 px-3 shadow-sm" role="alert" style="border-radius: 10px; border-left: 4px solid #dc3545;">
+                                <i class="bi bi-exclamation-triangle-fill fs-5 me-2 text-danger mt-1"></i>
+                                <div class="flex-grow-1 pe-3">
+                                    <span style="font-size: 1rem; line-height: 1.3; display: block;" class="mt-1">${sessionScope.errorMsg}</span>
+                                </div>
+                                <button type="button" class="btn-close p-2 m-1" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                            </div>
+                            <%-- Xóa message khỏi session để không bị hiện lại khi F5 --%>
+                            <c:remove var="errorMsg" scope="session"/>
+                        </c:if>
+
+                        <%-- Báo thành công (Success) --%>
+                        <c:if test="${not empty sessionScope.successMsg}">
+                            <div class="alert alert-success alert-dismissible fade show d-flex align-items-start mb-0 py-2 px-3 shadow-sm" role="alert" style="border-radius: 10px; border-left: 4px solid #198754;">
+                                <i class="bi bi-check-circle-fill fs-5 me-2 text-success mt-1"></i>
+                                <div class="flex-grow-1 pe-3">
+                                    <span style="font-size: 1rem; line-height: 1.3; display: block;" class="mt-1">${sessionScope.successMsg}</span>
+                                </div>
+                                <button type="button" class="btn-close p-2 m-1" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
+                            </div>
+                            <%-- Xóa message khỏi session --%>
+                            <c:remove var="successMsg" scope="session"/>
+                        </c:if>
+                    </div>
 
                     <div class="card shadow-sm border-0 d-none d-lg-block" style="border-radius: 16px;">
                         <div class="card-body p-3 p-xl-4">
@@ -536,7 +614,7 @@
                         </div>
 
                         <div class="card-footer bg-white border-top text-center py-2" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
-                            <a href="${pageContext.request.contextPath}/staff/history" class="text-decoration-none fw-bold text-primary" style="font-size: 0.8rem;">
+                            <a href="${ctx}/parking/history" class="text-decoration-none fw-bold text-primary" style="font-size: 0.8rem;">
                                 Xem toàn bộ <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
@@ -631,6 +709,52 @@
                                             }
                                             form.submit();
                                         };
+
+                                        // ==========================================
+// BẮT SỰ KIỆN PHÍM TẮT TOÀN CỤC (HOTKEYS)
+// ==========================================
+                                        document.addEventListener('keydown', function (e) {
+
+                                            // 1. Phím F1: Chuyển sang Check-in VÀ tự động lấy thẻ Random
+                                            if (e.key === 'F1') {
+                                                e.preventDefault(); // Chặn popup Help mặc định của trình duyệt
+                                                switchMode('in');
+                                            }
+
+                                            // 2. Phím F2: Chuyển sang Check-out
+                                            else if (e.key === 'F2') {
+                                                e.preventDefault();
+                                                switchMode('out');
+                                            }
+
+                                            // 3. Phím Space: Lấy thẻ Random
+                                            else if (e.code === 'Tab') {
+                                                // Kỹ thuật an toàn: Kiểm tra xem user có đang gõ text vào ô Input không
+                                                e.preventDefault(); // Chặn hành vi cuộn trang xuống của phím Space
+                                                const actionType = document.getElementById('actionType').value;
+                                                if (actionType === 'checkin') {
+                                                    fetchRandomCard();
+                                                }
+
+                                            }
+
+                                            // 4. Phím Enter: Xác nhận (Submit Form)
+                                            else if (e.key === 'Enter') {
+                                                e.preventDefault(); // Chặn hành vi submit mặc định để qua bước validate của mình
+
+                                                // UX thông minh: 
+                                                // - Nếu nhân viên vừa quét xong thẻ (đang đứng ở ô cardId) -> Enter nhảy sang ô Biển số
+                                                // - Nếu không phải -> Thực hiện Submit luôn
+                                                const cardIdInput = document.getElementById('cardId');
+                                                const plateInput = document.getElementById('licensePlate');
+
+                                                if (document.activeElement === cardIdInput && cardIdInput.value.trim() !== '') {
+                                                    plateInput.focus();
+                                                } else {
+                                                    submitForm();
+                                                }
+                                            }
+                                        });
 
                                         // 5. Auto focus thông minh & an toàn
 // (Chỉ focus lại nếu click ra ngoài các vùng tương tác)
