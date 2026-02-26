@@ -37,14 +37,14 @@ public class SubscriptionDAO extends DBContext {
         return totalSubscription;
     }
     
-    public int getTotalSubscriptionByCurrentMonth(int siteId) {
+    public int getTotalSubscriptionInCurrentMonthById(int siteId) {
         String sql = """
-                     SELECT COUNT(s.subscription_id) as total_subscription
-                     FROM Subscriptions s
-                     JOIN ParkingCard pc ON s.card_id = pc.card_id
-                     WHERE MONTH(s.start_date) = MONTH(GETDATE()) 
-                     	AND YEAR(s.start_date) = YEAR(GETDATE())
-                        AND pc.site_id = ?
+                    SELECT COUNT(s.subscription_id) as total_subscription
+                    FROM Subscriptions s
+                    JOIN ParkingCards pc ON s.card_id = pc.card_id
+                    WHERE MONTH(s.start_date) = MONTH(GETDATE()) 
+                          AND YEAR(s.start_date) = YEAR(GETDATE())
+                       AND pc.site_id = ?
                      """;
 
         int totalSubscription = 0;
@@ -58,7 +58,7 @@ public class SubscriptionDAO extends DBContext {
                 totalSubscription = rs.getInt("total_subscription");
             }
         } catch (Exception e) {
-            System.out.println("Error SubscriptionDAO.getTotalSubscriptionByCurrentMonth: " + e.getMessage());
+            System.out.println("Error SubscriptionDAO.getTotalSubscriptionInCurrentMonthById: " + e.getMessage());
         }
 
         return totalSubscription;

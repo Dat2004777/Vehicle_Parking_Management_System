@@ -65,19 +65,19 @@ public class PaymentTransactionDAO extends DBContext {
 
     public long getTotalAmountInCurrentMonthById(int siteId) {
         String sql = """
-                    SELECT SUM(pt.amount) as total_amount
+                    SELECT SUM(pt.total_amount) as total_amount
                     FROM PaymentTransactions pt
-                    LEFT JOIN Booking b ON pt.booking_id = b.booking_id
-                    LEFT JOIN MonthlySubscription ms ON pt.subscription_id = ms.subscription_id
-                    LEFT JOIN ParkingSession ps ON pt.session_id = ps.session_id
-                    LEFT JOIN ParkingCard pc ON pc.card_id = COALESCE(b.card_id, ms.card_id, ps.card_id)
+                    LEFT JOIN Bookings b ON pt.booking_id = b.booking_id
+                    LEFT JOIN Subscriptions ms ON pt.subscription_id = ms.subscription_id
+                    LEFT JOIN ParkingSessions ps ON pt.session_id = ps.session_id
+                    LEFT JOIN ParkingCards pc ON pc.card_id = COALESCE(b.card_id, ms.card_id, ps.card_id)
                     WHERE MONTH(pt.payment_date) = MONTH(GETDATE()) 
                         AND YEAR(pt.payment_date) = YEAR(GETDATE())
                         AND pc.site_id = ?
                     """;
 
         long totalAmount = 0;
-        System.out.println(siteId);
+
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, siteId);
@@ -107,7 +107,7 @@ public class PaymentTransactionDAO extends DBContext {
                       AND payment_date <  DATEADD(DAY, 9 - DATEPART(WEEKDAY, GETDATE()), CAST(GETDATE() AS DATE)) -- Kết thúc hết Chủ nhật tuần này
                     GROUP BY DATEPART(WEEKDAY, payment_date)
                     ORDER BY (DATEPART(WEEKDAY, payment_date) + 5) % 7; -- Sắp xếp để Thứ 2 luôn đứng đầu
-                     """; // Câu query ở trên
+                     """;
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -122,8 +122,62 @@ public class PaymentTransactionDAO extends DBContext {
                 weeklyData[index] = amount;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Error PaymentTransactionDAO.getWeeklyRevenue: " + e.getMessage());
         }
+        return Arrays.asList(weeklyData);
+    }
+
+    public List<Long> getWeeklyRevenueBySiteId(int siteId) {
+        // Khởi tạo danh sách 7 phần tử với giá trị 0 (Từ T2 đến CN)
+        Long[] weeklyData = {0L, 0L, 0L, 0L, 0L, 0L, 0L};
+
+        String sql = """
+            SELECT 
+                DATEPART(WEEKDAY, pt.payment_date) as DayID,
+                SUM(pt.total_amount) as DailyRevenue
+            FROM PaymentTransactions pt
+                        
+            -- 1. Tìm site_id nếu đây là giao dịch Vé Lượt (Session)
+            LEFT JOIN ParkingSessions sess ON pt.session_id = sess.session_id
+            LEFT JOIN ParkingCards card_sess ON sess.card_id = card_sess.card_id
+                        
+            -- 2. Tìm site_id nếu đây là giao dịch Vé Tháng (Subscription)
+            LEFT JOIN Subscriptions sub ON pt.subscription_id = sub.subscription_id
+            LEFT JOIN ParkingCards card_sub ON sub.card_id = card_sub.card_id -- ĐÃ SỬA: Join với ParkingCards
+                        
+            -- 3. Tìm site_id nếu đây là giao dịch Đặt chỗ online (Booking)
+            LEFT JOIN Bookings bk ON pt.booking_id = bk.booking_id
+            LEFT JOIN ParkingCards card_bk ON bk.card_id = card_bk.card_id
+                        
+            WHERE pt.payment_date >= DATEADD(DAY, 2 - DATEPART(WEEKDAY, GETDATE()), CAST(GETDATE() AS DATE))
+              AND pt.payment_date <  DATEADD(DAY, 9 - DATEPART(WEEKDAY, GETDATE()), CAST(GETDATE() AS DATE))
+              AND pt.payment_status = 'completed' -- Chỉ tính các giao dịch đã thu tiền thành công
+              
+              -- ĐÃ SỬA: COALESCE quét qua 3 nguồn thẻ để lấy ra site_id
+              AND COALESCE(card_sess.site_id, card_sub.site_id, card_bk.site_id) = ?
+                          
+            GROUP BY DATEPART(WEEKDAY, pt.payment_date)
+            ORDER BY (DATEPART(WEEKDAY, pt.payment_date) + 5) % 7;
+            """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, siteId); // Truyền tham số siteId vào dấu ?
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int dayId = rs.getInt("DayID"); // 1=CN, 2=T2, 3=T3...
+                    long amount = rs.getLong("DailyRevenue");
+
+                    // Chuyển DayID của SQL sang index của mảng Java (T2 là index 0)
+                    int index = (dayId == 1) ? 6 : (dayId - 2);
+                    weeklyData[index] = amount;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error PaymentTransactionDAO.getWeeklyRevenueBySiteId: " + e.getMessage());
+        }
+
         return Arrays.asList(weeklyData);
     }
 }

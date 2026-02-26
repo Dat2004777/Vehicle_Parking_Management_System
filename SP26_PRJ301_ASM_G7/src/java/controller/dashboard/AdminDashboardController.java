@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import model.dto.DashboardDTO;
+import model.dto.SiteDensityDTO;
 import utils.UrlConstants;
 import utils.ValidationUtils;
 
@@ -23,7 +24,7 @@ import utils.ValidationUtils;
  *
  * @author dat20
  */
-@WebServlet(name = "AdminDashboardController", urlPatterns = {UrlConstants.URL_ADMIN + "/dashboard"})
+@WebServlet(name = "AdminDashboardController", urlPatterns = {UrlConstants.URL_ADMIN + "/dashboard", UrlConstants.URL_ADMIN})
 public class AdminDashboardController extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -54,6 +55,8 @@ public class AdminDashboardController extends HttpServlet {
                     subscriptionDAO.getTotalSubscriptionByCurrentMonth(),
                     siteDAO.getAllActiveSites());
             List<Long> chartData = paymentTransactionDAO.getWeeklyRevenue();
+            List<SiteDensityDTO> siteDensityDTOs = siteDAO.getSiteDensities();
+            request.setAttribute("siteDensityDTOs", siteDensityDTOs);
             request.setAttribute("chartData", chartData);
             request.setAttribute("dashboardDTO", dashboardDTO);
         } else {
@@ -62,9 +65,11 @@ public class AdminDashboardController extends HttpServlet {
                 DashboardDTO dashboardDTO = new DashboardDTO(
                         paymentTransactionDAO.getTotalAmountInCurrentMonthById(siteId),
                         parkingSessionDAO.getCurrentParkedVehiclesInCurrentMonthById(siteId),
-                        subscriptionDAO.getTotalSubscriptionByCurrentMonth(siteId),
+                        subscriptionDAO.getTotalSubscriptionInCurrentMonthById(siteId),
                         siteDAO.getAllActiveSites());
-                List<Long> chartData = paymentTransactionDAO.getWeeklyRevenue();
+                List<Long> chartData = paymentTransactionDAO.getWeeklyRevenueBySiteId(siteId);
+                List<SiteDensityDTO> siteDensityDTOs = siteDAO.getSiteDensitiesById(siteId);
+                request.setAttribute("siteDensityDTOs", siteDensityDTOs);
                 request.setAttribute("chartData", chartData);
                 request.setAttribute("dashboardDTO", dashboardDTO);
                 request.setAttribute("siteId", siteId);

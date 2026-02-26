@@ -6,7 +6,6 @@ package controller.site.adminSite;
 
 import dal.SiteDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -38,11 +37,12 @@ public class adminSiteController extends HttpServlet {
         SiteDAO siteDAO = new SiteDAO();
 
         List<ParkingSite> parkingSites = siteDAO.getAllActiveSites();
-
+        int totalSites = parkingSites.size();
+        
+        request.setAttribute("totalSites", totalSites);
         request.setAttribute("parkingSites", parkingSites);
 
         request.getRequestDispatcher("/WEB-INF/views/site/admin/list.jsp").forward(request, response);
-        System.out.println("Test lỗi adminSite");
     }
 
     /**

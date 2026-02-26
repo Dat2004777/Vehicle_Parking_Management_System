@@ -408,7 +408,7 @@
 
             @media (max-width: 767.98px) {
                 .search-container {
-                    display: none;
+                    width: 100%;
                 }
                 .table-controls {
                     flex-direction: column;
@@ -430,34 +430,19 @@
                     <button id="mobileToggle" aria-label="Toggle menu">
                         <i class="bi bi-list"></i>
                     </button>
-                    <h1 class="page-title">Quản Lý Bãi Đỗ Xe</h1>
+                    <h1 class="page-title">Danh Sách Bãi Xe</h1>
                 </div>
 
-                <div class="header-actions">
-                    <!-- Phục hồi lại Search Input tiêu chuẩn như ảnh mới -->
-                    <div class="search-container">
-                        <i class="bi bi-search"></i>
-                        <input type="text" class="search-input" placeholder="Tìm kiếm bãi xe, địa chỉ...">
-                    </div>
-
-                    <button class="btn-icon">
-                        <i class="bi bi-bell"></i>
-                        <span class="notification-dot"></span>
-                    </button>
-                    <button class="btn-icon">
-                        <i class="bi bi-gear"></i>
-                    </button>
-                </div>
             </header>
 
             <!-- Content Area -->
             <div class="content-area">
 
                 <!-- Header Section -->
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-                    <div>
-                        <h2 class="fs-4 fw-bold text-dark mb-1">Danh Sách Bãi Xe</h2>
-                        <p class="text-muted mb-0" style="font-size: 0.875rem;">Quản lý thông tin và trạng thái các bãi đỗ xe trong hệ thống.</p>
+                <div class="d-flex flex-column flex-md-row align-items-md-center mb-4 gap-3">
+                    <div class="search-container">
+                        <i class="bi bi-search"></i>
+                        <input type="text" class="search-input" placeholder="Tìm kiếm bãi xe, địa chỉ...">
                     </div>
                     <button class="btn btn-primary d-flex align-items-center gap-2 px-3 fw-medium">
                         <i class="bi bi-plus-lg"></i> Thêm bãi xe mới
@@ -471,7 +456,7 @@
                             <div class="summary-icon icon-total"><i class="bi bi-building"></i></div>
                             <div>
                                 <div class="summary-title">Tổng số bãi xe</div>
-                                <div class="summary-value">12</div>
+                                <div class="summary-value">${totalSites}</div>
                             </div>
                         </div>
                     </div>
@@ -680,7 +665,7 @@
                                         <td class="text-center fw-bold text-dark">80</td>
                                         <td class="text-center fw-bold text-dark">68</td>
                                         <td>
-                                            <span class="custom-badge badge-active"><span class="dot dot-green"></span> ${site.siteStatus.label}</span>
+                                            <span class="custom-badge badge-active"><span class="dot dot-green"></span> ${site.siteState.label}</span>
                                         </td>
                                         <td class="text-end action-btns">
                                             <button class="btn-icon-sm"><i class="bi bi-eye"></i></button>

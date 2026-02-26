@@ -436,7 +436,7 @@
                                 <div class="stat-card-title">Tổng doanh thu</div>
                                 <div class="stat-icon icon-blue"><i class="bi bi-cash-stack"></i></div>
                             </div>
-                            <div class="stat-card-value"><fmt:formatNumber value="${dashboardDTO.totalAmount}" type="number" pattern="#,##0"/> VNĐ</div>
+                            <div class="stat-card-value"><fmt:formatNumber value="${dashboardDTO.totalAmount}" type="number" pattern="#,##0"/> đ</div>
                             <!--                            <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.875rem;">
                                                             <span class="trend-badge"><i class="bi bi-arrow-up-right"></i> +12.5%</span> 
                                                             <span>so với tháng trước</span>
@@ -506,45 +506,93 @@
                         <div class="custom-card">
                             <h3 class="card-title-h3 mb-4">Mật độ bãi xe</h3>
 
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between text-sm mb-1">
-                                    <span class="fw-medium text-dark">Nhà xe phía Bắc (A)</span>
-                                    <span class="text-muted small">230/250</span>
-                                </div>
-                                <div class="custom-progress">
-                                    <div class="custom-progress-bar pg-red" style="width: 92%"></div>
-                                </div>
-                            </div>
+                            <!--                            <div class="mb-4">
+                                                            <div class="d-flex justify-content-between text-sm mb-1">
+                                                                <span class="fw-medium text-dark">Nhà xe phía Bắc (A)</span>
+                                                                <span class="text-muted small">230/250</span>
+                                                            </div>
+                                                            <div class="custom-progress">
+                                                                <div class="custom-progress-bar pg-red" style="width: 92%"></div>
+                                                            </div>
+                                                        </div>
+                            
+                                                        <div class="mb-4">
+                                                            <div class="d-flex justify-content-between text-sm mb-1">
+                                                                <span class="fw-medium text-dark">Bãi xe phía Nam (B)</span>
+                                                                <span class="text-muted small">145/300</span>
+                                                            </div>
+                                                            <div class="custom-progress">
+                                                                <div class="custom-progress-bar pg-blue" style="width: 48%"></div>
+                                                            </div>
+                                                        </div>
+                            
+                                                        <div class="mb-4">
+                                                            <div class="d-flex justify-content-between text-sm mb-1">
+                                                                <span class="fw-medium text-dark">Tầng hầm (VIP)</span>
+                                                                <span class="text-muted small">45/50</span>
+                                                            </div>
+                                                            <div class="custom-progress">
+                                                                <div class="custom-progress-bar pg-orange" style="width: 90%"></div>
+                                                            </div>
+                                                        </div>
+                            
+                                                        <div>
+                                                            <div class="d-flex justify-content-between text-sm mb-1">
+                                                                <span class="fw-medium text-dark">Khu vực khách</span>
+                                                                <span class="text-muted small">12/80</span>
+                                                            </div>
+                                                            <div class="custom-progress">
+                                                                <div class="custom-progress-bar pg-green" style="width: 15%"></div>
+                                                            </div>
+                                                        </div>-->
+                            <c:forEach items="${siteDensityDTOs}" var="site">
+                                <div class="mb-4">
 
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between text-sm mb-1">
-                                    <span class="fw-medium text-dark">Bãi xe phía Nam (B)</span>
-                                    <span class="text-muted small">145/300</span>
-                                </div>
-                                <div class="custom-progress">
-                                    <div class="custom-progress-bar pg-blue" style="width: 48%"></div>
-                                </div>
-                            </div>
+                                    <c:choose>
+                                        <%-- TRƯỜNG HỢP 1: TẤT CẢ CÁC BÃI (siteId = 0 hoặc null) -> Hiện tổng quan --%>
+                                        <c:when test="${empty siteId or siteId == 0}">
+                                            <div class="d-flex justify-content-between text-sm mb-1">
+                                                <span class="fw-medium text-dark"><i class="bi bi-building"></i> ${site.siteName}</span>
+                                                <span class="text-muted small">${site.currentParked}/${site.maxCapacity}</span>
+                                            </div>
 
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between text-sm mb-1">
-                                    <span class="fw-medium text-dark">Tầng hầm (VIP)</span>
-                                    <span class="text-muted small">45/50</span>
-                                </div>
-                                <div class="custom-progress">
-                                    <div class="custom-progress-bar pg-orange" style="width: 90%"></div>
-                                </div>
-                            </div>
+                                            <div class="custom-progress">
+                                                <div class="custom-progress-bar ${site.densityPercentage > 90 ? 'pg-red' : site.densityPercentage > 75 ? 'pg-orange' : site.densityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
+                                                     style="width: ${site.densityPercentage}%">
+                                                </div>
+                                            </div>
+                                        </c:when>
 
-                            <div>
-                                <div class="d-flex justify-content-between text-sm mb-1">
-                                    <span class="fw-medium text-dark">Khu vực khách</span>
-                                    <span class="text-muted small">12/80</span>
+                                        <%-- TRƯỜNG HỢP 2: CHI TIẾT 1 BÃI (siteId > 0) -> Chỉ hiện Ô tô và Xe máy --%>
+                                        <c:otherwise>
+                                            <div class="mb-3">
+                                                <div class="d-flex justify-content-between text-sm mb-1">
+                                                    <span class="fw-medium text-dark"><i class="bi bi-car-front"></i> Khu vực Ô tô</span>
+                                                    <span class="text-muted small">${site.carCurrentParked}/${site.carMaxCapacity}</span>
+                                                </div>
+                                                <div class="custom-progress" style="height: 6px;">
+                                                    <div class="custom-progress-bar ${site.carDensityPercentage > 90 ? 'pg-red' : site.carDensityPercentage > 75 ? 'pg-orange' : site.carDensityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
+                                                         style="width: ${site.carDensityPercentage}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <div class="d-flex justify-content-between text-sm mb-1">
+                                                    <span class="fw-medium text-dark"><i class="bi bi-bicycle"></i> Khu vực Xe máy</span>
+                                                    <span class="text-muted small">${site.motoCurrentParked}/${site.motoMaxCapacity}</span>
+                                                </div>
+                                                <div class="custom-progress" style="height: 6px;">
+                                                    <div class="custom-progress-bar ${site.motoDensityPercentage > 90 ? 'pg-red' : site.motoDensityPercentage > 75 ? 'pg-orange' : site.motoDensityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
+                                                         style="width: ${site.motoDensityPercentage}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
+
                                 </div>
-                                <div class="custom-progress">
-                                    <div class="custom-progress-bar pg-green" style="width: 15%"></div>
-                                </div>
-                            </div>
+                            </c:forEach>
                         </div>
                     </div>
                 </div>
