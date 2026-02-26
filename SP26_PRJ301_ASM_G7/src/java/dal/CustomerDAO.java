@@ -34,7 +34,7 @@ public class CustomerDAO extends DBContext {
             System.out.println("Lỗi thêm giá trị Customer");
         }
     }
-    
+
     public Customer getCustomerProfile(int account_id) {
         String sql
                 = """
@@ -64,6 +64,21 @@ public class CustomerDAO extends DBContext {
             System.out.println("Lỗi lấy dữ liệu user");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public boolean isEmailExist(String email) {
+        String sql = "SELECT 1 FROM Customers WHERE email = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            return rs.next(); 
+
+        } catch (Exception e) {
+            System.out.println("Lỗi lấy user-email");
+            e.printStackTrace();
+            return false;
         }
     }
 }

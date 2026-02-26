@@ -66,7 +66,8 @@
                         <!-- Email -->
                         <div class="mb-3">
                             <label class="form-label fw-bold">Email</label>
-                            <input name="email" id="email" type="email" class="form-control" placeholder="Enter Email" required>
+                            <input name="email" 
+                                  value="${email}" id="email" type="email" class="form-control" placeholder="Enter Email" required>
                             <span id="emailError" class="text-danger d-block mt-2">${errorEmail}</span>
                         </div>
 
