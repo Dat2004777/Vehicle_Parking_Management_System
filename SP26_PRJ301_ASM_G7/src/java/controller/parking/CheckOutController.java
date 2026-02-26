@@ -129,6 +129,6 @@ public class CheckOutController extends HttpServlet {
         java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###");
         String formattedFee = formatter.format(feeToCollect);
 
-        return "Xe " + inputPlate + " ra bãi thành công. Thu phí: " + formattedFee + " VNĐ";
+        return "Xe " + inputPlate + " ra bãi thành công. <br>Thu phí: " + formattedFee + " VNĐ";
     }
 }

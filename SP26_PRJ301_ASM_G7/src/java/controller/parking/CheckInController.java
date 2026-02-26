@@ -74,8 +74,26 @@ public class CheckInController extends HttpServlet {
             throw new Exception("Vui lòng nhập đầy đủ Mã thẻ và Biển số!");
         }
 
+        boolean isValidFormat = false;
+
+        // Giả sử: vehicleTypeId == 1 (Xe máy), vehicleTypeId == 2 (Ô tô)
+        if (vehicleTypeId == 2) {
+            isValidFormat = ValidationUtils.isValidMotorbikePlate(licensePlate);
+            if (!isValidFormat) {
+                throw new Exception("Sai định dạng biển số Xe Máy! (VD chuẩn: 29H1-12345)");
+            }
+        } else if (vehicleTypeId == 1) {
+            isValidFormat = ValidationUtils.isValidCarPlate(licensePlate);
+            if (!isValidFormat) {
+                throw new Exception("Sai định dạng biển số Ô Tô! (VD chuẩn: 30A-12345)");
+            }
+        }
+
+        // Dọn dẹp biển số (xóa dấu chấm, khoảng trắng) trước khi lưu vào DB để dữ liệu đồng nhất 100%
+        licensePlate = ValidationUtils.cleanLicensePlate(licensePlate);
+
         if (vehicleTypeId == -1) {
-            throw new Exception("Bãi xe đã hết chỗ cho loại xe này. Không thể cho xe vào!");
+            throw new Exception("Bãi xe đã hết chỗ cho loại xe này. \nKhông thể cho xe vào!");
         }
 
         // 2. Kiểm tra Thẻ (Validation)
@@ -138,6 +156,6 @@ public class CheckInController extends HttpServlet {
         cardDAO.updateState(cardId, ParkingCard.State.USING);
 
         // 6. Trả về thông báo thành công
-        return "Check-in thành công: " + licensePlate + " (Được xếp vào " + targetArea.getAreaName() + ")";
+        return "Check-in thành công: " + licensePlate + " <br>(Được xếp vào " + targetArea.getAreaName() + ")";
     }
 }

@@ -1,5 +1,7 @@
 package utils;
 
+import java.util.regex.Pattern;
+
 /**
  * Lớp tiện ích (Utility class) hỗ trợ việc xác thực (validate) và ép kiểu dữ
  * liệu đầu vào. Lớp này được thiết kế theo tư duy Fail-Fast: Ném ra
@@ -149,5 +151,48 @@ public class ValidationUtils {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(errorMessage + " (Giá trị lựa chọn không hợp lệ)");
         }
+    }
+
+    /**
+     * REGEX XE MÁY: - ^[1-9][0-9] : 2 số đầu mã tỉnh (từ 11 đến 99) - [A-Z] : 1
+     * chữ cái in hoa (Series chữ) - [A-Z0-9] : 1 số hoặc 1 chữ (Ví dụ: 29H1,
+     * hoặc 50AA cho xe <50cc) - - : Dấu gạch ngang bắt buộc - \d{4,5}$ : Kết
+     * thúc bằng 4 hoặc 5 chữ số (Biển cũ 4 số, biển mới 5 số)
+     */
+    private static final Pattern MOTORBIKE_PATTERN = Pattern.compile("^[1-9][0-9][A-Z][A-Z0-9]-\\d{4,5}$");
+
+    /**
+     * REGEX Ô TÔ: - ^[1-9][0-9] : 2 số đầu mã tỉnh - [A-Z]{1,2} : 1 hoặc 2 chữ
+     * cái (Ví dụ: 30A, 51LD, 29KT...) - - : Dấu gạch ngang bắt buộc - \d{4,5}$
+     * : Kết thúc bằng 4 hoặc 5 chữ số
+     */
+    private static final Pattern CAR_PATTERN = Pattern.compile("^[1-9][0-9][A-Z]{1,2}-\\d{4,5}$");
+
+    // Hàm kiểm tra biển số Xe Máy
+    public static boolean isValidMotorbikePlate(String licensePlate) {
+        if (licensePlate == null || licensePlate.trim().isEmpty()) {
+            return false;
+        }
+        // Chuẩn hóa: Đổi thành in hoa, xóa toàn bộ dấu chấm và khoảng trắng thừa
+        String normalizedPlate = licensePlate.toUpperCase().replaceAll("[\\s\\.]", "");
+        return MOTORBIKE_PATTERN.matcher(normalizedPlate).matches();
+    }
+
+    // Hàm kiểm tra biển số Ô tô
+    public static boolean isValidCarPlate(String licensePlate) {
+        if (licensePlate == null || licensePlate.trim().isEmpty()) {
+            return false;
+        }
+        // Chuẩn hóa: Đổi thành in hoa, xóa toàn bộ dấu chấm và khoảng trắng thừa
+        String normalizedPlate = licensePlate.toUpperCase().replaceAll("[\\s\\.]", "");
+        return CAR_PATTERN.matcher(normalizedPlate).matches();
+    }
+
+    // Hàm dùng để lấy ra biển số đã được "Dọn dẹp" sạch sẽ chuẩn format để lưu vào Database
+    public static String cleanLicensePlate(String licensePlate) {
+        if (licensePlate == null) {
+            return "";
+        }
+        return licensePlate.toUpperCase().replaceAll("[\\s\\.]", "");
     }
 }
