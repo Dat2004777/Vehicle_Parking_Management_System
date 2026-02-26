@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 <style>
-    
+
     /* --- Header / Navbar --- */
     .navbar {
         padding-top: 1rem;
@@ -77,7 +77,7 @@
     .user-dropdown {
         display: none;
         position: absolute;
-        top: 110%;
+        top: 100%;
         right: 0;
         left: auto;   /* thêm dòng này */
         background: white;
@@ -104,6 +104,7 @@
 
     @media (max-width: 991px) {
 
+
         .user-menu-container {
             flex-direction: column;   /* QUAN TRỌNG */
         }
@@ -116,10 +117,37 @@
             margin-top: 10px;
         }
 
+        /* 1. Đưa container chứa 2 nút về dạng cột và căn giữa */
+        .auth-buttons-mobile {
+            flex-direction: column;
+            width: 100%;
+            gap: 10px; /* Tạo khoảng cách giữa 2 nút */
+            margin-bottom: 1rem;
+        }
+
+        /* 2. Làm nút Đăng nhập full-width và căn giữa chữ */
+        .btn-login {
+            margin-right: 0 !important; /* Bỏ margin bên phải hiện tại */
+            width: 100%;
+            text-align: center;
+            padding: 0.75rem 0;
+            background-color: #f8f9fa;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            display: block;
+        }
+
+        /* 3. Làm nút Đăng ký full-width */
+        .btn-register {
+            width: 100%;
+            text-align: center;
+        }
+
     }
 
-    /* Hiển thị dropdown khi hover vào container */
-    .user-menu-container:hover .user-dropdown {
+    /* Hiển thị dropdown khi hover */
+    .avatar-trigger:hover + .user-dropdown,
+    .user-dropdown:hover {
         display: block;
     }
 
@@ -142,7 +170,7 @@
     }
 
     /* Khi hover vào container, mũi tên sẽ xoay 180 độ */
-    .user-menu-container:hover .arrow-icon {
+    .avatar-trigger:hover .arrow-icon {
         transform: rotate(180deg);
         color: var(--bs-primary);
     }
@@ -150,6 +178,55 @@
     /* Căn chỉnh lại menu để không bị lệch */
     .user-dropdown {
         top: 110%; /* Đẩy xuống một chút so với header */
+    }
+
+    @media (max-width: 991px) {
+
+        /* Container user full width */
+        .user-menu-container {
+            flex-direction: column;
+            align-items: flex-start !important;
+            width: 100%;
+            margin-top: 0.7rem;
+            padding-top: 0.7rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .email{
+            margin-left: 18px;
+        }
+        /* Avatar + tên */
+        .avatar-trigger {
+            display: none;
+        }
+
+        .avatar-wrapper {
+            display: none;
+        }
+
+        .avatar-circle {
+            display: none;
+        }
+
+        /* Ẩn mũi tên dropdown */
+        .arrow-icon {
+            display: none;
+        }
+
+        /* Hiển thị dropdown như block bình thường */
+        .user-dropdown {
+            display: block !important;
+            position: static;
+            width: 100%;
+            box-shadow: none;
+            padding: 0;
+        }
+
+
+        /* Ẩn phần "Xin chào" desktop */
+        .user-name-text {
+            display: none;
+        }
     }
 </style>
 
@@ -185,7 +262,7 @@
             <c:choose>
                 <%-- TRƯỜNG HỢP CHƯA ĐĂNG NHẬP --%>
                 <c:when test="${empty sessionScope.account}">
-                    <div class="d-flex align-items-center mt-3 mt-lg-0">
+                    <div class="d-flex align-items-center mt-3 mt-lg-0 auth-buttons-mobile">
                         <a href="${pageContext.request.contextPath}/login" class="btn-login">Đăng nhập</a>
                         <a href="${pageContext.request.contextPath}/signup" class="btn btn-primary btn-register">Đăng ký</a>
                     </div>
@@ -194,15 +271,18 @@
                 <%-- TRƯỜNG HỢP ĐÃ ĐĂNG NHẬP --%>
                 <c:otherwise>
                     <div class="user-menu-container d-flex align-items-center">
-                        <span class="user-name-text d-none d-lg-block">Xin chào, ${sessionScope.account.username}</span>
-
-                        <a href="${pageContext.request.contextPath}/customer-info" class="avatar-wrapper d-flex align-items-center gap-2 text-decoration-none">
-                            <div class="avatar-circle">
-                                <c:out value="${fn:substring(sessionScope.customer.firstname, 0, 1)}${fn:substring(sessionScope.customer.lastname, 0, 1)}" />
-                            </div>
-                            <i class="fa-solid fa-angle-down arrow-icon"></i>
-                        </a>
-
+                        <div class="d-flex flex-column align-items-center">
+                            <span class="user-name-text d-none d-lg-block fs-5">Xin chào, <span class="fw-bold text-dark">${sessionScope.customer.firstname} ${sessionScope.customer.lastname}</span></span>
+                            <span class="text-muted small email">${sessionScope.customer.email}</span>
+                        </div>
+                        <div class="avatar-trigger">
+                            <a href="${pageContext.request.contextPath}/customer-info" class="avatar-wrapper d-flex align-items-center gap-2 text-decoration-none">
+                                <div class="avatar-circle">
+                                    <c:out value="${fn:substring(sessionScope.customer.firstname, 0, 1)}${fn:substring(sessionScope.customer.lastname, 0, 1)}" />
+                                </div>
+                                <i class="fa-solid fa-angle-down arrow-icon"></i>
+                            </a>
+                        </div>
                         <div class="user-dropdown">
                             <div class="px-3 py-2 border-bottom mb-1">
                                 <small class="text-muted d-block">Tài khoản</small>
