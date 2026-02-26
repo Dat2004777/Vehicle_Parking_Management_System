@@ -89,6 +89,11 @@ public class CheckInController extends HttpServlet {
             throw new Exception("Thẻ này không thuộc thẩm quyền của bãi xe hiện tại!");
         }
 
+        // So sánh lisencePlate với xe trong session
+        if (sessionDAO.isVehicleInLot(licensePlate, siteId)) {
+            throw new Exception("Xe đã tồn tại trong bãi!");
+        }
+
         // Kiểm tra trạng thái thẻ (Phải là AVAILABLE mới được dùng)
         if (card.getState() != ParkingCard.State.AVAILABLE) {
             throw new Exception("Thẻ này đang được xe khác sử dụng hoặc đang bị khóa!");
@@ -123,7 +128,7 @@ public class CheckInController extends HttpServlet {
         newSession.setSessionType("casual");
         newSession.setSessionState("parked");
         // Thực hiện Insert xuống Database
-        boolean isSessionCreated = sessionDAO.checkIn(newSession); 
+        boolean isSessionCreated = sessionDAO.checkIn(newSession);
 
         if (!isSessionCreated) {
             throw new Exception("Lỗi hệ thống: Không thể tạo phiên đỗ xe!");

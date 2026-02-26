@@ -37,7 +37,7 @@ public class SessionDAO extends DBContext {
     // Thêm vào SessionDAO.java
     public int countActiveSessionsByArea(int areaId) {
         int count = 0;
-        String sql =  """
+        String sql = """
                      SELECT COUNT(*)
                      FROM ParkingSessions s
                      JOIN ParkingCards c ON s.card_id = c.card_id
@@ -160,6 +160,32 @@ public class SessionDAO extends DBContext {
     // ==========================================================
     // 2. CÁC HÀM TRUY VẤN (TÌM KIẾM, LẤY DANH SÁCH)
     // ==========================================================
+    public boolean isVehicleInLot(String licensePlate, int siteId) {
+        // Dùng hàm COUNT, chỉ trả về 1 con số duy nhất là 0 hoặc >0. Siêu nhẹ!
+        String sql = """
+                 SELECT COUNT(1) FROM ParkingSessions s
+                 JOIN ParkingCards c ON s.card_id = c.card_id
+                 WHERE c.site_id = ? 
+                   AND s.status = 'active'
+                   AND s.session_state = 'parked' 
+                   AND s.license_plate = ?
+                 """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, siteId);
+            ps.setString(2, licensePlate); // Truyền trực tiếp biển số xuống DB
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Nếu Count > 0 nghĩa là xe đã tồn tại
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Lỗi kiểm tra trùng biển số: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * HÀM 3: Tìm xe đang đỗ trong bãi dựa vào Mã thẻ HOẶC Biển số
      */
