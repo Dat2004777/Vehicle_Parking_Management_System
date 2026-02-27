@@ -4,6 +4,7 @@
  */
 package controller.customer;
 
+import dal.AccountDAO;
 import dal.CustomerDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -64,7 +65,7 @@ public class ProfileController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
-        if (account == null) {
+        if (account == null || account.getRole() != Account.RoleEnum.CUSTOMER) {
             response.sendRedirect(request.getContextPath());
             return;
         }
@@ -85,32 +86,49 @@ public class ProfileController extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
-
         if (action == null) {
             response.sendRedirect(request.getContextPath() + "/customer-info");
             return;
         }
+        
+        HttpSession session = request.getSession();
+
+        Account account = (Account) session.getAttribute("account");
+
+        if (account == null || account.getRole() != Account.RoleEnum.CUSTOMER) {
+            response.sendRedirect(request.getContextPath());
+            return;
+        }
+        
+        Customer customer = (Customer) session.getAttribute("customer");
+
+        if (customer == null) {
+            response.sendRedirect(request.getContextPath());
+            return;
+        }
+
 
         switch (action) {
             case "updateProfile":
-                handleUpdateProfile(request, response);
+                handleUpdateProfile(request, response, customer);
                 break;
             case "changePassword":
+                handleChangePassword(request, response, customer);
                 break;
         }
     }
 
-    private void handleUpdateProfile(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void handleUpdateProfile(HttpServletRequest request, HttpServletResponse response, Customer customer) throws ServletException, IOException {
         String userName = request.getParameter("customerName");
         String phoneNumber = request.getParameter("phone");
 
         boolean hasError = false;
-        if (userName == null || userName.trim().isEmpty()) {
+        if (userName == null || userName.isBlank()) {
             request.setAttribute("errorName", "Không được để trống!");
             hasError = true;
         }
 
-        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+        if (phoneNumber == null || phoneNumber.isBlank()) {
             request.setAttribute("errorPhone", "Không được để trống!");
             hasError = true;
         } else if (!ValidationUtils.checkPhone(phoneNumber.trim())) {
@@ -135,13 +153,6 @@ public class ProfileController extends HttpServlet {
             lastName = userName;
         }
 
-        HttpSession session = request.getSession();
-        Customer customer = (Customer) session.getAttribute("customer");
-
-        if (customer == null) {
-            response.sendRedirect(request.getContextPath());
-            return;
-        }
         //Kiểm tra không thay đổi
         boolean isSameName = customer.getLastname().trim().equals(lastName)
                 && customer.getFirstname().trim().equals(firstName);
@@ -161,11 +172,77 @@ public class ProfileController extends HttpServlet {
             customer.setLastname(lastName);
             customer.setPhone(phoneNumber);
 
-            session.setAttribute("customer", customer);
+//            session.setAttribute("customer", customer);
         }
 
         response.sendRedirect(request.getContextPath() + "/customer-info?success=" + updated);
 
+    }
+
+    private void handleChangePassword(HttpServletRequest request, HttpServletResponse response, Customer customer) throws ServletException, IOException {
+        String oldPassword = request.getParameter("oldPass");
+        String newPassword = request.getParameter("newPass");
+        String confirmNewPasword = request.getParameter("confirmPass");
+
+        boolean hasError = false;
+
+        if (oldPassword == null || oldPassword.isBlank()) {
+            request.setAttribute("errorOldPass", "Không được để trống!");
+            hasError = true;
+        }
+
+        if (newPassword == null || newPassword.isBlank()) {
+            request.setAttribute("errorNewPass", "Không được để trống!");
+            hasError = true;
+        }
+
+        if (confirmNewPasword == null || confirmNewPasword.isBlank()) {
+            request.setAttribute("errorConfirmPass", "Không được để trống!");
+            hasError = true;
+        }
+
+        if (hasError) {
+            request.getRequestDispatcher("/WEB-INF/views/customer/info-detail.jsp").forward(request, response);
+            return;
+        }
+
+        oldPassword = oldPassword.trim();
+        newPassword = newPassword.trim();
+        confirmNewPasword = confirmNewPasword.trim();
+
+        Account accountSession = (Account) request.getSession().getAttribute("account");
+        if (accountSession == null) {
+            response.sendRedirect(request.getContextPath());
+            return;
+        }
+
+        AccountDAO accountDAO = new AccountDAO();
+
+        Account accountOldPass = accountDAO.checkAccount(accountSession.getUsername(), oldPassword);
+        if (accountOldPass == null) {
+            request.setAttribute("errorOldPass", "Mật khẩu hiện tại không đúng!");
+            request.getRequestDispatcher("/WEB-INF/views/customer/info-detail.jsp").forward(request, response);
+            return;
+        }
+
+        boolean checkNewPass = !newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$");
+        boolean checkConfirmPass = !confirmNewPasword.equals(newPassword);
+
+        if (checkNewPass) {
+            request.setAttribute("errorNewPass", "Mật khẩu phải ≥8 ký tự, gồm hoa, thường, số, ký tự đặc biệt!");
+            request.getRequestDispatcher("/WEB-INF/views/customer/info-detail.jsp").forward(request, response);
+            return;
+        }
+
+        if (checkConfirmPass) {
+            request.setAttribute("errorConfirmPass", "Mật khẩu xác nhận không đúng!");
+            request.getRequestDispatcher("/WEB-INF/views/customer/info-detail.jsp").forward(request, response);
+            return;
+        }
+
+        boolean changePassword = accountDAO.changePassword(customer.getAccount_id(), newPassword);
+
+        response.sendRedirect(request.getContextPath() + "/customer-info?success=" + changePassword);
     }
 
     /**

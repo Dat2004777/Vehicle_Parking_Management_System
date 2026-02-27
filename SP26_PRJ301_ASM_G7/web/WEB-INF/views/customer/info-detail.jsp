@@ -36,6 +36,18 @@
                 -webkit-font-smoothing: antialiased;
             }
 
+            .password-wrapper{
+                position: relative;
+            }
+
+            .toggle-password {
+                position: absolute;
+                right: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                color: #9ca3af;
+            }
         </style>
     </head>
     <body>
@@ -100,19 +112,28 @@
                                     <div class="row g-4">
                                         <div class="col-12">
                                             <label class="form-label fw-semibold small">Mật khẩu hiện tại</label>
-                                            <input id="oldPass"name="oldPass" type="password" class="form-control">
+                                            <div class="password-wrapper">
+                                                <input id="oldPass"name="oldPass" type="password" class="form-control">
+                                                <i class="bi bi-eye toggle-password" onclick="togglePassword(this)"></i>
+                                            </div>
                                             <span id="errorOldPass" class="text-danger d-block mt-2">${errorOldPass}</span>
                                         </div>
 
                                         <div class="col-12">
                                             <label class="form-label fw-semibold small">Mật khẩu mới</label>
-                                            <input id="newPass" name="newPass" type="password" class="form-control">
+                                            <div class="password-wrapper">
+                                                <input id="newPass" name="newPass" type="password" class="form-control">
+                                                <i class="bi bi-eye toggle-password" onclick="togglePassword(this)"></i>
+                                            </div>
                                             <span id="errorNewPass" class="text-danger d-block mt-2">${errorNewPass}</span>
                                         </div>
 
                                         <div class="col-12">
                                             <label class="form-label fw-semibold small">Xác nhận mật khẩu mới</label>
-                                            <input id="confirmPass" name=""confirmPass type="password" class="form-control">
+                                            <div class="password-wrapper">
+                                                <input id="confirmPass" name="confirmPass" type="password" class="form-control">
+                                                <i class="bi bi-eye toggle-password" onclick="togglePassword(this)"></i>
+                                            </div>
                                             <span id="errorConfirmPass" class="text-danger d-block mt-2">${errorConfirmPass}</span>
                                         </div>
 
@@ -135,7 +156,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             const contextPath = "${pageContext.request.contextPath}";
-            
+
             document.addEventListener("DOMContentLoaded", function () {
 
                 // ===== PROFILE SECTION =====
@@ -186,6 +207,20 @@
                 confirmPass.addEventListener("input", checkPasswordChange);
 
             });
+
+            // Toggle hiển thị Mật khẩu (Eye Icon)
+            function togglePassword(element) {
+                const input = element.previousElementSibling;
+                if (input.type === "password") {
+                    input.type = "text";
+                    element.classList.remove("bi-eye");
+                    element.classList.add("bi-eye-slash");
+                } else {
+                    input.type = "password";
+                    element.classList.remove("bi-eye-slash");
+                    element.classList.add("bi-eye");
+                }
+            }
 
             //Validate Phone
             document.addEventListener("DOMContentLoaded", function () {

@@ -91,7 +91,13 @@ public class SignupController extends HttpServlet {
         String phone = request.getParameter("phone");
         String password = request.getParameter("password_1");
         String confirmPassword = request.getParameter("password_2");
-
+        
+        
+        // ===== GỮ GIÁ TRỊ NHẬP LẠI =====
+            request.setAttribute("username", username);
+            request.setAttribute("email", email);
+            
+            
         if (username == null || firstname == null || lastname == null
                 || email == null || phone == null
                 || password == null || confirmPassword == null) {
@@ -172,9 +178,6 @@ public class SignupController extends HttpServlet {
         // ===== NẾU CÓ LỖI → QUAY LẠI SIGNUP =====
         if (hasError) {
             request.setAttribute("authMode", "signup");
-            // ===== GỮ GIÁ TRỊ NHẬP LẠI =====
-            request.setAttribute("username", username);
-            request.setAttribute("email", email);
             request.getRequestDispatcher("/WEB-INF/views/public/login-signup.jsp")
                     .forward(request, response);
             return;

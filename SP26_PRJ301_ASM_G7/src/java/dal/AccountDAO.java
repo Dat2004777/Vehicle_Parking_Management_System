@@ -91,4 +91,25 @@ public class AccountDAO extends DBContext {
             return -1;
         }
     }
+    
+    public boolean changePassword(int accountId, String newPass){
+        String sql =
+                """
+                UPDATE Accounts
+                SET passsword ?
+                WHERE account_id = ?
+                """;
+        
+        try(PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setString(1,newPass);
+            ps.setInt(2,accountId);
+             
+            int row = ps.executeUpdate();
+            return row > 0;
+        }catch(Exception e){
+            System.out.println("Lỗi cập thay đổi password của Account");
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -76,23 +76,23 @@
                 <i class="bi bi-person-circle me-2"></i> Thông tin cá nhân
             </a>
 
-            <a href="${pageContext.request.contextPath}/history-tickets"
+            <a href="${pageContext.request.contextPath}/customer-info/history-subscriptions"
                class="list-group-item list-group-item-action sidebar-link
-               ${currentPage == 'history-tickets' ? 'active' : ''}">
+               ${currentPage == 'history-subscriptions' ? 'active' : ''}">
                 <i class="bi bi-ticket-perforated me-2"></i> Vé tháng của tôi
             </a>
 
-            <a href="${pageContext.request.contextPath}/history-bookings"
+            <a href="${pageContext.request.contextPath}/customer-info/history-bookings"
                class="list-group-item list-group-item-action sidebar-link
                ${currentPage == 'history-bookings' ? 'active' : ''}">
                 <i class="bi bi-calendar-event me-2"></i> Lịch sử đặt chỗ
             </a>
-
+<!--
             <a href="${pageContext.request.contextPath}/history-transactions"
                class="list-group-item list-group-item-action sidebar-link
                ${currentPage == 'history-transactions' ? 'active' : ''}">
                 <i class="bi bi-credit-card me-2"></i> Lịch sử thanh toán
-            </a>
+            </a>-->
 
             <a href="logout"
                class="list-group-item list-group-item-action text-danger">
