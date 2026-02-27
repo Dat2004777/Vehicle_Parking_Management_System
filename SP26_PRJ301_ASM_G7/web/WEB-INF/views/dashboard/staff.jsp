@@ -255,12 +255,18 @@
             </div>
         </nav>
 
+
         <main class="container-fluid d-flex align-items-center justify-content-center" style="max-width: 1400px; min-height: calc(100vh - 80px); padding: 2rem 15px;">
             <%-- [QUAN TRỌNG] Trích xuất message ra biến cục bộ và xóa session ngay lập tức --%>
             <c:set var="errMsg" value="${sessionScope.errorMsg}" />
             <c:set var="sucMsg" value="${sessionScope.successMsg}" />
+            <c:set var="oldCard" value="${sessionScope.oldCardId}" />
+            <c:set var="oldPlate" value="${sessionScope.oldPlate}" />
             <c:remove var="errorMsg" scope="session"/>
             <c:remove var="successMsg" scope="session"/>
+            <c:remove var="oldCardId" scope="session"/>
+            <c:remove var="oldPlate" scope="session"/>
+
             <div class="row g-4 w-100 align-items-center">
 
                 <div class="col-12 d-lg-none order-1">
@@ -268,17 +274,11 @@
                         <div class="card-body p-3">
                             <div class="d-flex justify-content-between align-items-end">
                                 <div>
-                                    <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">
-                                        Chỗ còn trống
-                                    </div>
-                                    <div class="fw-bold text-primary" style="font-size: 2.2rem; line-height: 1;">
-                                        ${stats.availableSpaces != null ? stats.availableSpaces : '0'}
-                                    </div>
+                                    <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Chỗ còn trống</div>
+                                    <div class="fw-bold text-primary" style="font-size: 2.2rem; line-height: 1;">${stats.availableSpaces != null ? stats.availableSpaces : '0'}</div>
                                 </div>
                                 <div class="text-end">
-                                    <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">
-                                        Đã đỗ / Tổng
-                                    </div>
+                                    <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Đã đỗ / Tổng</div>
                                     <div class="fw-bold text-dark" style="font-size: 1.1rem; line-height: 1;">
                                         ${stats.occupiedSpaces != null ? stats.occupiedSpaces : '0'} <span class="text-muted fw-normal" style="font-size: 0.85rem;">/ ${stats.totalCapacity != null ? stats.totalCapacity : '0'}</span>
                                     </div>
@@ -312,15 +312,14 @@
                 </div>
 
                 <div class="col-lg-8 order-2 order-lg-1">
-
                     <div class="form-card shadow-lg p-4 p-xl-5 mx-auto" style="border-radius: 16px; background-color: #fff; max-width: 700px;">
                         <div class="w-100">
 
                             <div class="tab-switch mb-4" id="formTabs">
-                                <button type="button" class="active" id="tabIn" onclick="switchMode('in')">
+                                <button type="button" class="active" id="tabIn" data-mode="in">
                                     VÀO BÃI <span class="fw-bold opacity-75 ms-1">[F1]</span>
                                 </button>
-                                <button type="button" id="tabOut" onclick="switchMode('out')">
+                                <button type="button" id="tabOut" data-mode="out">
                                     RA BÃI <span class="fw-bold opacity-75 ms-1">[F2]</span>
                                 </button>
                             </div>
@@ -333,10 +332,10 @@
                                     <div class="d-flex shadow-sm" style="border-radius: 8px;">
                                         <div class="position-relative flex-grow-1">
                                             <i class="bi bi-credit-card-2-front icon-left"></i>
-                                            <input type="text" id="cardId" name="cardId" placeholder="Quét thẻ hoặc nhập mã số..." required autofocus autocomplete="off" class="form-control-lg fs-5 w-100" style="border: 1px solid #e2e8f0; border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0; padding-left: 3rem;">
+                                            <input type="text" id="cardId" name="cardId" value="${oldCard}" placeholder="Quét thẻ hoặc nhập mã số..." required autocomplete="off" class="form-control-lg fs-5 w-100" style="border: 1px solid #e2e8f0; border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0; padding-left: 3rem;">
                                         </div>
 
-                                        <button type="button" id="btnRandomCard" class="btn btn-primary px-4" onclick="fetchRandomCard()" style="border-top-left-radius: 0; border-bottom-left-radius: 0; z-index: 1;" title="Lấy thẻ trống ngẫu nhiên">
+                                        <button type="button" id="btnRandomCard" class="btn btn-primary px-4" style="border-top-left-radius: 0; border-bottom-left-radius: 0; z-index: 1;" title="Lấy thẻ trống ngẫu nhiên">
                                             <i class="bi bi-shuffle fs-5"></i>
                                         </button>
                                     </div>
@@ -345,18 +344,16 @@
                                 <div class="input-group-custom mb-4">
                                     <label class="form-label text-secondary fw-bold" style="font-size: 0.85rem;">BIỂN SỐ XE</label>
                                     <i class="bi bi-123 icon-left"></i>
-                                    <input type="text" id="licensePlate" name="licensePlate" placeholder="NHẬP BIỂN SỐ (VD: 30A-123.45)" required autocomplete="off" class="form-control-lg fs-5 text-uppercase">
+                                    <input type="text" id="licensePlate" name="licensePlate" value="${oldPlate}" placeholder="NHẬP BIỂN SỐ (VD: 30A-123.45)" required autocomplete="off" class="form-control-lg fs-5 text-uppercase">
                                 </div>
 
                                 <div id="vehicleTypeContainer" class="mb-4">
                                     <label class="form-label text-secondary fw-bold" style="font-size: 0.85rem;">LOẠI XE <span class="text-muted fw-normal text-lowercase">(Dành cho vé lượt)</span></label>
-
                                     <c:set var="hasSelected" value="false" />
                                     <input type="hidden" name="vehicleTypeId" id="vehicleTypeId" value="-1">
 
                                     <div class="d-flex gap-3">
                                         <c:forEach var="entry" items="${overview.slotPerVehicle}">
-
                                             <c:set var="vType" value="${entry.key}" />
                                             <c:set var="availableSlots" value="${entry.value}" />
                                             <c:set var="isAvailable" value="${availableSlots > 0}" />
@@ -380,9 +377,8 @@
                                                 <c:when test="${isAvailable}">
                                                     <div id="boxType_${vType.vehicleTypeId}" 
                                                          class="vehicle-box flex-fill py-3 text-center fw-bold border rounded-3 cursor-pointer ${!hasSelected ? 'bg-primary border-primary text-white active-box' : 'bg-light border-secondary text-secondary'}" 
-                                                         onclick="selectVehicleType(${vType.vehicleTypeId}, 'boxType_${vType.vehicleTypeId}')" 
+                                                         data-type-id="${vType.vehicleTypeId}"
                                                          style="cursor: pointer; transition: all 0.2s; user-select: none;">
-
                                                         <i class="bi ${icon} fs-4 d-block mb-1"></i> ${label}
                                                         <small class="d-block fw-normal subtitle-text ${!hasSelected ? 'text-white-50' : 'text-muted'}" style="font-size: 0.7rem;">(Còn ${availableSlots} chỗ)</small>
                                                     </div>
@@ -396,13 +392,11 @@
                                                 <c:otherwise>
                                                     <div class="flex-fill py-3 text-center fw-bold border rounded-3" 
                                                          style="background-color: #e2e8f0; opacity: 0.6; cursor: not-allowed; user-select: none; border-color: #cbd5e1;">
-
                                                         <i class="bi ${icon} fs-4 d-block mb-1 text-muted"></i> 
                                                         <span class="text-muted">${label} <small class="d-block fw-normal text-danger" style="font-size: 0.7rem;">(Đầy)</small></span>
                                                     </div>
                                                 </c:otherwise>
                                             </c:choose>
-
                                         </c:forEach>
                                     </div>
 
@@ -418,17 +412,13 @@
                                     <small class="text-muted">Nhấn phím <b>Enter</b> để xác nhận và gửi thông tin.</small>
                                 </div>
 
-                                <button type="button" id="btnSubmitForm" class="btn-submit py-3 fs-5" style="background-color: #3b82f6;" onclick="submitForm()">
+                                <button type="button" id="btnSubmitForm" class="btn-submit py-3 fs-5" style="background-color: #3b82f6;">
                                     <span id="btnSubmitText">XÁC NHẬN VÀO</span> <i id="btnSubmitIcon" class="bi bi-box-arrow-in-right ms-2"></i>
                                 </button>
                             </form>
 
-
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <div class="col-lg-4 order-3 order-lg-2 d-flex flex-column gap-3">
@@ -454,38 +444,9 @@
                             </c:if>
                         </div>
                     </c:if>
-                    <div class="alert-wrapper mt-lg-0 mt-3" style="max-height: 120px; overflow-y: auto; scrollbar-width: thin;">
-
-                        <%-- Bắt lỗi (Error) --%>
-                        <c:if test="${not empty sessionScope.errorMsg}">
-                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-start mb-0 py-2 px-3 shadow-sm" role="alert" style="border-radius: 10px; border-left: 4px solid #dc3545;">
-                                <i class="bi bi-exclamation-triangle-fill fs-5 me-2 text-danger mt-1"></i>
-                                <div class="flex-grow-1 pe-3">
-                                    <span style="font-size: 1rem; line-height: 1.3; display: block;" class="mt-1">${sessionScope.errorMsg}</span>
-                                </div>
-                                <button type="button" class="btn-close p-2 m-1" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
-                            </div>
-                            <%-- Xóa message khỏi session để không bị hiện lại khi F5 --%>
-                            <c:remove var="errorMsg" scope="session"/>
-                        </c:if>
-
-                        <%-- Báo thành công (Success) --%>
-                        <c:if test="${not empty sessionScope.successMsg}">
-                            <div class="alert alert-success alert-dismissible fade show d-flex align-items-start mb-0 py-2 px-3 shadow-sm" role="alert" style="border-radius: 10px; border-left: 4px solid #198754;">
-                                <i class="bi bi-check-circle-fill fs-5 me-2 text-success mt-1"></i>
-                                <div class="flex-grow-1 pe-3">
-                                    <span style="font-size: 1rem; line-height: 1.3; display: block;" class="mt-1">${sessionScope.successMsg}</span>
-                                </div>
-                                <button type="button" class="btn-close p-2 m-1" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.65rem;"></button>
-                            </div>
-                            <%-- Xóa message khỏi session --%>
-                            <c:remove var="successMsg" scope="session"/>
-                        </c:if>
-                    </div>
 
                     <div class="card shadow-sm border-0 d-none d-lg-block" style="border-radius: 16px;">
                         <div class="card-body p-3 p-xl-4">
-
                             <div class="d-flex justify-content-between align-items-end mb-2">
                                 <div>
                                     <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Chỗ còn trống</div>
@@ -498,20 +459,15 @@
                                     </div>
                                 </div>
                             </div>
-
                             <hr class="text-muted opacity-25 my-3">
-
                             <div class="scrollable-area-list">
                                 <div class="row g-3 mb-2">
-
                                     <c:if test="${empty overview.areas}">
                                         <div class="col-12 text-center text-muted py-4">
                                             <i>Chưa có dữ liệu phân khu cho bãi xe này.</i>
                                         </div>
                                     </c:if>
-
                                     <c:forEach items="${overview.areas}" var="area">
-
                                         <c:choose>
                                             <c:when test="${area.vehicleType.vehicleTypeName.toLowerCase().contains('car')}">
                                                 <c:set var="borderColor" value="#3b82f6" />
@@ -535,7 +491,6 @@
                                                 <div class="text-muted fw-bold mb-2 text-uppercase" style="font-size: 0.8rem;">
                                                     <i class="bi ${iconClass} me-2 ${textColor}"></i>${area.areaName}
                                                 </div>
-
                                                 <div class="d-flex justify-content-between align-items-baseline">
                                                     <c:choose>
                                                         <c:when test="${area.availableSlots <= 0}">
@@ -549,24 +504,19 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </c:forEach>
-                                    
                                 </div> 
                             </div>
                         </div>
                     </div>
 
                     <div class="card shadow-sm border-0 flex-grow-1" style="border-radius: 16px; display: flex; flex-direction: column;">
-
                         <div class="card-header bg-white border-bottom py-2 px-3 d-flex justify-content-between align-items-center" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
                             <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.9rem;"><i class="bi bi-clock-history me-2"></i>Hoạt động gần đây</h6>
                             <span class="badge bg-primary-subtle text-primary rounded-pill" style="font-size: 0.7rem;">Real-time</span>
                         </div>
-
                         <div class="card-body p-0" style="max-height: 280px; overflow-y: auto;">
                             <div class="list-group list-group-flush">
-
                                 <c:forEach var="log" items="${recentLogs}">
                                     <c:choose>
                                         <c:when test="${log.sessionState == 'parked' || log.sessionState == 'PARKED'}">
@@ -588,7 +538,6 @@
                                             <c:set var="statusText" value="Lỗi" />
                                         </c:otherwise>
                                     </c:choose>
-
                                     <div class="list-group-item px-3 py-2 border-bottom">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <span class="fw-bold text-dark" style="font-size: 0.85rem;">${log.licensePlate}</span>
@@ -602,261 +551,298 @@
                                         </div>
                                     </div>
                                 </c:forEach>
-
                                 <c:if test="${empty recentLogs}">
                                     <div class="py-4 text-center text-muted">
                                         <i class="bi bi-inbox fs-2 d-block mb-1 text-light"></i>
                                         <small style="font-size: 0.8rem;">Chưa có dữ liệu.</small>
                                     </div>
                                 </c:if>
-
                             </div>
                         </div>
-
                         <div class="card-footer bg-white border-top text-center py-2" style="border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;">
                             <a href="${ctx}/parking/history" class="text-decoration-none fw-bold text-primary" style="font-size: 0.8rem;">
                                 Xem toàn bộ <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
-
                     </div>
                 </div>
-
             </div>
-            <div class="offcanvas offcanvas-start border-0 shadow" tabindex="-1" id="sidebarOffcanvas" style="width: 280px;">
 
+            <div class="offcanvas offcanvas-start border-0 shadow" tabindex="-1" id="sidebarOffcanvas" style="width: 280px;">
                 <div class="offcanvas-header border-bottom">
                     <h5 class="fw-bold mb-0 text-success"><i class="bi bi-p-square-fill me-2"></i>Smart Parking</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
                 </div>
-
                 <div class="offcanvas-body d-flex flex-column p-3">
-                    <jsp:include page="/WEB-INF/views/layout/sidebar.jsp"/>
+                    <jsp:include page="/WEB-INF/views/layout/sidebar.jsp">
+                        <jsp:param name="activepage" value="dashboard" />
+                    </jsp:include>
                 </div>
-
             </div>
-
         </main>
-
 
         <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
         <script>
-                                    // Bọc toàn bộ code để đảm bảo HTML đã load xong 100% mới chạy JS
-                                    document.addEventListener('DOMContentLoaded', function () {
+                                                            document.addEventListener('DOMContentLoaded', function () {
 
-                                        // 1. Khai báo Elements
-                                        const form = document.getElementById('mainGateForm');
-                                        const actionType = document.getElementById('actionType');
-                                        const tabIn = document.getElementById('tabIn');
-                                        const tabOut = document.getElementById('tabOut');
-                                        const cardIdInput = document.getElementById('cardId');
-                                        const plateInput = document.getElementById('licensePlate');
-                                        const btnSubmit = document.getElementById('btnSubmitForm');
+                                                                // ==========================================
+                                                                // KHỐI 1: CACHE DOM ELEMENTS
+                                                                // (Lấy 1 lần dùng mãi mãi, giúp thao tác cực mượt)
+                                                                // ==========================================
+                                                                const el = {
+                                                                    form: document.getElementById('mainGateForm'),
+                                                                    actionType: document.getElementById('actionType'),
+                                                                    tabIn: document.getElementById('tabIn'),
+                                                                    tabOut: document.getElementById('tabOut'),
+                                                                    cardIdInput: document.getElementById('cardId'),
+                                                                    plateInput: document.getElementById('licensePlate'),
+                                                                    btnSubmit: document.getElementById('btnSubmitForm'),
+                                                                    btnRandom: document.getElementById('btnRandomCard'),
+                                                                    vehicleContainer: document.getElementById('vehicleTypeContainer'),
+                                                                    hiddenVehicleTypeId: document.getElementById('vehicleTypeId'),
+                                                                    vehicleBoxes: document.querySelectorAll('.vehicle-box'), // Lấy danh sách tất cả hộp chọn xe
+                                                                    clockTime: document.getElementById('realtimeClock'),
+                                                                    clockDate: document.getElementById('realtimeDate'),
+                                                                    ctx: "${ctx}" // Lấy biến môi trường từ JSP
+                                                                };
 
-                                        const ctx = "${ctx}";
+                                                                // ==========================================
+                                                                // KHỐI 2: EVENT HANDLERS (Logic Cốt Lõi)
+                                                                // ==========================================
 
-                                        // Tự động focus vào ô Mã thẻ khi vừa vào trang
-                                        if (cardIdInput)
-                                            cardIdInput.focus();
+                                                                // Xử lý chuyển chế độ VÀO / RA
+                                                                function handleSwitchMode(mode, isUserClick = true) {
+                                                                    if (!el.tabIn || !el.tabOut || !el.form || !el.actionType)
+                                                                        return;
 
-                                        // 2. Logic Đổi Tab (Vào/Ra)
-                                        window.switchMode = function (mode) {
-                                            const vehicleContainer = document.getElementById('vehicleTypeContainer');
-                                            const btnRandom = document.getElementById('btnRandomCard'); // Lấy nút Random Card
+                                                                    if (mode === 'in') {
+                                                                        el.tabIn.classList.add('active');
+                                                                        el.tabOut.classList.remove('active');
+                                                                        el.actionType.value = 'checkin';
+                                                                        el.form.action = el.ctx + '/parking/checkin';
 
-                                            if (mode === 'in') {
-                                                tabIn.classList.add('active');
-                                                tabOut.classList.remove('active');
-                                                actionType.value = 'checkin';
-                                                form.action = ctx + '/parking/checkin';
+                                                                        if (el.btnSubmit) {
+                                                                            el.btnSubmit.style.backgroundColor = '#3b82f6';
+                                                                            el.btnSubmit.innerHTML = '<span>XÁC NHẬN VÀO</span> <i class="bi bi-box-arrow-in-right ms-2"></i>';
+                                                                        }
 
-                                                btnSubmit.style.backgroundColor = '#3b82f6'; // Nút Xanh
-                                                btnSubmit.innerHTML = '<span>XÁC NHẬN VÀO</span> <i class="bi bi-box-arrow-in-right ms-2"></i>';
+                                                                        if (el.vehicleContainer)
+                                                                            el.vehicleContainer.classList.remove('d-none');
+                                                                        if (el.btnRandom)
+                                                                            el.btnRandom.style.display = '';
+                                                                    } else {
+                                                                        el.tabOut.classList.add('active');
+                                                                        el.tabIn.classList.remove('active');
+                                                                        el.actionType.value = 'checkout';
+                                                                        el.form.action = el.ctx + '/parking/checkout';
 
-                                                // HIỆN LẠI cụm chọn loại xe và Nút Random
-                                                if (vehicleContainer)
-                                                    vehicleContainer.classList.remove('d-none');
-                                                if (btnRandom)
-                                                    btnRandom.style.display = ''; // Để rỗng để trả về trạng thái flex ban đầu
+                                                                        if (el.btnSubmit) {
+                                                                            el.btnSubmit.style.backgroundColor = '#ef4444';
+                                                                            el.btnSubmit.innerHTML = '<span>XÁC NHẬN RA</span> <i class="bi bi-box-arrow-right ms-2"></i>';
+                                                                        }
 
-                                            } else {
-                                                tabOut.classList.add('active');
-                                                tabIn.classList.remove('active');
-                                                actionType.value = 'checkout';
-                                                form.action = ctx + '/parking/checkout';
+                                                                        if (el.vehicleContainer)
+                                                                            el.vehicleContainer.classList.add('d-none');
+                                                                        if (el.btnRandom)
+                                                                            el.btnRandom.style.display = 'none';
+                                                                    }
 
-                                                btnSubmit.style.backgroundColor = '#ef4444'; // Nút Đỏ
-                                                btnSubmit.innerHTML = '<span>XÁC NHẬN RA</span> <i class="bi bi-box-arrow-right ms-2"></i>';
+                                                                    if (isUserClick) {
+                                                                        if (el.cardIdInput) {
+                                                                            el.cardIdInput.value = '';
+                                                                            el.cardIdInput.focus();
+                                                                        }
+                                                                        if (el.plateInput)
+                                                                            el.plateInput.value = '';
+                                                                    }
+                                                                }
 
-                                                // ẨN cụm chọn loại xe và Nút Random đi cho màn hình Check-out gọn gàng
-                                                if (vehicleContainer)
-                                                    vehicleContainer.classList.add('d-none');
-                                                if (btnRandom)
-                                                    btnRandom.style.display = 'none'; // Ẩn nút random
-                                            }
+                                                                // Xử lý Submit Form
+                                                                function handleFormSubmit() {
+                                                                    if (el.cardIdInput && el.plateInput) {
+                                                                        if (el.cardIdInput.value.trim() === '' && el.plateInput.value.trim() === '') {
+                                                                            alert('Vui lòng quét thẻ hoặc nhập biển số!');
+                                                                            el.cardIdInput.focus();
+                                                                            return;
+                                                                        }
+                                                                    }
 
-                                            // Xóa trắng & Tự động Focus lại ô đầu tiên (Mã thẻ) để sẵn sàng quét
-                                            cardIdInput.value = '';
-                                            plateInput.value = '';
-                                            cardIdInput.focus();
-                                        };
+                                                                    if (el.actionType) {
+                                                                        sessionStorage.setItem("lastActiveTab", JSON.stringify(el.actionType.value === 'checkout' ? 'out' : 'in'));
+                                                                    }
+                                                                    if (el.form)
+                                                                        el.form.submit();
+                                                                }
 
-                                        window.submitForm = function () {
-                                            if (cardIdInput.value.trim() === '' && plateInput.value.trim() === '') {
-                                                alert('Vui lòng quét thẻ hoặc nhập biển số!');
-                                                cardIdInput.focus();
-                                                return;
-                                            }
-                                            form.submit();
-                                        };
+                                                                // Xử lý Chọn Hộp Loại Xe
+                                                                function handleVehicleSelect(boxElement) {
+                                                                    const typeId = boxElement.getAttribute('data-type-id');
 
-                                        // ==========================================
-// BẮT SỰ KIỆN PHÍM TẮT TOÀN CỤC (HOTKEYS)
-// ==========================================
-                                        document.addEventListener('keydown', function (e) {
+                                                                    if (el.hiddenVehicleTypeId) {
+                                                                        el.hiddenVehicleTypeId.value = typeId;
+                                                                    }
 
-                                            // 1. Phím F1: Chuyển sang Check-in VÀ tự động lấy thẻ Random
-                                            if (e.key === 'F1') {
-                                                e.preventDefault(); // Chặn popup Help mặc định của trình duyệt
-                                                switchMode('in');
-                                            }
+                                                                    // Reset màu tất cả các hộp
+                                                                    el.vehicleBoxes.forEach(box => {
+                                                                        box.classList.remove('bg-primary', 'border-primary', 'text-white', 'active-box');
+                                                                        box.classList.add('bg-light', 'border-secondary', 'text-secondary');
+                                                                        const subtitle = box.querySelector('.subtitle-text');
+                                                                        if (subtitle) {
+                                                                            subtitle.classList.remove('text-white-50');
+                                                                            subtitle.classList.add('text-muted');
+                                                                        }
+                                                                    });
 
-                                            // 2. Phím F2: Chuyển sang Check-out
-                                            else if (e.key === 'F2') {
-                                                e.preventDefault();
-                                                switchMode('out');
-                                            }
+                                                                    // Kích hoạt hộp vừa chọn
+                                                                    boxElement.classList.remove('bg-light', 'border-secondary', 'text-secondary');
+                                                                    boxElement.classList.add('bg-primary', 'border-primary', 'text-white', 'active-box');
 
-                                            // 3. Phím Space: Lấy thẻ Random
-                                            else if (e.code === 'Tab') {
-                                                // Kỹ thuật an toàn: Kiểm tra xem user có đang gõ text vào ô Input không
-                                                e.preventDefault(); // Chặn hành vi cuộn trang xuống của phím Space
-                                                const actionType = document.getElementById('actionType').value;
-                                                if (actionType === 'checkin') {
-                                                    fetchRandomCard();
-                                                }
+                                                                    const selectedSubtitle = boxElement.querySelector('.subtitle-text');
+                                                                    if (selectedSubtitle) {
+                                                                        selectedSubtitle.classList.remove('text-muted');
+                                                                        selectedSubtitle.classList.add('text-white-50');
+                                                                    }
 
-                                            }
+                                                                    // Trả focus về đúng luồng
+                                                                    if (el.cardIdInput && el.plateInput) {
+                                                                        if (el.cardIdInput.value.trim() === '')
+                                                                            el.cardIdInput.focus();
+                                                                        else
+                                                                            el.plateInput.focus();
+                                                                    }
+                                                                }
 
-                                            // 4. Phím Enter: Xác nhận (Submit Form)
-                                            else if (e.key === 'Enter') {
-                                                e.preventDefault(); // Chặn hành vi submit mặc định để qua bước validate của mình
+                                                                // Xử lý Gọi API Lấy Thẻ Mới
+                                                                function fetchRandomCard() {
+                                                                    if (!el.btnRandom)
+                                                                        return;
+                                                                    const icon = el.btnRandom.querySelector('i');
+                                                                    if (icon)
+                                                                        icon.className = 'bi bi-arrow-repeat spin-animation';
 
-                                                // UX thông minh: 
-                                                // - Nếu nhân viên vừa quét xong thẻ (đang đứng ở ô cardId) -> Enter nhảy sang ô Biển số
-                                                // - Nếu không phải -> Thực hiện Submit luôn
-                                                const cardIdInput = document.getElementById('cardId');
-                                                const plateInput = document.getElementById('licensePlate');
+                                                                    fetch('${pageContext.request.contextPath}/api/parking/random-card')
+                                                                            .then(response => response.json())
+                                                                            .then(data => {
+                                                                                if (data.success) {
+                                                                                    if (el.cardIdInput)
+                                                                                        el.cardIdInput.value = data.cardId;
+                                                                                    if (el.plateInput)
+                                                                                        el.plateInput.focus(); // Flow-forward UX
+                                                                                } else {
+                                                                                    alert(data.message || 'Hệ thống báo: Đã hết thẻ trống!');
+                                                                                }
+                                                                            })
+                                                                            .catch(error => {
+                                                                                console.error('Lỗi khi lấy thẻ ngẫu nhiên:', error);
+                                                                                alert('Lỗi kết nối đến máy chủ!');
+                                                                            })
+                                                                            .finally(() => {
+                                                                                if (icon)
+                                                                                    icon.className = 'bi bi-shuffle fs-5';
+                                                                            });
+                                                                }
 
-                                                if (document.activeElement === cardIdInput && cardIdInput.value.trim() !== '') {
-                                                    plateInput.focus();
-                                                } else {
-                                                    submitForm();
-                                                }
-                                            }
-                                        });
+                                                                // Xử lý Cập nhật Đồng hồ
+                                                                function updateClock() {
+                                                                    if (el.clockTime && el.clockDate) {
+                                                                        const now = new Date();
+                                                                        el.clockTime.innerText = now.toLocaleTimeString('vi-VN', {hour12: false});
+                                                                        el.clockDate.innerText = now.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'});
+                                                                    }
+                                                                }
 
-                                        // 5. Auto focus thông minh & an toàn
-// (Chỉ focus lại nếu click ra ngoài các vùng tương tác)
-                                        document.addEventListener('click', function (e) {
-                                            // Đã thêm .vehicle-box để nhận diện hộp chọn xe là một vùng tương tác hợp lệ
-                                            const isInteractiveArea = e.target.closest('button, a, input, .offcanvas, .vehicle-box');
 
-                                            if (!isInteractiveArea) {
-                                                if (cardIdInput.value === '') {
-                                                    cardIdInput.focus();
-                                                } else {
-                                                    plateInput.focus();
-                                                }
-                                            }
-                                        });
+                                                                // ==========================================
+                                                                // KHỐI 3: EVENT REGISTRATION (Gắn sự kiện)
+                                                                // ==========================================
 
-// 6. Gắn thẳng hàm đổi màu vào "window" để HTML gọi được
-                                        window.selectVehicleType = function (typeId, boxId) {
-                                            const hiddenInput = document.getElementById('vehicleTypeId');
-                                            if (hiddenInput) {
-                                                hiddenInput.value = typeId;
-                                            }
+                                                                // Gắn sự kiện chuyển Tab
+                                                                if (el.tabIn)
+                                                                    el.tabIn.addEventListener('click', () => handleSwitchMode('in'));
+                                                                if (el.tabOut)
+                                                                    el.tabOut.addEventListener('click', () => handleSwitchMode('out'));
 
-                                            const allBoxes = document.querySelectorAll('.vehicle-box');
+                                                                // Gắn sự kiện nút Gửi Form
+                                                                if (el.btnSubmit)
+                                                                    el.btnSubmit.addEventListener('click', handleFormSubmit);
 
-                                            // 1. Reset tất cả các hộp về trạng thái CHƯA CHỌN (Màu xám nhạt bg-light)
-                                            allBoxes.forEach(box => {
-                                                box.classList.remove('bg-primary', 'border-primary', 'text-white', 'active-box');
-                                                box.classList.add('bg-light', 'border-secondary', 'text-secondary');
+                                                                // Gắn sự kiện nút Random Card
+                                                                if (el.btnRandom)
+                                                                    el.btnRandom.addEventListener('click', fetchRandomCard);
 
-                                                const subtitle = box.querySelector('.subtitle-text');
-                                                if (subtitle) {
-                                                    subtitle.classList.remove('text-white-50');
-                                                    subtitle.classList.add('text-muted');
-                                                }
-                                            });
+                                                                // Gắn sự kiện Click cho từng hộp chọn loại xe (Bỏ qua hộp bị disable)
+                                                                el.vehicleBoxes.forEach(box => {
+                                                                    box.addEventListener('click', function () {
+                                                                        // Kiểm tra xem CSS của hộp có đang bị khóa (not-allowed) hay không
+                                                                        if (this.style.cursor === 'not-allowed')
+                                                                            return;
+                                                                        handleVehicleSelect(this);
+                                                                    });
+                                                                });
 
-                                            // 2. Kích hoạt hộp VỪA BẤM thành trạng thái ĐÃ CHỌN (Màu xanh bg-primary)
-                                            const selectedBox = document.getElementById(boxId);
-                                            if (selectedBox) {
-                                                selectedBox.classList.remove('bg-light', 'border-secondary', 'text-secondary');
-                                                selectedBox.classList.add('bg-primary', 'border-primary', 'text-white', 'active-box');
 
-                                                const selectedSubtitle = selectedBox.querySelector('.subtitle-text');
-                                                if (selectedSubtitle) {
-                                                    selectedSubtitle.classList.remove('text-muted');
-                                                    selectedSubtitle.classList.add('text-white-50');
-                                                }
-                                            }
+                                                                // ==========================================
+                                                                // KHỐI 4: GLOBAL LISTENERS (Bàn phím & Smart Focus)
+                                                                // ==========================================
 
-                                            // 3. Logic Smart Focus sau khi click chọn xong
-                                            // Nếu chưa quét thẻ -> Trỏ về ô Thẻ. Nếu đã có thẻ -> Trỏ sang ô Biển số
-                                            if (cardIdInput.value.trim() === '') {
-                                                cardIdInput.focus();
-                                            } else {
-                                                plateInput.focus();
-                                            }
-                                        };
+                                                                // Lắng nghe Phím Tắt
+                                                                document.addEventListener('keydown', function (e) {
+                                                                    if (e.key === 'F1') {
+                                                                        e.preventDefault();
+                                                                        handleSwitchMode('in');
+                                                                    } else if (e.key === 'F2') {
+                                                                        e.preventDefault();
+                                                                        handleSwitchMode('out');
+                                                                    } else if (e.code === 'Tab') {
+                                                                        e.preventDefault();
+                                                                        if (el.actionType && el.actionType.value === 'checkin') {
+                                                                            fetchRandomCard();
+                                                                        }
+                                                                    } else if (e.key === 'Enter') {
+                                                                        e.preventDefault();
+                                                                        // Nếu quét thẻ xong thì nhảy sang Biển số, ngược lại Submit
+                                                                        if (document.activeElement === el.cardIdInput && el.cardIdInput.value.trim() !== '') {
+                                                                            if (el.plateInput)
+                                                                                el.plateInput.focus();
+                                                                        } else {
+                                                                            handleFormSubmit();
+                                                                        }
+                                                                    }
+                                                                });
 
-                                        // 7. Đồng hồ Realtime
-                                        function updateClock() {
-                                            const clockEl = document.getElementById('realtimeClock');
-                                            const dateEl = document.getElementById('realtimeDate');
+                                                                // Lắng nghe Smart Focus (Click ra ngoài UI tự đưa chuột về ô nhập liệu)
+                                                                document.addEventListener('click', function (e) {
+                                                                    const isInteractiveArea = e.target.closest('button, a, input, .offcanvas, .vehicle-box');
+                                                                    if (!isInteractiveArea && el.cardIdInput && el.plateInput) {
+                                                                        if (el.cardIdInput.value === '')
+                                                                            el.cardIdInput.focus();
+                                                                        else
+                                                                            el.plateInput.focus();
+                                                                    }
+                                                                });
 
-                                            if (clockEl && dateEl) {
-                                                const now = new Date();
-                                                clockEl.innerText = now.toLocaleTimeString('vi-VN', {hour12: false});
-                                                dateEl.innerText = now.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'});
-                                            }
-                                        }
-                                        setInterval(updateClock, 1000);
-                                        updateClock();
-                                    });
 
-                                    // Hàm gọi API lấy thẻ rảnh ngẫu nhiên
-                                    window.fetchRandomCard = function () {
-                                        const icon = document.querySelector('#btnRandomCard i');
+                                                                // ==========================================
+                                                                // KHỐI 5: INITIALIZATION (Khởi chạy trang)
+                                                                // ==========================================
 
-                                        // Đổi icon thành vòng xoay (Loading) cho chuyên nghiệp
-                                        icon.className = 'bi bi-arrow-repeat spin-animation';
+                                                                // Khôi phục Tab gần nhất từ Bộ nhớ
+                                                                const savedTab = JSON.parse(sessionStorage.getItem("lastActiveTab"));
+                                                                if (savedTab) {
+                                                                    handleSwitchMode(savedTab, false);
+                                                                    sessionStorage.removeItem("lastActiveTab");
+                                                                }
 
-                                        // Gọi API Backend (Bạn nhớ sửa URL ctx cho đúng với route của bạn)
-                                        fetch('${pageContext.request.contextPath}/api/parking/random-card')
-                                                .then(response => response.json())
-                                                .then(data => {
-                                                    if (data.success) {
-                                                        // Điền thẻ vào ô input và tự nhảy sang ô Biển số
-                                                        document.getElementById('cardId').value = data.cardId;
-                                                        document.getElementById('licensePlate').focus();
-                                                    } else {
-                                                        alert(data.message || 'Hệ thống báo: Đã hết thẻ trống!');
-                                                    }
-                                                })
-                                                .catch(error => {
-                                                    console.error('Lỗi khi lấy thẻ ngẫu nhiên:', error);
-                                                    alert('Lỗi kết nối đến máy chủ!');
-                                                })
-                                                .finally(() => {
-                                                    // Trả lại icon Shuffle ban đầu
-                                                    icon.className = 'bi bi-shuffle fs-5';
-                                                });
-                                    };
+                                                                // Auto focus ô quét thẻ ban đầu
+                                                                if (el.cardIdInput && document.activeElement !== el.cardIdInput) {
+                                                                    el.cardIdInput.focus();
+                                                                }
+
+                                                                // Chạy Đồng Hồ Realtime
+                                                                setInterval(updateClock, 1000);
+                                                                updateClock();
+
+                                                            });
         </script>
     </body>
 </html>

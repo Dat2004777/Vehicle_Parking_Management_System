@@ -61,7 +61,12 @@ public class CheckInController extends HttpServlet {
         } catch (Exception e) {
             // Tóm gọn mọi lỗi ném ra từ hàm Helper (Ví dụ: "Thẻ không hợp lệ")
             session.setAttribute("errorMsg", e.getMessage());
+            session.setAttribute("oldCardId", cardId);
+            session.setAttribute("oldPlate", licensePlate);
         }
+
+        String activeTab = request.getParameter("actionType");
+        session.setAttribute("activeTab", activeTab);
 
         response.sendRedirect(request.getContextPath() + "/staff/dashboard");
     }

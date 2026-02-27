@@ -53,7 +53,8 @@ public class StaffDashboardController extends HttpServlet {
             // 1. GỌI CÁC HÀM NỘI BỘ (PRIVATE) ĐỂ LẤY DỮ LIỆU DTO
             request.setAttribute("stats", getDashboardStats(currentSiteId));
             request.setAttribute("recentLogs", getRecentActivities(currentSiteId, 10));
-
+            
+            
             // 2. FORWARD TỚI JSP
             request.getRequestDispatcher("/WEB-INF/views/dashboard/staff.jsp").forward(request, response);
 

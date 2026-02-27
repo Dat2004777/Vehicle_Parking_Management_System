@@ -55,6 +55,11 @@ public class CheckOutController extends HttpServlet {
             session.setAttribute("errorMsg", e.getMessage());
         }
 
+        String activeTab = request.getParameter("actionType");
+        session.setAttribute("activeTab", activeTab);
+        session.setAttribute("oldCardId", cardId);
+        session.setAttribute("oldPlate", licensePlate);
+
         response.sendRedirect(request.getContextPath() + "/staff/dashboard");
     }
 
@@ -113,9 +118,9 @@ public class CheckOutController extends HttpServlet {
         currentSession.setFeeAmount(feeToCollect);
         currentSession.setSessionState("COMPLETED");
         // Thời gian ra (exit_time) sẽ được DAO tự động lấy lúc gọi lệnh UPDATE
-        
+
         currentSession.setExitTime(LocalDateTime.now());
-        
+
         boolean isSessionUpdated = sessionDAO.checkOut(currentSession); // Cần tạo hàm này trong SessionDAO
 
         if (!isSessionUpdated) {
