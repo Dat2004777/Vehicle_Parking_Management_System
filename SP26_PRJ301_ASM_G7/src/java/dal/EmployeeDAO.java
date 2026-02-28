@@ -116,35 +116,4 @@ public class EmployeeDAO extends DBContext {
                 rs.getInt("site_id")
         );
     }
-    
-    
-    public int getEmployeeId(int accountId, String role){
-        String sql =
-                """
-                SELECT e.employee_id
-                FROM Employees e 
-                JOIN Account a ON e.account_id = a.account_id
-                WHERE a.role = ? AND a.account_id = ?
-                """;
-        
-        try(PreparedStatement ps = connection.prepareStatement(sql)){
-            
-            ps.setString(1,role);
-            ps.setInt(2,accountId);
-            
-            ResultSet rs = ps.executeQuery();
-            
-            if(rs.next()){
-                int employeeId = rs.getInt("employee_id");
-                return employeeId;
-            }else{
-                return -1;
-            }
-            
-        }catch(Exception e){
-            System.out.println("Lỗi: Không lấy được empId");
-            e.printStackTrace();
-            return -1;
-        }
-    }
 }
