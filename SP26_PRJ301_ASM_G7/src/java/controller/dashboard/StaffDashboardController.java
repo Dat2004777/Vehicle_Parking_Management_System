@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.Account;
 import model.Employee;
 import model.ParkingArea;
 import model.ParkingSite;
@@ -28,7 +29,7 @@ import model.dto.SiteDetailDTO;
 
 import utils.UrlConstants;
 
-@WebServlet(name = "StaffDashboardController", urlPatterns = {UrlConstants.URL_STAFF + "/dashboard"})
+@WebServlet(name = "StaffDashboardController", urlPatterns = {UrlConstants.URL_STAFF + "/dashboard", UrlConstants.URL_STAFF})
 public class StaffDashboardController extends HttpServlet {
 
     private SiteDAO siteDAO = new SiteDAO();
@@ -39,10 +40,8 @@ public class StaffDashboardController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        request.getSession().setAttribute("ctx", request.getContextPath() + UrlConstants.URL_STAFF);
-        request.getSession().setAttribute("role", "STAFF");
-        Employee emp = empDAO.getById(2);
+        Account acc = (Account) request.getSession().getAttribute("account");
+        Employee emp = empDAO.getById(acc.getEmployeeId());
 
         try {
             // Tạm thời gán cứng ID bãi xe theo employee để test giao diện

@@ -185,7 +185,7 @@ public class ValidationUtils {
         }
         // Chuẩn hóa: Đổi thành in hoa, xóa toàn bộ dấu chấm và khoảng trắng thừa
         String normalizedPlate = licensePlate.toUpperCase().replaceAll("[\\s\\.]", "");
-        return CAR_PATTERN.matcher(normalizedPlate).matches();
+        return CAR_PATTERN.matcher(normalizedPlate).matches();  
     }
 
     // Hàm dùng để lấy ra biển số đã được "Dọn dẹp" sạch sẽ chuẩn format để lưu vào Database

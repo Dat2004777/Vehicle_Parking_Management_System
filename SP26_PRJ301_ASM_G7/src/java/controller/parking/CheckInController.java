@@ -33,7 +33,7 @@ public class CheckInController extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
-//        Employee emp = (Employee) session.getAttribute("employee");
+
         Employee emp = new EmployeeDAO().getById(2);
 
         if (emp == null) {
