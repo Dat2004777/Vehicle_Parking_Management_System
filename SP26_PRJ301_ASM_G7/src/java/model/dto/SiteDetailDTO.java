@@ -5,8 +5,9 @@ import java.util.Map;
 import model.ParkingSite;
 import model.VehicleType;
 
-public class SiteOverviewDTO {
-
+public class SiteDetailDTO {
+    
+    private int siteId;
     private String siteName;
     private String address;
     private ParkingSite.Status operatingState;
@@ -16,7 +17,7 @@ public class SiteOverviewDTO {
     private List<AreaDetailDTO> areas;
     private Map<VehicleType, Integer> slotPerVehicle;
 
-    public SiteOverviewDTO(String siteName, String address, ParkingSite.Status operatingState, List<AreaDetailDTO> areas) {
+    public SiteDetailDTO(String siteName, String address, ParkingSite.Status operatingState, List<AreaDetailDTO> areas) {
         this.siteName = siteName;
         this.address = address;
         this.operatingState = operatingState;

@@ -1,4 +1,4 @@
-package model.dto;
+package model.dto.search;
 
 public class VehicleSearchResultDTO {
     private String licensePlate;     // Biển số xe

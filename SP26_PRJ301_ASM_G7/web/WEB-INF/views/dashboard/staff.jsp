@@ -240,7 +240,7 @@
                         <i class="bi bi-list fs-4"></i>
                     </button>
                     <div class="d-sm-block">
-                        <div class="fw-bold fs-5" style="line-height: 1.2; color: #1e293b;">${stats.siteName}</div>
+                        <div class="fw-bold fs-5" style="line-height: 1.2; color: #1e293b;">${overview.siteName}</div>
                     </div>
                 </div>
 
@@ -275,12 +275,12 @@
                             <div class="d-flex justify-content-between align-items-end">
                                 <div>
                                     <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Chỗ còn trống</div>
-                                    <div class="fw-bold text-primary" style="font-size: 2.2rem; line-height: 1;">${stats.availableSpaces != null ? stats.availableSpaces : '0'}</div>
+                                    <div class="fw-bold text-primary" style="font-size: 2.2rem; line-height: 1;">${overview.totalAvailable != null ? overview.totalAvailable : '0'}</div>
                                 </div>
                                 <div class="text-end">
                                     <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Đã đỗ / Tổng</div>
                                     <div class="fw-bold text-dark" style="font-size: 1.1rem; line-height: 1;">
-                                        ${stats.occupiedSpaces != null ? stats.occupiedSpaces : '0'} <span class="text-muted fw-normal" style="font-size: 0.85rem;">/ ${stats.totalCapacity != null ? stats.totalCapacity : '0'}</span>
+                                        ${overview.totalOccupied != null ? overview.totalOccupied : '0'} <span class="text-muted fw-normal" style="font-size: 0.85rem;">/ ${overview.totalCapacity != null ? overview.totalCapacity : '0'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -450,12 +450,12 @@
                             <div class="d-flex justify-content-between align-items-end mb-2">
                                 <div>
                                     <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Chỗ còn trống</div>
-                                    <div class="fw-bold text-primary" style="font-size: 2.5rem; line-height: 1;">${stats.availableSpaces != null ? stats.availableSpaces : '0'}</div>
+                                    <div class="fw-bold text-primary" style="font-size: 2.5rem; line-height: 1;">${overview.totalAvailable != null ? overview.totalAvailable : '0'}</div>
                                 </div>
                                 <div class="text-end">
                                     <div class="text-muted fw-bold mb-1" style="font-size: 0.75rem; text-transform: uppercase;">Đã đỗ / Tổng</div>
                                     <div class="fw-bold text-dark" style="font-size: 1.25rem; line-height: 1;">
-                                        ${stats.occupiedSpaces != null ? stats.occupiedSpaces : '0'} <span class="text-muted fw-normal" style="font-size: 0.9rem;">/ ${stats.totalCapacity != null ? stats.totalCapacity : '0'}</span>
+                                        ${overview.totalOccupied != null ? overview.totalOccupied : '0'} <span class="text-muted fw-normal" style="font-size: 0.9rem;">/ ${overview.totalCapacity != null ? overview.totalCapacity : '0'}</span>
                                     </div>
                                 </div>
                             </div>

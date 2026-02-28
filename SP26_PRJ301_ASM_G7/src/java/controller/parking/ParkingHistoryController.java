@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import model.ParkingSession;
 import model.dto.RecentActivityDTO;
@@ -24,7 +23,7 @@ import utils.UrlConstants;
  * @author Admin
  */
 @WebServlet(name = "HistoryController", urlPatterns = {UrlConstants.URL_STAFF + "/parking/history"})
-public class HistoryController extends HttpServlet {
+public class ParkingHistoryController extends HttpServlet {
     private SessionDAO sessionDAO = new SessionDAO();
 
     /**

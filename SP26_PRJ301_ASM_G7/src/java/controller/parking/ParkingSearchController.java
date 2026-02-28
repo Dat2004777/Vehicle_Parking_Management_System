@@ -12,14 +12,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
-import model.dto.CardSearchResultDTO;
+import model.dto.search.CardSearchResultDTO;
 import model.dto.TransactionHistoryDTO;
-import model.dto.VehicleSearchResultDTO;
+import model.dto.search.VehicleSearchResultDTO;
 import utils.UrlConstants;
 
     
 @WebServlet(name = "StaffSearchController", urlPatterns = {UrlConstants.URL_STAFF + "/search"})
-public class StaffSearchController extends HttpServlet {
+public class ParkingSearchController extends HttpServlet {
 
     private final SearchDAO searchDAO = new SearchDAO();
 
@@ -67,7 +67,7 @@ public class StaffSearchController extends HttpServlet {
         // Param query sẽ tự động được JSP lấy qua ${param.query}
 
         // 3. Forward dữ liệu sang View
-        request.getRequestDispatcher("/WEB-INF/views/parking/card-search.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/parking/search.jsp").forward(request, response);
     }
 
 }

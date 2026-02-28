@@ -220,7 +220,7 @@
             <i class="bi bi-people"></i> Quản lý vé tháng
         </a>
 
-        <a href="#" class="nav-item-link ${param.activepage == 'subscription' ? 'active' : ''}">
+        <a href="${ctx}/parking/history" class="nav-item-link ${param.activepage == 'parking/history' ? 'active' : ''}">
             <i class="bi bi-card-heading"></i> Lịch sử 
         </a>
 

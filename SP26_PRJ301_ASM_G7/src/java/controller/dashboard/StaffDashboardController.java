@@ -24,7 +24,7 @@ import model.ParkingArea;
 import model.ParkingSite;
 import model.VehicleType;
 import model.dto.AreaDetailDTO;
-import model.dto.SiteOverviewDTO;
+import model.dto.SiteDetailDTO;
 
 import utils.UrlConstants;
 
@@ -47,7 +47,7 @@ public class StaffDashboardController extends HttpServlet {
         try {
             // Tạm thời gán cứng ID bãi xe theo employee để test giao diện
             int currentSiteId = emp.getSiteId();
-            SiteOverviewDTO overviewData = buildSiteOverview(currentSiteId);
+            SiteDetailDTO overviewData = buildSiteOverview(currentSiteId);
             request.setAttribute("overview", overviewData);
 
             // 1. GỌI CÁC HÀM NỘI BỘ (PRIVATE) ĐỂ LẤY DỮ LIỆU DTO
@@ -114,14 +114,14 @@ public class StaffDashboardController extends HttpServlet {
         return dtoList;
     }
 
-    private SiteOverviewDTO buildSiteOverview(int siteId) {
+    private SiteDetailDTO buildSiteOverview(int siteId) {
         // Lấy Entity Site
         ParkingSite site = siteDAO.getById(siteId);
 
         // 1. Lấy danh sách Entity Khu vực từ DAO
         List<ParkingArea> rawAreas = areaDAO.getAreasBySite(siteId);
 
-        // Chuẩn bị 2 cấu trúc dữ liệu để nhét vào SiteOverviewDTO
+        // Chuẩn bị 2 cấu trúc dữ liệu để nhét vào SiteDetailDTO
         List<AreaDetailDTO> areaList = new ArrayList<>();
         Map<VehicleType, Integer> slotPerVehicleMap = new HashMap<>();
 
@@ -151,7 +151,7 @@ public class StaffDashboardController extends HttpServlet {
         }
 
         // 3. Khởi tạo DTO tổng hợp
-        SiteOverviewDTO overview = new SiteOverviewDTO(
+        SiteDetailDTO overview = new SiteDetailDTO(
                 site.getSiteName(),
                 site.getAddress(),
                 site.getSiteStatus(), // Dựa theo DB của bạn là operating_state
