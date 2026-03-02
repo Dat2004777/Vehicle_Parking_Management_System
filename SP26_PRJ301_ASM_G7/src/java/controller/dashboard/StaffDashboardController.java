@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import model.Account;
 import model.Employee;
 import model.ParkingArea;
 import model.ParkingSite;
@@ -40,9 +39,14 @@ public class StaffDashboardController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Account acc = (Account) request.getSession().getAttribute("account");
-        Employee emp = empDAO.getById(acc.getEmployeeId());
-
+        
+        Employee emp = (Employee) request.getSession().getAttribute("staff");
+        
+        if (emp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
         try {
             // Tạm thời gán cứng ID bãi xe theo employee để test giao diện
             int currentSiteId = emp.getSiteId();
@@ -50,7 +54,7 @@ public class StaffDashboardController extends HttpServlet {
             request.setAttribute("overview", overviewData);
 
             // 1. GỌI CÁC HÀM NỘI BỘ (PRIVATE) ĐỂ LẤY DỮ LIỆU DTO
-            request.setAttribute("stats", getDashboardStats(currentSiteId));
+            request.setAttribute("stats", getDashboardStats(currentSiteId, emp));
             request.setAttribute("recentLogs", getRecentActivities(currentSiteId, 10));
             
             
@@ -69,9 +73,9 @@ public class StaffDashboardController extends HttpServlet {
     /**
      * Hàm tính toán và đóng gói Thống kê bãi xe
      */
-    private DashboardStatsDTO getDashboardStats(int siteId) {
+    private DashboardStatsDTO getDashboardStats(int siteId, Employee emp) {
         String siteName = siteDAO.getById(siteId).getSiteName();
-        String empName = empDAO.getById(2).getFullName();
+        String empName = emp.getFullName();
         int total = siteDAO.getById(siteId).getTotalSlots();
 
         // Gọi thẳng SessionDAO để đếm số lượng ACTIVE hiện tại

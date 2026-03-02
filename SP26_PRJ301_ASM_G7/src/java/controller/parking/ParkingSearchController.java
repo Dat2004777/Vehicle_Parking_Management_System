@@ -12,12 +12,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import model.Employee;
 import model.dto.search.CardSearchResultDTO;
 import model.dto.TransactionHistoryDTO;
 import model.dto.search.VehicleSearchResultDTO;
 import utils.UrlConstants;
 
-    
 @WebServlet(name = "StaffSearchController", urlPatterns = {UrlConstants.URL_STAFF + "/search"})
 public class ParkingSearchController extends HttpServlet {
 
@@ -26,36 +26,40 @@ public class ParkingSearchController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        // 1. Lấy thông số từ URL (VD: ?type=vehicle&query=30A-123.45)
+
         String type = request.getParameter("type");
         String query = request.getParameter("query");
+        Employee emp = (Employee) request.getSession().getAttribute("staff");
+        if (emp == null) {
+            response.sendRedirect("/login");
+            return;
+        }
+        
+        int siteId = emp.getSiteId();
 
-        // Nếu người dùng vừa vào trang (chưa search gì), type và query sẽ null
         if (type != null && query != null && !query.trim().isEmpty()) {
             query = query.trim();
 
             if ("vehicle".equals(type)) {
                 // Tiền xử lý: Viết hoa biển số xe để tìm kiếm chính xác
                 query = query.toUpperCase();
-                
+
                 // Gọi DAO lấy dữ liệu xe
-                VehicleSearchResultDTO vehicleResult = searchDAO.findActiveVehicleByPlate(query);
-                
+                VehicleSearchResultDTO vehicleResult = searchDAO.findActiveVehicleByPlate(query, siteId);
+
                 if (vehicleResult != null) {
                     // Nếu tìm thấy xe, mới gọi tiếp để lấy lịch sử
-                    List<TransactionHistoryDTO> txns = searchDAO.getVehicleTransactions(query);
+                    List<TransactionHistoryDTO> txns = searchDAO.getVehicleTransactions(query, siteId);
                     request.setAttribute("vehicleResult", vehicleResult);
                     request.setAttribute("vehicleTransactions", txns);
                 }
-            } 
-            else if ("card".equals(type)) {
+            } else if ("card".equals(type)) {
                 // Gọi DAO lấy dữ liệu thẻ
-                CardSearchResultDTO cardResult = searchDAO.findCardByRfid(query);
-                
+                CardSearchResultDTO cardResult = searchDAO.findCardById(query, siteId);
+
                 if (cardResult != null) {
                     // Nếu tìm thấy thẻ, mới gọi tiếp để lấy lịch sử
-                    List<TransactionHistoryDTO> txns = searchDAO.getCardTransactions(query);
+                    List<TransactionHistoryDTO> txns = searchDAO.getCardTransactions(query, siteId);
                     request.setAttribute("cardResult", cardResult);
                     request.setAttribute("cardTransactions", txns);
                 }

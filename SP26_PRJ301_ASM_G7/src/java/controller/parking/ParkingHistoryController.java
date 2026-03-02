@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Employee;
 import model.ParkingSession;
 import model.dto.RecentActivityDTO;
 import utils.UrlConstants;
@@ -39,7 +40,14 @@ public class ParkingHistoryController extends HttpServlet {
             throws ServletException, IOException {
         
         String state = request.getParameter("state");
-        List<RecentActivityDTO> recentLogs = getRecentActivities(1, 20, state);
+        Employee emp = (Employee) request.getSession().getAttribute("staff");
+        
+        if (emp == null) {
+            response.sendRedirect("/login");
+            return;
+        }
+        
+        List<RecentActivityDTO> recentLogs = getRecentActivities(emp.getSiteId(), 20, state);
         request.setAttribute("recentLogs", recentLogs);
         request.getRequestDispatcher("/WEB-INF/views/parking/history.jsp").forward(request, response);
     }

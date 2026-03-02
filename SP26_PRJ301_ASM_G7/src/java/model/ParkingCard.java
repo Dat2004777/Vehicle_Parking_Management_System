@@ -4,7 +4,8 @@ public class ParkingCard {
     
     public enum State {
         AVAILABLE,  
-        USING,     
+        USING,  
+        BOOKED
 //        LOST,       
 //        BROKEN     
     }
