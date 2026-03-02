@@ -388,8 +388,10 @@
     </head>
     <body>
 
-        <%@include file="../layout/sidebar.jsp" %>
-
+        <jsp:include page="../layout/admin-sidebar.jsp">
+            <jsp:param name="activePage" value="adminDashboard" />
+        </jsp:include>
+        
         <!-- Main Content -->
         <main class="main-content">
             <!-- Header -->
@@ -486,7 +488,7 @@
                     <div class="col-12 col-lg-8">
                         <div class="custom-card d-flex flex-column">
                             <div class="card-header-flex">
-                                <h3 class="card-title-h3">Xu hướng doanh thu</h3>
+                                <h3 class="card-title-h3">Doanh thu</h3>
                                 <div class="btn-group" role="group">
                                     <input type="radio" class="btn-check" name="btnradio" id="btnWeek" autocomplete="off" checked>
                                     <label class="btn btn-outline-secondary btn-sm" for="btnWeek">Theo tuần</label>

@@ -123,4 +123,8 @@ public class SiteDensityDTO {
         }
         return (double) ((motoCurrentParked * 100.0) / motoMaxCapacity);
     }
+    
+    public int getAvailableCapacity() {
+        return getMaxCapacity() - getCurrentParked();
+    }
 }

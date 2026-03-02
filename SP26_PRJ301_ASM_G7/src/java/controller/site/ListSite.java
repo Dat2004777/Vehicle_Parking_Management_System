@@ -17,7 +17,7 @@ import utils.UrlConstants;
  * @author Admin
  */
 
-@WebServlet(name = "ListSite", urlPatterns = {UrlConstants.URL_ADMIN + "/site/list"})
+//@WebServlet(name = "ListSite", urlPatterns = {UrlConstants.URL_ADMIN + "/site/list"})
 public class ListSite extends HttpServlet {
 
     /**

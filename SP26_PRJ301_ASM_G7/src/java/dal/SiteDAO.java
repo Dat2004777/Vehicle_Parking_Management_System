@@ -232,7 +232,7 @@ public class SiteDAO extends DBContext {
         return new ParkingSite(id, name, address, region, status, managerId, totalSlots);
     }
 
-    public List<ParkingSite> getAllActiveSites() {
+    public List<ParkingSite> getAllSites() {
         List<ParkingSite> list = new ArrayList<>();
         String sql = """
                 SELECT ps.site_id, ps.site_name, ps.address, ps.region, ps.operating_state, ps.manager_id
@@ -251,14 +251,14 @@ public class SiteDAO extends DBContext {
                 site.setAddress(rs.getString("address"));
                 String regionStr = rs.getString("region");
                 site.setRegion(ParkingSite.Region.valueOf(regionStr.toUpperCase().trim()));
-                String statusStr = rs.getString("operating_state");
-                site.setSiteState(ParkingSite.State.valueOf(statusStr.toUpperCase().trim()));
+                String siteStateStr = rs.getString("operating_state");
+                site.setSiteState(ParkingSite.State.valueOf(siteStateStr.toUpperCase().trim()));
                 site.setManagerId(rs.getInt("manager_id"));
 
                 list.add(site);
             }
         } catch (Exception e) {
-            System.out.println("Error siteDAO.getAllActiveSites: " + e.getMessage());
+            System.out.println("Error siteDAO.getAllSites: " + e.getMessage());
         }
 
         return list;
@@ -293,7 +293,7 @@ public class SiteDAO extends DBContext {
                 GROUP BY pc.site_id
             ) p ON s.site_id = p.site_id
             
-            WHERE s.status = 'active' AND s.operating_state = 'operating'
+            WHERE s.status = 'active' 
             """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
@@ -353,7 +353,7 @@ public class SiteDAO extends DBContext {
                 GROUP BY pc.site_id
             ) p ON s.site_id = p.site_id
             
-            WHERE s.status = 'active' AND s.operating_state = 'operating' AND s.site_id = ?
+            WHERE s.status = 'active' AND s.site_id = ?
             """;
 
         try {

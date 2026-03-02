@@ -20,7 +20,7 @@ import utils.ValidationUtils;
  *
  * @author Admin
  */
-@WebServlet(name = "DetailSite", urlPatterns = {UrlConstants.URL_ADMIN + "/site/detail"})
+//@WebServlet(name = "DetailSite", urlPatterns = {UrlConstants.URL_ADMIN + "/site/detail"})
 public class DetailSite extends HttpServlet {
 
     @Override

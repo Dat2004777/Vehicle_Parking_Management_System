@@ -291,6 +291,10 @@
                 background-color: #dcfce7;
                 color: #16a34a;
             }
+            .badge-maintenance {
+                background-color: #fef3c7; /* Nền vàng nhạt */
+                color: #d97706;            /* Chữ vàng cam đậm, cùng màu với dot-yellow */
+            }
             .badge-full {
                 background-color: #fee2e2;
                 color: #dc2626;
@@ -305,6 +309,16 @@
             }
             .dot-red {
                 background-color: #dc2626;
+            }
+
+            /* Màu chấm tròn cho Bảo trì */
+            .dot-yellow {
+                background-color: #d97706; /* Màu vàng cam đậm (Amber-600) để nổi bật trên nền sáng */
+            }
+
+            /* Màu text cho Bảo trì */
+            .text-warning-custom {
+                color: #f59e0b !important; /* Màu vàng cam (Amber-500) */
             }
 
             .text-success-custom {
@@ -416,11 +430,30 @@
                     gap: 1rem;
                 }
             }
+
+            /* Hiệu ứng cho hàng trong bảng có thể click */
+            .clickable-row {
+                cursor: pointer; /* Đổi chuột thành hình bàn tay */
+                transition: all 0.2s ease-in-out; /* Làm mượt animation */
+            }
+
+            .clickable-row:hover {
+                background-color: #f8fafc !important; /* Đổi màu nền sang xám rất nhạt (chuẩn Tailwind) */
+                transform: translateY(-1px); /* Nổi dòng lên 1 pixel tạo cảm giác 3D */
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* Thêm bóng đổ siêu nhẹ */
+            }
+
+            /* Đảm bảo các viền không bị vỡ khi dòng nổi lên */
+            .clickable-row td {
+                border-bottom: 1px solid transparent;
+            }
         </style>
     </head>
     <body>
 
-        <%@include file="../../layout/sidebar.jsp" %>
+        <jsp:include page="../../layout/admin-sidebar.jsp">
+            <jsp:param name="activePage" value="adminSite" />
+        </jsp:include>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -430,7 +463,7 @@
                     <button id="mobileToggle" aria-label="Toggle menu">
                         <i class="bi bi-list"></i>
                     </button>
-                    <h1 class="page-title">Danh Sách Bãi Xe</h1>
+                    <h1 class="page-title">Danh sách bãi xe</h1>
                 </div>
 
             </header>
@@ -444,9 +477,9 @@
                         <i class="bi bi-search"></i>
                         <input type="text" class="search-input" placeholder="Tìm kiếm bãi xe, địa chỉ...">
                     </div>
-                    <button class="btn btn-primary d-flex align-items-center gap-2 px-3 fw-medium">
+                    <a href="${ctx}/site/add" class="btn btn-primary d-flex align-items-center gap-2 px-3 fw-medium">
                         <i class="bi bi-plus-lg"></i> Thêm bãi xe mới
-                    </button>
+                    </a>
                 </div>
 
                 <!-- Summary Cards Row -->
@@ -456,7 +489,7 @@
                             <div class="summary-icon icon-total"><i class="bi bi-building"></i></div>
                             <div>
                                 <div class="summary-title">Tổng số bãi xe</div>
-                                <div class="summary-value">${totalSites}</div>
+                                <div class="summary-value">${siteStateDTO.totalSites}</div>
                             </div>
                         </div>
                     </div>
@@ -465,7 +498,7 @@
                             <div class="summary-icon icon-active"><i class="bi bi-check-circle"></i></div>
                             <div>
                                 <div class="summary-title">Đang hoạt động</div>
-                                <div class="summary-value">10</div>
+                                <div class="summary-value">${siteStateDTO.operatingSites}</div>
                             </div>
                         </div>
                     </div>
@@ -473,8 +506,8 @@
                         <div class="summary-card">
                             <div class="summary-icon icon-full"><i class="bi bi-x-circle"></i></div>
                             <div>
-                                <div class="summary-title">Đã đầy chỗ</div>
-                                <div class="summary-value">2</div>
+                                <div class="summary-title">Đóng cửa</div>
+                                <div class="summary-value">${siteStateDTO.closedSites}</div>
                             </div>
                         </div>
                     </div>
@@ -483,7 +516,7 @@
                             <div class="summary-icon icon-maint"><i class="bi bi-tools"></i></div>
                             <div>
                                 <div class="summary-title">Bảo trì</div>
-                                <div class="summary-value">0</div>
+                                <div class="summary-value">${siteStateDTO.maintenanceSites}</div>
                             </div>
                         </div>
                     </div>
@@ -512,145 +545,14 @@
                                 <tr>
                                     <th>TÊN BÃI XE</th>
                                     <th>ĐỊA CHỈ</th>
-                                    <th class="text-center">TỔNG CHỖ</th>
                                     <th class="text-center">TRỐNG</th>
+                                    <th class="text-center">TỔNG CHỖ</th>
                                     <th>TRẠNG THÁI</th>
-                                    <th class="text-end">THAO TÁC</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Item 1 -->
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="type-icon type-p-blue">P</div>
-                                            <div>
-                                                <div class="lot-name">Bãi xe Trung Tâm A</div>
-                                                <div class="lot-sub">Khu vực A - Tầng hầm</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">
-                                        <i class="bi bi-geo-alt me-1"></i> 123 đường Lê Lợi, Q.1
-                                    </td>
-                                    <td class="text-center fw-bold text-dark">250</td>
-                                    <td class="text-center fw-bold text-success-custom">20</td>
-                                    <td>
-                                        <span class="custom-badge badge-active"><span class="dot dot-green"></span> Hoạt động</span>
-                                    </td>
-                                    <td class="text-end action-btns">
-                                        <button class="btn-icon-sm" title="Xem chi tiết"><i class="bi bi-eye"></i></button>
-                                        <button class="btn-icon-sm" title="Chỉnh sửa"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm delete" title="Xóa"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-
-                                <!-- Item 2 -->
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="type-icon type-p-blue">P</div>
-                                            <div>
-                                                <div class="lot-name">Bãi xe Khu B</div>
-                                                <div class="lot-sub">Khu vực B - Ngoài trời</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">
-                                        <i class="bi bi-geo-alt me-1"></i> 456 đường Nguyễn Huệ, Q.1
-                                    </td>
-                                    <td class="text-center fw-bold text-dark">300</td>
-                                    <td class="text-center fw-bold text-dark">145</td>
-                                    <td>
-                                        <span class="custom-badge badge-active"><span class="dot dot-green"></span> Hoạt động</span>
-                                    </td>
-                                    <td class="text-end action-btns">
-                                        <button class="btn-icon-sm"><i class="bi bi-eye"></i></button>
-                                        <button class="btn-icon-sm"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm delete"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-
-                                <!-- Item 3 -->
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="type-icon type-star-orange"><i class="bi bi-star-fill" style="font-size: 1rem;"></i></div>
-                                            <div>
-                                                <div class="lot-name">Khu VIP Hầm B2</div>
-                                                <div class="lot-sub">Khu vực VIP - Có bảo vệ</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">
-                                        <i class="bi bi-geo-alt me-1"></i> 123 đường Lê Lợi, Q.1
-                                    </td>
-                                    <td class="text-center fw-bold text-dark">50</td>
-                                    <td class="text-center fw-bold text-danger-custom">0</td>
-                                    <td>
-                                        <span class="custom-badge badge-full"><span class="dot dot-red"></span> Đã đầy</span>
-                                    </td>
-                                    <td class="text-end action-btns">
-                                        <button class="btn-icon-sm"><i class="bi bi-eye"></i></button>
-                                        <button class="btn-icon-sm"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm delete"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-
-                                <!-- Item 4 -->
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="type-icon type-moto-green"><i class="bi bi-bicycle" style="font-size: 1.2rem;"></i></div>
-                                            <div>
-                                                <div class="lot-name">Bãi xe máy C</div>
-                                                <div class="lot-sub">Khu vực C - Xe máy</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">
-                                        <i class="bi bi-geo-alt me-1"></i> 789 đường Hai Bà Trưng, Q.3
-                                    </td>
-                                    <td class="text-center fw-bold text-dark">500</td>
-                                    <td class="text-center fw-bold text-dark">320</td>
-                                    <td>
-                                        <span class="custom-badge badge-active"><span class="dot dot-green"></span> Hoạt động</span>
-                                    </td>
-                                    <td class="text-end action-btns">
-                                        <button class="btn-icon-sm"><i class="bi bi-eye"></i></button>
-                                        <button class="btn-icon-sm"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm delete"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-
-                                <!-- Item 5 -->
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="type-icon type-p-blue">P</div>
-                                            <div>
-                                                <div class="lot-name">Bãi xe Khách Vãng Lai</div>
-                                                <div class="lot-sub">Khu vực D - Ngoài trời</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted">
-                                        <i class="bi bi-geo-alt me-1"></i> 456 đường Nguyễn Huệ, Q.1
-                                    </td>
-                                    <td class="text-center fw-bold text-dark">80</td>
-                                    <td class="text-center fw-bold text-dark">68</td>
-                                    <td>
-                                        <span class="custom-badge badge-active"><span class="dot dot-green"></span> Hoạt động</span>
-                                    </td>
-                                    <td class="text-end action-btns">
-                                        <button class="btn-icon-sm"><i class="bi bi-eye"></i></button>
-                                        <button class="btn-icon-sm"><i class="bi bi-pencil"></i></button>
-                                        <button class="btn-icon-sm delete"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-
                                 <c:forEach var="site" items="${parkingSites}">
-                                    <tr>
+                                    <tr class="clickable-row" onclick="window.location.href = '${ctx}/site/detail?siteId=${site.siteId}'">
                                         <td>
                                             <div class="d-flex align-items-center gap-3">
                                                 <div class="type-icon type-p-blue">P</div>
@@ -662,17 +564,54 @@
                                         <td class="text-muted">
                                             <i class="bi bi-geo-alt me-1"></i> ${site.address}
                                         </td>
-                                        <td class="text-center fw-bold text-dark">80</td>
-                                        <td class="text-center fw-bold text-dark">68</td>
-                                        <td>
-                                            <span class="custom-badge badge-active"><span class="dot dot-green"></span> ${site.siteState.label}</span>
+                                        <c:set var="densityData" value="${densityMap[site.siteId]}" />
+
+                                        <td class="text-center fw-bold ${
+                                            densityData != null && densityData.densityPercentage > 90 ? 'text-danger-custom' : 
+                                                densityData != null && densityData.densityPercentage > 75 ? 'text-warning-custom' : 
+                                                'text-success-custom'
+                                            }">
+                                            ${densityData != null ? densityData.availableCapacity : 0}
                                         </td>
-                                        <td class="text-end action-btns">
-                                            <button class="btn-icon-sm"><i class="bi bi-eye"></i></button>
-                                            <button class="btn-icon-sm"><i class="bi bi-pencil"></i></button>
-                                            <button class="btn-icon-sm delete"><i class="bi bi-trash"></i></button>
+                                        <td class="text-center fw-bold text-dark">
+                                            ${densityData != null ? densityData.maxCapacity : 0}
+                                        </td>
+                                        <td>
+                                            <span class="custom-badge ${site.siteState == 'OPERATING' ? 'badge-active' : 
+                                                                        site.siteState == 'CLOSED' ? 'badge-full' : 'badge-maintenance'}">
+                                                <span class="dot ${site.siteState == 'OPERATING' ? 'dot-green' : 
+                                                                   site.siteState == 'CLOSED' ? 'dot-red' : 'dot-yellow'}">
+                                                </span> 
+                                                ${site.siteState.label}
+                                            </span>
                                         </td>
                                     </tr>
+                                    <!--                                <iframe 
+                                                                        width="100%" 
+                                                                        height="300" 
+                                                                        frameborder="0" 
+                                                                        scrolling="no" 
+                                                                        marginheight="0" 
+                                                                        marginwidth="0" 
+                                                                        style="border:0;"
+                                                                        title="Bản đồ vị trí bãi xe"
+                                                                        allowfullscreen="" 
+                                                                        loading="lazy"
+                                                                        src="https://maps.google.com/maps?q=${site.address}&hl=vi&z=16&output=embed">
+                                                                    </iframe>-->
+                                    <!--                                <c:url value="https://maps.google.com/maps" var="mapUrl">
+                                        <c:param name="q" value="${site.address}" />
+                                        <c:param name="hl" value="vi" />
+                                        <c:param name="z" value="16" />
+                                        <c:param name="output" value="embed" />
+                                    </c:url>
+    
+                                    <iframe 
+                                        width="100%" 
+                                        height="300" 
+                                        style="border:0; border-radius: 8px;" 
+                                        src="${mapUrl}">
+                                    </iframe>-->
                                 </c:forEach>
                             </tbody>
                         </table>
@@ -698,25 +637,25 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
-            // --- Mobile Sidebar Toggle Logic ---
-            const mobileToggle = document.getElementById('mobileToggle');
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
+                                        // --- Mobile Sidebar Toggle Logic ---
+                                        const mobileToggle = document.getElementById('mobileToggle');
+                                        const sidebar = document.getElementById('sidebar');
+                                        const overlay = document.getElementById('sidebarOverlay');
 
-            function toggleMenu() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
+                                        function toggleMenu() {
+                                            sidebar.classList.toggle('active');
+                                            overlay.classList.toggle('active');
 
-                // Prevent body scroll when menu is open on mobile
-                if (sidebar.classList.contains('active')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
-            }
+                                            // Prevent body scroll when menu is open on mobile
+                                            if (sidebar.classList.contains('active')) {
+                                                document.body.style.overflow = 'hidden';
+                                            } else {
+                                                document.body.style.overflow = '';
+                                            }
+                                        }
 
-            mobileToggle.addEventListener('click', toggleMenu);
-            overlay.addEventListener('click', toggleMenu);
+                                        mobileToggle.addEventListener('click', toggleMenu);
+                                        overlay.addEventListener('click', toggleMenu);
         </script>
     </body>
 </html>

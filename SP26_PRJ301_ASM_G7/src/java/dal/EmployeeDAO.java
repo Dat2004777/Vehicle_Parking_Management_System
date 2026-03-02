@@ -9,9 +9,9 @@ import model.Employee;
 
 public class EmployeeDAO extends DBContext {
 
-    public List<Employee> getAll() {
+    public List<Employee> getAllEmployee() {
         List<Employee> list = new ArrayList<>();
-        String sql = "SELECT * FROM Employees";
+        String sql = "SELECT * FROM Employees e WHERE e.status = 'active'";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -21,7 +21,27 @@ public class EmployeeDAO extends DBContext {
                 list.add(mapRowToEmployee(rs));
             }
         } catch (SQLException e) {
-            System.out.println("Error EmployeeDAO.getAll: " + e.getMessage());
+            System.out.println("Error EmployeeDAO.getAllEmployee: " + e.getMessage());
+        }
+        return list;
+    }
+    
+    public List<Employee> getAllEmployeeWithNullSiteId() {
+        List<Employee> list = new ArrayList<>();
+        String sql = """
+                     SELECT * FROM Employees e 
+                     WHERE e.status = 'active' AND e.site_id IS NULL
+                     """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapRowToEmployee(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error EmployeeDAO.getAllEmployeeWithNullSiteId: " + e.getMessage());
         }
         return list;
     }

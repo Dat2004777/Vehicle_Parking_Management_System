@@ -119,7 +119,7 @@ public class ParkingSite {
     }
 
     public enum State {
-        OPERATING("Đang hoạt động"),
+        OPERATING("Hoạt động"),
         MAINTENANCE("Bảo trì"),
         CLOSED("Đóng cửa");
 

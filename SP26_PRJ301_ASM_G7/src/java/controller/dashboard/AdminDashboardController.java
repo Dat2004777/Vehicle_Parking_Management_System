@@ -53,7 +53,7 @@ public class AdminDashboardController extends HttpServlet {
                     paymentTransactionDAO.getTotalAmountInCurrentMonth(),
                     parkingSessionDAO.getCurrentParkedVehiclesInCurrentMonth(),
                     subscriptionDAO.getTotalSubscriptionByCurrentMonth(),
-                    siteDAO.getAllActiveSites());
+                    siteDAO.getAllSites());
             List<Long> chartData = paymentTransactionDAO.getWeeklyRevenue();
             List<SiteDensityDTO> siteDensityDTOs = siteDAO.getSiteDensities();
             request.setAttribute("siteDensityDTOs", siteDensityDTOs);
@@ -66,7 +66,7 @@ public class AdminDashboardController extends HttpServlet {
                         paymentTransactionDAO.getTotalAmountInCurrentMonthById(siteId),
                         parkingSessionDAO.getCurrentParkedVehiclesInCurrentMonthById(siteId),
                         subscriptionDAO.getTotalSubscriptionInCurrentMonthById(siteId),
-                        siteDAO.getAllActiveSites());
+                        siteDAO.getAllSites());
                 List<Long> chartData = paymentTransactionDAO.getWeeklyRevenueBySiteId(siteId);
                 List<SiteDensityDTO> siteDensityDTOs = siteDAO.getSiteDensitiesById(siteId);
                 request.setAttribute("siteDensityDTOs", siteDensityDTOs);

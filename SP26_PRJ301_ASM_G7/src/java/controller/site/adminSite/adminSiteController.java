@@ -11,8 +11,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.ParkingSite;
+import model.dto.SiteDensityDTO;
+import model.dto.SiteStateDTO;
 import utils.UrlConstants;
 
 /**
@@ -20,39 +25,57 @@ import utils.UrlConstants;
  * @author dat20
  */
 @WebServlet(name = "adminSiteController", urlPatterns = {UrlConstants.URL_ADMIN + "/site"})
-public class adminSiteController extends HttpServlet {
+public class AdminSiteController extends HttpServlet {
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    private SiteDAO siteDAO = new SiteDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        SiteDAO siteDAO = new SiteDAO();
 
-        List<ParkingSite> parkingSites = siteDAO.getAllActiveSites();
+        List<ParkingSite> parkingSites = siteDAO.getAllSites();
+        List<ParkingSite> operatingSites = new ArrayList<>();
+        List<ParkingSite> closedSites = new ArrayList<>();
+        List<ParkingSite> maintenanceSites = new ArrayList<>();
+
+        for (ParkingSite parkingSite : parkingSites) {
+            switch (parkingSite.getSiteState()) {
+                case OPERATING:
+                    operatingSites.add(parkingSite);
+                    break;
+                case MAINTENANCE:
+                    maintenanceSites.add(parkingSite);
+                    break;
+                case CLOSED:
+                    closedSites.add(parkingSite);
+                    break;
+            }
+        }
+
         int totalSites = parkingSites.size();
+        int operatingSiteCount = operatingSites.size();
+        int closedSiteCount = closedSites.size();
+        int maintenanceSiteCount = maintenanceSites.size();
+
+        SiteStateDTO siteStateDTO = new SiteStateDTO(
+                totalSites,
+                operatingSiteCount,
+                closedSiteCount,
+                maintenanceSiteCount);
+
+        List<SiteDensityDTO> siteDensityDTOs = siteDAO.getSiteDensities();
+        Map<Integer, SiteDensityDTO> densityMap = new HashMap<>();
+        for (SiteDensityDTO siteDensityDTO : siteDensityDTOs) {
+            densityMap.put(siteDensityDTO.getSiteId(), siteDensityDTO);
+        }
         
-        request.setAttribute("totalSites", totalSites);
+        request.setAttribute("densityMap", densityMap);
+        request.setAttribute("siteStateDTO", siteStateDTO);
         request.setAttribute("parkingSites", parkingSites);
 
         request.getRequestDispatcher("/WEB-INF/views/site/admin/list.jsp").forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
