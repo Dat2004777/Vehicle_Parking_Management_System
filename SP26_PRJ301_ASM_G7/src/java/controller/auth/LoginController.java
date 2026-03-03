@@ -110,6 +110,7 @@ public class LoginController extends HttpServlet {
             EmployeeDAO empDAO = new EmployeeDAO();
             String contextPath = request.getContextPath();
             session.setAttribute("account", acc);
+            session.setMaxInactiveInterval(3600);
             switch (acc.getRole()) {
                 case ADMIN:
                     int adminId = empDAO.getEmployeeId(acc.getAccountId(), "admin");
