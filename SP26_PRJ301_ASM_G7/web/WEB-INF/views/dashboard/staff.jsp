@@ -242,7 +242,7 @@
 
                             <form action="${ctx}/parking/checkin" method="POST" id="mainGateForm">
                                 <input type="hidden" name="actionType" id="actionType" value="checkin">
-
+                                <input type="hidden" id="estimatedFeeInput" name="estimatedFee">
                                 <div class="input-group-custom mb-4 position-relative">
                                     <label class="form-label text-secondary fw-bold" style="font-size: 0.85rem;">MÃ SỐ THẺ</label>
                                     <div class="d-flex shadow-sm" style="border-radius: 8px;">
@@ -569,7 +569,7 @@
                         }
                         if (el.plateInput)
                             el.plateInput.value = '';
-                }
+                    }
                 }
 
                 // --- HÀM XỬ LÝ SUBMIT (ĐÃ CẬP NHẬT EVENT) ---
@@ -595,7 +595,6 @@
                     if (el.actionType && el.actionType.value === 'checkout') {
                         // 1. [XE RA] Dừng submit, gọi API để lấy thông tin cước phí
                         fetchCheckoutFee(el.cardIdInput.value.trim(), el.plateInput.value.trim());
-                        el.form.submit();
                     } else {
                         // 2. [XE VÀO] Cứ submit form để Server xử lý (Mở cửa barie)
                         if (el.form)
@@ -603,12 +602,21 @@
                     }
                 }
 
+                // Biến toàn cục để quản lý bộ đếm thời gian thanh toán
+                let paymentTimeout;
+
                 function fetchCheckoutFee(cardId, plateNumber) {
+                    // 1. Xóa bộ đếm cũ nếu có (trường hợp quét thẻ liên tục)
+                    if (paymentTimeout)
+                        clearTimeout(paymentTimeout);
+
                     const params = new URLSearchParams();
+                    params.append('type', 'session');
                     params.append('cardId', cardId);
                     params.append('plateNumber', plateNumber);
-
-                    fetch(el.ctx + '/api/parking/calculate-fee', {
+                    params.append('siteId', ${staff.siteId});
+                    
+                    fetch('${pageContext.request.contextPath}/api/parking/estimate-price', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                         body: params
@@ -616,25 +624,44 @@
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    // Cập nhật text vào Modal
+                                    // 2. Cập nhật thông tin hiển thị lên Modal
                                     document.getElementById('modalCardId').innerText = data.cardId || cardId;
                                     document.getElementById('modalPlate').innerText = data.plateNumber || plateNumber;
                                     document.getElementById('modalTimeIn').innerText = data.timeIn || '---';
                                     document.getElementById('modalDuration').innerText = data.duration || '---';
-                                    document.getElementById('modalFee').innerText = data.feeFormatted || '0 đ';
+                                    document.getElementById('modalFee').innerText = data.price || '0 VNĐ';
 
-                                    // KHỞI TẠO MODAL (Cách an toàn nhất)
+                                    // 3. Lưu phí dự kiến vào input hidden để gửi lên Backend đối chiếu lúc Submit
+                                    // Điều này giúp Backend kiểm tra xem giá có bị nhảy sau khi hiện Modal không
+                                    const feeInput = document.getElementById('estimatedFeeInput');
+                                    if (feeInput) {
+                                        feeInput.value = data.fee;
+                                    }
+
+                                    // 4. Khởi tạo và hiển thị Modal (Bootstrap 5)
                                     const modalEl = document.getElementById('paymentModal');
                                     const myModal = bootstrap.Modal.getOrCreateInstance(modalEl);
                                     myModal.show();
 
+                                    // 5. THIẾT LẬP THỜI GIAN CHỜ (TIMEOUT)
+                                    // Nếu sau 5 phút (300.000ms) không bấm Xác nhận, Modal tự đóng để tránh sai lệch giá
+                                    paymentTimeout = setTimeout(() => {
+                                        myModal.hide();
+                                        showToast('warning', '⏳ Phiên thanh toán đã hết hạn (quá 5 phút). Vui lòng quét lại thẻ!');
+                                        // Reset form nếu cần thiết
+                                        const mainForm = document.getElementById('checkoutForm');
+                                        if (mainForm)
+                                            mainForm.reset();
+                                    }, 300000);
+
                                 } else {
+                                    // Hiển thị thông báo lỗi từ Backend (Thẻ không tồn tại, sai bãi, v.v.)
                                     showToast('error', data.message || 'Không tìm thấy lượt đỗ xe!');
                                 }
                             })
                             .catch(error => {
-                                console.error('Lỗi:', error);
-                                showToast('error', 'Lỗi kết nối máy chủ!');
+                                console.error('Lỗi Fetch API:', error);
+                                showToast('error', 'Lỗi kết nối máy chủ! Vui lòng thử lại.');
                             });
                 }
 
@@ -654,7 +681,7 @@
                     // 2. Lấy instance của Modal
                     const modalInstance = bootstrap.Modal.getInstance(el.paymentModal);
 
-                    if (modalInstance) {
+                    if (!modalInstance) {
                         // LẮNG NGHE SỰ KIỆN: Khi nào modal ẩn hẳn thì mới Submit form
                         // Điều này giúp tránh xung đột UI và đảm bảo logic chạy mượt mà
                         el.paymentModal.addEventListener('hidden.bs.modal', function () {
@@ -666,7 +693,7 @@
                         // 3. Ra lệnh ẩn Modal (sẽ kích hoạt sự kiện hidden bên trên)
                         modalInstance.hide();
                     } else {
-                        // Phòng hờ nếu không tìm thấy instance thì submit luôn
+                        //Phòng hờ nếu không tìm thấy instance thì submit luôn
                         if (el.form)
                             el.form.submit();
                     }

@@ -3,9 +3,11 @@ package dal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 import model.ParkingSession;
 
 public class SessionDAO extends DBContext {
@@ -219,7 +221,7 @@ public class SessionDAO extends DBContext {
         }
         return null;
     }
-    
+
     public ParkingSession getActiveSession(String cardId, String licensePlate) {
         String sql = "SELECT TOP 1 * FROM ParkingSessions "
                 + "WHERE card_id = ? AND license_plate = ? AND status = 'active' AND session_state = 'parked'"
@@ -229,7 +231,7 @@ public class SessionDAO extends DBContext {
 
             ps.setString(1, cardId);
             ps.setString(2, licensePlate);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapRowToSession(rs);
@@ -237,6 +239,40 @@ public class SessionDAO extends DBContext {
             }
         } catch (SQLException e) {
             System.out.println("Lỗi Tìm xe Active: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public LocalDateTime getExpectedTimeOut(String cardId) {
+        String sql = """
+                 SELECT 
+                     CASE 
+                         WHEN s.session_type = 'noncasual' THEN 
+                             COALESCE(
+                                 (SELECT TOP 1 sub.end_date FROM Subscriptions sub 
+                                  WHERE sub.card_id = s.card_id AND sub.sub_state = 'active'
+                                  ORDER BY sub.end_date DESC),
+                                 (SELECT TOP 1 b.end_time FROM Bookings b 
+                                  WHERE b.card_id = s.card_id AND b.booking_state = 'completed')
+                             )
+                         ELSE NULL 
+                     END AS expected_time_out
+                 FROM ParkingSessions s
+                 WHERE s.card_id = ? AND s.session_state = 'parked';
+                 """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, cardId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                // Lưu ý: Tên cột ở đây phải khớp với ALIAS 'expected_time_out' trong SQL
+                Timestamp ts = rs.getTimestamp("expected_time_out");
+                if (ts != null) {
+                    return ts.toLocalDateTime();
+                }
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
