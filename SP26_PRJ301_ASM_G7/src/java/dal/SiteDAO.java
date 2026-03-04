@@ -156,34 +156,35 @@ public class SiteDAO extends DBContext {
         return null;
     }
 
-    public List<ParkingSite> searchByName(String keyword) {
+    public List<ParkingSite> siteSearchQuery(String siteSearchQuery) {
         List<ParkingSite> list = new ArrayList<>();
 
-        String sql
-                = """
-                SELECT s.site_id, s.site_name,s.address, s.region, s.manager_id, s.status,SUM(a.totalSlots) AS total_slots
-                    FROM ParkingSites s
-                    JOIN ParkingAreas a ON s.site_id = a.site_id 
-                    WHERE s.site_name LIKE ?
-                    GROUP BY 
-                        s.site_id,
-                        s.site_name,
-                        s.address,
-                        s.region,
-                        s.manager_id,
-                        s.status;
-                """;
+        String sql = """
+                        SELECT * FROM ParkingSites ps
+                        WHERE (ps.site_name like ? OR ps.address like ?) AND ps.status = 'active'
+                    """;
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, "%" + keyword + "%");
+            ps.setString(1, "%" + siteSearchQuery + "%");
+            ps.setString(2, "%" + siteSearchQuery + "%");
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                list.add(mapRowToSite(rs));
+                ParkingSite site = new ParkingSite();
+                site.setSiteId(rs.getInt("site_id"));
+                site.setSiteName(rs.getString("site_name"));
+                site.setAddress(rs.getString("address"));
+                String regionStr = rs.getString("region");
+                site.setRegion(ParkingSite.Region.valueOf(regionStr.toUpperCase().trim()));
+                String siteStateStr = rs.getString("operating_state");
+                site.setSiteState(ParkingSite.State.valueOf(siteStateStr.toUpperCase().trim()));
+                site.setManagerId(rs.getInt("manager_id"));
+
+                list.add(site);
             }
         } catch (SQLException e) {
-            System.out.println("Error searchByName: " + e.getMessage());
+            System.out.println("Error SiteDAO.siteSearchQuery: " + e.getMessage());
         }
         return list;
     }
@@ -352,7 +353,58 @@ public class SiteDAO extends DBContext {
             """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                SiteDensityDTO dto = new SiteDensityDTO();
+                dto.setSiteId(rs.getInt("site_id"));
+                dto.setSiteName(rs.getString("site_name"));
+                dto.setCurrentParked(rs.getInt("current_parked"));
+                dto.setMaxCapacity(rs.getInt("max_capacity"));
 
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            System.out.println("Error siteDAO.getSiteDensities: " + e.getMessage());
+        }
+
+        return list;
+    }
+
+    public List<SiteDensityDTO> getSiteDensities(String siteSearchQuery) {
+        List<SiteDensityDTO> list = new ArrayList<>();
+
+        // Câu Query gom nhóm dữ liệu theo từng Site
+        String sql = """
+            SELECT 
+                s.site_id, 
+                s.site_name,
+                ISNULL(p.current_parked, 0) AS current_parked,
+                ISNULL(a.max_capacity, 0) AS max_capacity
+            FROM ParkingSites s
+            
+            -- 1. Tính tổng số Slot của toàn bộ Area thuộc Site
+            LEFT JOIN (
+                SELECT site_id, SUM(totalSlots) as max_capacity
+                FROM ParkingAreas
+                WHERE status = 'active'
+                GROUP BY site_id
+            ) a ON s.site_id = a.site_id
+            
+            -- 2. Đếm số lượng xe đang nằm trong bãi (session_state = 'parked')
+            LEFT JOIN (
+                SELECT pc.site_id, COUNT(ps.session_id) as current_parked
+                FROM ParkingSessions ps
+                JOIN ParkingCards pc ON ps.card_id = pc.card_id
+                WHERE ps.session_state = 'parked' AND ps.status = 'active'
+                GROUP BY pc.site_id
+            ) p ON s.site_id = p.site_id
+            
+            WHERE s.status = 'active' AND (s.site_name LIKE ? OR s.address LIKE ?)
+            """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);) {
+            ps.setString(1, "%" + siteSearchQuery + "%");
+            ps.setString(2, "%" + siteSearchQuery + "%");
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 SiteDensityDTO dto = new SiteDensityDTO();
                 dto.setSiteId(rs.getInt("site_id"));

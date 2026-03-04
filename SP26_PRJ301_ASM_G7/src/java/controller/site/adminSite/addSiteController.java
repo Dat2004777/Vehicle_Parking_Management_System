@@ -29,7 +29,7 @@ import utils.ValidationUtils;
  *
  * @author dat20
  */
-@WebServlet(name = "addSiteController", urlPatterns = {UrlConstants.URL_ADMIN + "/site/add"})
+@WebServlet(name = "AddSiteController", urlPatterns = {UrlConstants.URL_ADMIN + "/site/add"})
 public class AddSiteController extends HttpServlet {
     
     private EmployeeDAO employeeDao = new EmployeeDAO();

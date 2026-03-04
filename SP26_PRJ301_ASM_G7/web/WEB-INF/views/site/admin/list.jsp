@@ -475,7 +475,7 @@
                 <div class="d-flex flex-column flex-md-row align-items-md-center mb-4 gap-3">
                     <div class="search-container">
                         <i class="bi bi-search"></i>
-                        <input type="text" class="search-input" placeholder="Tìm kiếm bãi xe, địa chỉ...">
+                        <input id="siteSearchQuery" name="siteSearchQuery" type="text" class="search-input" placeholder="Tìm kiếm bãi xe, địa chỉ..." value="${param.siteSearchQuery}">
                     </div>
                     <a href="${ctx}/site/add" class="btn btn-primary d-flex align-items-center gap-2 px-3 fw-medium">
                         <i class="bi bi-plus-lg"></i> Thêm bãi xe mới
@@ -656,6 +656,23 @@
 
                                         mobileToggle.addEventListener('click', toggleMenu);
                                         overlay.addEventListener('click', toggleMenu);
+        </script>
+
+        <script>
+            document.getElementById('siteSearchQuery').addEventListener('change', function () {
+                const query = this.value.trim();
+                const currentUrl = new URL(window.location.href);
+
+                // Sử dụng URLSearchParams để quản lý param chuyên nghiệp hơn
+                if (query) {
+                    currentUrl.searchParams.set('siteSearchQuery', query); // Đặt tên param khớp với Servlet của bạn
+                } else {
+                    currentUrl.searchParams.delete('siteSearchQuery'); // Xóa nếu ô search trống
+                }
+
+                // Chuyển hướng trang
+                window.location.href = currentUrl.toString();
+            });
         </script>
     </body>
 </html>

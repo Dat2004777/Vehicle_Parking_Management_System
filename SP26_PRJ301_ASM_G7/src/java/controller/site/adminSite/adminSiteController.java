@@ -24,7 +24,7 @@ import utils.UrlConstants;
  *
  * @author dat20
  */
-@WebServlet(name = "adminSiteController", urlPatterns = {UrlConstants.URL_ADMIN + "/site"})
+@WebServlet(name = "AdminSiteController", urlPatterns = {UrlConstants.URL_ADMIN + "/site"})
 public class AdminSiteController extends HttpServlet {
 
     private SiteDAO siteDAO = new SiteDAO();
@@ -33,7 +33,15 @@ public class AdminSiteController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<ParkingSite> parkingSites = siteDAO.getAllSites();
+        String siteSearchQuery = request.getParameter("siteSearchQuery");
+
+        List<ParkingSite> parkingSites;
+        if (siteSearchQuery != null && !siteSearchQuery.trim().isEmpty()) {
+            parkingSites = siteDAO.siteSearchQuery(siteSearchQuery);
+        } else {
+            parkingSites = siteDAO.getAllSites();
+        }
+
         List<ParkingSite> operatingSites = new ArrayList<>();
         List<ParkingSite> closedSites = new ArrayList<>();
         List<ParkingSite> maintenanceSites = new ArrayList<>();
@@ -63,7 +71,13 @@ public class AdminSiteController extends HttpServlet {
                 closedSiteCount,
                 maintenanceSiteCount);
 
-        List<SiteDensityDTO> siteDensityDTOs = siteDAO.getSiteDensities();
+        List<SiteDensityDTO> siteDensityDTOs;
+        if (siteSearchQuery != null && !siteSearchQuery.trim().isEmpty()) {
+            siteDensityDTOs = siteDAO.getSiteDensities(siteSearchQuery);
+        } else {
+            siteDensityDTOs = siteDAO.getSiteDensities();
+        }
+
         Map<Integer, SiteDensityDTO> densityMap = new HashMap<>();
         for (SiteDensityDTO siteDensityDTO : siteDensityDTOs) {
             densityMap.put(siteDensityDTO.getSiteId(), siteDensityDTO);
