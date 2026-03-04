@@ -29,13 +29,15 @@ public class DeleteSiteController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession httpSession = request.getSession();
         String siteIdStr = request.getParameter("siteId");
-        
+
         int valideSiteId = ValidationUtils.requireValidInt(siteIdStr, "SiteId không được trống!");
 
         if (siteDAO.deleteSiteBySiteIdAndChangeEmp(valideSiteId)) {
-            response.sendRedirect(httpSession.getAttribute("ctx") + "/site?msg=deleteSuccess");
+            httpSession.setAttribute("successMessage", "Xóa bãi xe thành công");
+            response.sendRedirect(httpSession.getAttribute("ctx") + "/site");
         } else {
-            response.sendRedirect(httpSession.getAttribute("ctx") + "/site?msg=deleteError");
+            httpSession.setAttribute("errorMessage", "Xóa bãi xe thất bại");
+            response.sendRedirect(httpSession.getAttribute("ctx") + "/site");
         }
     }
 

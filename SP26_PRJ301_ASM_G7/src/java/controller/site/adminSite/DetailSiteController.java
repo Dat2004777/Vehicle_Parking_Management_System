@@ -21,6 +21,7 @@ import java.util.List;
 import model.ParkingArea;
 import model.ParkingSite;
 import model.PriceConfig;
+import model.dto.SaveSiteDataDTO;
 import model.dto.SiteFormDataDTO;
 import model.dto.VehicleConfigDTO;
 import utils.UrlConstants;
@@ -79,7 +80,11 @@ public class DetailSiteController extends HttpServlet {
         String[] hourlyPrices = request.getParameterValues("hourlyPrice");
         String[] monthlyPrices = request.getParameterValues("monthlyPrice");
 
+        int validSiteId = 0; // Khởi tạo bên ngoài để catch có thể dùng
+
         try {
+            validSiteId = ValidationUtils.requireValidInt(siteIdStr, "siteId không tìm thấy, vui lòng kiểm tra lại");
+
             String validName = ValidationUtils.requireNonEmpty(siteName, "Tên bãi xe không được để trống!");
             String validAddress = ValidationUtils.requireNonEmpty(siteAddress, "Địa chỉ bãi xe không được để trống!");
 
@@ -94,14 +99,6 @@ public class DetailSiteController extends HttpServlet {
                     siteManager = 0;
                 }
             }
-
-            int validSiteId = ValidationUtils.requireValidInt(siteIdStr, "siteId không tìm thấy, vui lòng kiểm tra lại");
-
-            ParkingSite parkingSite = new ParkingSite(validSiteId, validName, validAddress, validRegion, validState, siteManager);
-
-            employeeDao.updateSiteIdForNewEmployeeAndRemoveForOldEmployee(parkingSite, siteManager);
-
-            siteDAO.updateParkingSite(parkingSite);
 
             if (vehicleTypes == null || vehicleTypes.length == 0 || capacities == null || hourlyPrices == null || monthlyPrices == null) {
                 throw new IllegalArgumentException("Vui lòng cấu hình ít nhất một loại xe và điền đầy đủ thông tin.");
@@ -137,6 +134,12 @@ public class DetailSiteController extends HttpServlet {
                 priceList.add(priceConfig2);
             }
 
+            ParkingSite parkingSite = new ParkingSite(validSiteId, validName, validAddress, validRegion, validState, siteManager);
+
+            employeeDao.updateSiteIdForNewEmployeeAndRemoveForOldEmployee(parkingSite, siteManager);
+
+            siteDAO.updateParkingSite(parkingSite);
+
             //Xoa truoc roi add lai config moi
             priceConfigsDAO.deletePriceConfigsBySiteId(validSiteId);
             areaDAO.deleteAreaBySiteId(validSiteId);
@@ -146,19 +149,48 @@ public class DetailSiteController extends HttpServlet {
             areaDAO.insertAreas(areaList);
 
             // 4. Nếu mọi thứ thành công, chuyển hướng về trang danh sách
+            httpSession.setAttribute("successMessage", "Cập nhật bãi xe thành công");
             response.sendRedirect(httpSession.getAttribute("ctx") + "/site");
         } catch (IllegalArgumentException e) {
             request.setAttribute("errorMessage", e.getMessage());
-            
+
+            // Tạo danh sách configs tạm thời từ input
+            List<VehicleConfigDTO> savedConfigs = new ArrayList<>();
+            if (vehicleTypes != null) {
+                for (int i = 0; i < vehicleTypes.length; i++) {
+                    if (vehicleTypes[i] == null || vehicleTypes[i].trim().isEmpty()) {
+                        continue;
+                    }
+                    try {
+                        VehicleConfigDTO config = new VehicleConfigDTO();
+                        config.setVehicleTypeId(Integer.parseInt(vehicleTypes[i]));
+                        config.setCapacity(Integer.parseInt(capacities[i]));
+                        config.setHourlyPrice(Long.parseLong(hourlyPrices[i].replaceAll("[^0-9]", "")));
+                        config.setMonthlyPrice(Long.parseLong(monthlyPrices[i].replaceAll("[^0-9]", "")));
+                        savedConfigs.add(config);
+                    } catch (Exception ex) {
+                    }
+                }
+            }
+
+            // Gom vào SaveAddSiteDataDTO (Dùng chung cho cả trang Add và Detail/Update)
+            SaveSiteDataDTO savedData = new SaveSiteDataDTO(
+                    siteName, siteAddress, siteRegion, siteManagerStr, siteState, savedConfigs
+            );
+            request.setAttribute("savedData", savedData);
+
             // BẮT BUỘC: Nạp lại toàn bộ dữ liệu của các thẻ Select (DTO)
             SiteFormDataDTO formData = new SiteFormDataDTO(
                     ParkingSite.Region.values(),
                     ParkingSite.State.values(),
                     vehicleDao.getAllVehicle(),
-                    employeeDao.getAllEmployeeWithNullSiteId()
+                    employeeDao.getAllEmployeeForDetailSite(validSiteId)
             );
             request.setAttribute("formData", formData);
-
+            
+            // Quan trọng: Phải nạp lại đối tượng bãi xe gốc hoặc siteId để trang Detail không bị trống ID
+            request.setAttribute("siteId", siteIdStr);
+            
             // Chuyển hướng về lại trang Form kèm theo câu thông báo lỗi
             request.getRequestDispatcher("/WEB-INF/views/site/admin/detail.jsp").forward(request, response);
         }

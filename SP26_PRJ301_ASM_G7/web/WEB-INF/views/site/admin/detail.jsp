@@ -533,7 +533,7 @@
                         <i class="bi bi-list"></i>
                     </button>
                     <h1 class="page-title">Chi tiết bãi xe</h1>
-                    <a class="btn btn-delete ms-auto" href="${ctx}/site/detail/delete?siteId=${parkingSite.siteId}">Xóa bãi xe</a>
+                    <a class="btn btn-delete ms-auto" href="${ctx}/site/detail/delete?siteId=${not empty siteId ? siteId : parkingSite.siteId}">Xóa bãi xe</a>
                 </div>
             </header>
 
@@ -551,7 +551,7 @@
                             <!-- Tên bãi xe -->
                             <div class="col-12">
                                 <label class="form-label">Tên bãi xe</label>
-                                <input name="siteName" type="text" class="form-control" placeholder="Ví dụ: Bãi xe ParkEasy Quận 1" value="${parkingSite.siteName}">
+                                <input name="siteName" type="text" class="form-control" placeholder="Ví dụ: Bãi xe ParkEasy Quận 1" value="${not empty savedData ? savedData.siteName : parkingSite.siteName}">
                             </div>
 
                             <!-- Địa chỉ -->
@@ -559,7 +559,7 @@
                                 <label class="form-label">Địa chỉ</label>
                                 <div class="input-group-custom">
                                     <div class="icon-wrapper"><i class="bi bi-geo-alt-fill"></i></div>
-                                    <input name="siteAddress" type="text" class="form-control" placeholder="Nhập địa chỉ chi tiết" value="${parkingSite.address}">
+                                    <input name="siteAddress" type="text" class="form-control" placeholder="Nhập địa chỉ chi tiết" value="${not empty savedData ? savedData.siteAddress : parkingSite.address}">
                                 </div>
                             </div>
 
@@ -569,16 +569,20 @@
                                 <select name="siteRegion" class="form-select">
                                     <option value="0" selected disabled>Chọn khu vực</option>
                                     <c:forEach items="${formData.regions}" var="region">
-                                        <option value="${region.name().toLowerCase()}" ${region.name().toLowerCase() == parkingSite.region.name().toLowerCase() ? 'selected' : ''}>${region.label}</option>
+                                        <c:set var="currentRegion" value="${not empty savedData ? savedData.siteRegion : parkingSite.region.name().toLowerCase()}" />
+                                        <option value="${region.name().toLowerCase()}" ${region.name().toLowerCase() eq currentRegion ? 'selected' : ''}>
+                                            ${region.label}
+                                        </option>
                                     </c:forEach>
                                 </select>
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Nhân viên quản lý</label>
                                 <select name="siteManager" class="form-select">
-                                    <option value="0" selected>Chưa có nhân viên</option>
+                                    <option value="0" ${not empty savedData and savedData.siteManagerId eq '0' ? 'selected' : (parkingSite.managerId eq 0 ? 'selected' : '')}>Chưa có nhân viên</option>
                                     <c:forEach items="${formData.availableManagers}" var="employee">
-                                        <option value="${employee.employeeId}" ${employee.employeeId == parkingSite.managerId ? 'selected' : ''}>${employee.getName()}</option>
+                                        <c:set var="currentManager" value="${not empty savedData ? savedData.siteManagerId : parkingSite.managerId}" />
+                                        <option value="${employee.employeeId}" ${(employee.employeeId).toString() eq currentManager ? 'selected' : ''}>${employee.getName()}</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -588,7 +592,8 @@
                                 <label class="form-label">Trạng thái ban đầu</label>
                                 <select name="siteState" class="form-select">
                                     <c:forEach items="${formData.states}" var="state">
-                                        <option value="${state.name().toLowerCase()}" ${state.name().toLowerCase() == parkingSite.siteState.name().toLowerCase() ? 'selected' : ''}>${state.label}</option>
+                                        <c:set var="currentState" value="${not empty savedData ? savedData.siteState : parkingSite.siteState.name().toLowerCase()}" />
+                                        <option value="${state.name().toLowerCase()}" ${state.name().toLowerCase() eq currentState ? 'selected' : ''}>${state.label}</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -602,7 +607,7 @@
                                 <!-- Container chứa các khối cấu hình -->
                                 <div id="vehicleConfigContainer">
                                     <c:forEach items="${vehicleConfigDTOs}" var="config" varStatus="status">
-                                        <!-- Khối cấu hình mặc định (có thể thêm/xóa) -->
+<!--                                         Khối cấu hình mặc định (có thể thêm/xóa) 
                                         <div class="vehicle-config-block">
                                             <div class="row g-3 align-items-end">
                                                 <div class="col-12 col-md-5">
@@ -623,7 +628,7 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Thiết lập giá vé (Ẩn mặc định, hiển thị bằng JS) -->
+                                             Thiết lập giá vé (Ẩn mặc định, hiển thị bằng JS) 
                                             <div class="pricing-section">
                                                 <h6 class="form-label mb-3">Thiết lập giá vé</h6>
                                                 <div class="row g-3">
@@ -637,8 +642,54 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div>-->
                                     </c:forEach>
+                                        
+                                    <%-- Xác định danh sách cấu hình sẽ dùng để hiển thị --%>
+                                    <c:set var="configsToDisplay" value="${not empty savedData ? savedData.vehicleConfigs : vehicleConfigDTOs}" />
+
+                                    <c:forEach items="${configsToDisplay}" var="config">
+                                        <div class="vehicle-config-block">
+                                            <div class="row g-3 align-items-end">
+                                                <div class="col-12 col-md-5">
+                                                    <label class="form-label">Loại xe</label>
+                                                    <select name="vehicleType" class="form-select vehicle-type-select">
+                                                        <option value="" disabled>Chọn loại xe</option>
+                                                        <c:forEach items="${formData.vehicles}" var="v">
+                                                            <%-- So sánh ID loại xe để giữ selected --%>
+                                                            <option value="${v.vehicleId}" ${v.vehicleId eq config.vehicleTypeId ? 'selected' : ''}>
+                                                                ${v.vehicleName.label}
+                                                            </option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-10 col-md-6">
+                                                    <label class="form-label">Số lượng (Sức chứa)</label>
+                                                    <input name="capacity" type="number" class="form-control" value="${config.capacity}">
+                                                </div>
+
+                                                <div class="col-2 col-md-1 text-center pb-1">
+                                                    <button type="button" class="btn-remove-vehicle"><i class="bi bi-trash-fill"></i></button>
+                                                </div>
+                                            </div>
+
+                                            <%-- Phần giá vé: Nếu đã chọn loại xe thì phải hiện ra --%>
+                                            <div class="pricing-section ${config.vehicleTypeId gt 0 ? '' : 'd-none'}">
+                                                <h6 class="form-label mb-3">Thiết lập giá vé</h6>
+                                                <div class="row g-3">
+                                                    <div class="col-12 col-md-6">
+                                                        <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo giờ</label>
+                                                        <input name="hourlyPrice" type="text" class="form-control mt-2" value="${config.hourlyPrice}">
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo tháng</label>
+                                                        <input name="monthlyPrice" type="text" class="form-control mt-2" value="${config.monthlyPrice}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:forEach>   
                                 </div>
 
                                 <!-- Nút thêm khối cấu hình mới -->
@@ -678,6 +729,8 @@
                 </div>
             </div>
         </main>
+
+        <jsp:include page="../../layout/toast-message.jsp" />         
 
         <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
