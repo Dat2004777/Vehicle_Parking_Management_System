@@ -124,7 +124,7 @@
 
 <div class="toast-container position-fixed end-0 p-4" style="z-index: 1055; top: var(--navbar-height)">
     <div id="systemToast" class="toast custom-toast shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex align-items-start py-2 px-3 bg-white" style="border-radius: 0 10px 10px 0;">
+        <div class="d-flex align-items-center py-2 px-3 bg-white" style="border-radius: 0 10px 10px 0;">
             <i id="toastIcon" class="bi fs-5 me-2 mt-1"></i>
             <div class="flex-grow-1 pe-3">
                 <span id="toastText" style="font-size: 0.9rem; line-height: 1.3; display: block;" class="mt-1 fw-medium text-dark"></span>
