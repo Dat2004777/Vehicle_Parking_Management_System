@@ -4,6 +4,7 @@
     Author     : dat20
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -407,6 +408,29 @@
                 background-color: #1d4ed8;
             }
 
+            .btn-delete {
+                background-color: #ef4444; /* Đỏ tươi (Red-500) */
+                border: none;
+                color: white;
+                font-weight: 600;
+                padding: 0.6rem 1.5rem;
+                border-radius: 8px;
+                transition: all 0.2s;
+                cursor: pointer;
+            }
+
+            .btn-delete:hover {
+                color: #fef3c7;
+                background-color: #dc2626; /* Đỏ đậm hơn khi di chuột (Red-600) */
+                box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2); /* Đổ bóng đỏ nhẹ */
+            }
+
+            /* Thêm hiệu ứng khi nhấn vào (Active) */
+            .btn-delete:active {
+                background-color: #b91c1c;
+                transform: scale(0.98);
+            }
+
             /* --- Alert Box --- */
             .info-alert {
                 background-color: #eff6ff;
@@ -504,11 +528,12 @@
         <main class="main-content">
             <!-- Header -->
             <header class="top-header">
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center w-100">
                     <button id="mobileToggle" aria-label="Toggle menu">
                         <i class="bi bi-list"></i>
                     </button>
                     <h1 class="page-title">Chi tiết bãi xe</h1>
+                    <a class="btn btn-delete ms-auto" href="${ctx}/site/detail/delete?siteId=${parkingSite.siteId}">Xóa bãi xe</a>
                 </div>
             </header>
 
@@ -521,12 +546,12 @@
 
                 <!-- Form Card -->
                 <div class="custom-card">
-                    <form id="addParkingForm">
+                    <form id="DetailSiteController" method="post">
                         <div class="row g-4">
                             <!-- Tên bãi xe -->
                             <div class="col-12">
                                 <label class="form-label">Tên bãi xe</label>
-                                <input type="text" class="form-control" placeholder="Ví dụ: Bãi xe ParkEasy Quận 1">
+                                <input name="siteName" type="text" class="form-control" placeholder="Ví dụ: Bãi xe ParkEasy Quận 1" value="${parkingSite.siteName}">
                             </div>
 
                             <!-- Địa chỉ -->
@@ -534,36 +559,37 @@
                                 <label class="form-label">Địa chỉ</label>
                                 <div class="input-group-custom">
                                     <div class="icon-wrapper"><i class="bi bi-geo-alt-fill"></i></div>
-                                    <input type="text" class="form-control" placeholder="Nhập địa chỉ chi tiết">
+                                    <input name="siteAddress" type="text" class="form-control" placeholder="Nhập địa chỉ chi tiết" value="${parkingSite.address}">
                                 </div>
                             </div>
 
                             <!-- Khu vực & Nhân viên -->
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Khu vực</label>
-                                <select class="form-select">
-                                    <option value="" selected disabled>Chọn khu vực</option>
-                                    <option value="1">Quận 1</option>
-                                    <option value="2">Quận 3</option>
-                                    <option value="3">Quận 10</option>
+                                <select name="siteRegion" class="form-select">
+                                    <option value="0" selected disabled>Chọn khu vực</option>
+                                    <c:forEach items="${formData.regions}" var="region">
+                                        <option value="${region.name().toLowerCase()}" ${region.name().toLowerCase() == parkingSite.region.name().toLowerCase() ? 'selected' : ''}>${region.label}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Nhân viên quản lý</label>
-                                <select class="form-select">
-                                    <option value="" selected disabled>Chọn nhân viên</option>
-                                    <option value="1">Nguyễn Văn A</option>
-                                    <option value="2">Trần Thị B</option>
+                                <select name="siteManager" class="form-select">
+                                    <option value="0" selected>Chưa có nhân viên</option>
+                                    <c:forEach items="${formData.availableManagers}" var="employee">
+                                        <option value="${employee.employeeId}" ${employee.employeeId == parkingSite.managerId ? 'selected' : ''}>${employee.getName()}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
 
                             <!-- Trạng thái ban đầu -->
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Trạng thái ban đầu</label>
-                                <select class="form-select">
-                                    <option value="active" selected>Hoạt động</option>
-                                    <option value="maintenance">Bảo trì</option>
-                                    <option value="closed">Đóng cửa</option>
+                                <select name="siteState" class="form-select">
+                                    <c:forEach items="${formData.states}" var="state">
+                                        <option value="${state.name().toLowerCase()}" ${state.name().toLowerCase() == parkingSite.siteState.name().toLowerCase() ? 'selected' : ''}>${state.label}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
 
@@ -575,42 +601,44 @@
 
                                 <!-- Container chứa các khối cấu hình -->
                                 <div id="vehicleConfigContainer">
-                                    <!-- Khối cấu hình mặc định (có thể thêm/xóa) -->
-                                    <div class="vehicle-config-block">
-                                        <div class="row g-3 align-items-end">
-                                            <div class="col-12 col-md-5">
-                                                <label class="form-label">Loại xe</label>
-                                                <select class="form-select vehicle-type-select">
-                                                    <option value="" selected disabled>Chọn loại xe</option>
-                                                    <option value="oto">Ô tô</option>
-                                                    <option value="xemay">Xe máy</option>
-                                                    <option value="xedap">Xe đạp</option>
-                                                </select>
+                                    <c:forEach items="${vehicleConfigDTOs}" var="config" varStatus="status">
+                                        <!-- Khối cấu hình mặc định (có thể thêm/xóa) -->
+                                        <div class="vehicle-config-block">
+                                            <div class="row g-3 align-items-end">
+                                                <div class="col-12 col-md-5">
+                                                    <label class="form-label">Loại xe</label>
+                                                    <select name="vehicleType" class="form-select vehicle-type-select">
+                                                        <option value="" selected disabled>Chọn loại xe</option>
+                                                        <c:forEach items="${formData.vehicles}" var="vehicle">
+                                                            <option value="${vehicle.vehicleId}" ${vehicle.vehicleId == config.vehicleTypeId ? 'selected' : ''}>${vehicle.vehicleName.label}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </div>
+                                                <div class="col-10 col-md-6">
+                                                    <label class="form-label">Số lượng (Sức chứa)</label>
+                                                    <input name="capacity" type="number" class="form-control" placeholder="Ví dụ: 500" min="0" value="${config.capacity}">
+                                                </div>
+                                                <div class="col-2 col-md-1 text-center pb-1">
+                                                    <button type="button" class="btn-remove-vehicle" title="Xóa loại xe này"><i class="bi bi-trash-fill"></i></button>
+                                                </div>
                                             </div>
-                                            <div class="col-10 col-md-6">
-                                                <label class="form-label">Số lượng (Sức chứa)</label>
-                                                <input type="number" class="form-control" placeholder="Ví dụ: 500" min="0">
-                                            </div>
-                                            <div class="col-2 col-md-1 text-center pb-1">
-                                                <button type="button" class="btn-remove-vehicle" title="Xóa loại xe này"><i class="bi bi-trash-fill"></i></button>
-                                            </div>
-                                        </div>
 
-                                        <!-- Thiết lập giá vé (Ẩn mặc định, hiển thị bằng JS) -->
-                                        <div class="pricing-section d-none">
-                                            <h6 class="form-label mb-3">Thiết lập giá vé</h6>
-                                            <div class="row g-3">
-                                                <div class="col-12 col-md-6">
-                                                    <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo giờ (VNĐ)</label>
-                                                    <input type="text" class="form-control mt-2" placeholder="Ví dụ: 12.000đ">
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                                    <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo tháng (VNĐ)</label>
-                                                    <input type="text" class="form-control mt-2" placeholder="Ví dụ: 120.000đ">
+                                            <!-- Thiết lập giá vé (Ẩn mặc định, hiển thị bằng JS) -->
+                                            <div class="pricing-section">
+                                                <h6 class="form-label mb-3">Thiết lập giá vé</h6>
+                                                <div class="row g-3">
+                                                    <div class="col-12 col-md-6">
+                                                        <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo giờ (VNĐ)</label>
+                                                        <input name="hourlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 12.000đ" value="${config.hourlyPrice}">
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo tháng (VNĐ)</label>
+                                                        <input name="monthlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 120.000đ" value="${config.monthlyPrice}">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </c:forEach>
                                 </div>
 
                                 <!-- Nút thêm khối cấu hình mới -->
@@ -624,8 +652,19 @@
                             <div class="col-12 mt-5">
                                 <label class="form-label">Vị trí trên bản đồ</label>
                                 <div class="map-placeholder">
-                                    <i class="bi bi-map-fill map-icon"></i>
-                                    <span class="map-text">Xem trước bản đồ sẽ hiển thị tại đây</span>
+                                    <c:url value="https://maps.google.com/maps" var="mapUrl">
+                                        <c:param name="q" value="${parkingSite.address}" />
+                                        <c:param name="hl" value="vi" />
+                                        <c:param name="z" value="16" />
+                                        <c:param name="output" value="embed" />
+                                    </c:url>
+
+                                    <iframe 
+                                        width="100%" 
+                                        height="300" 
+                                        style="border:0; border-radius: 8px;" 
+                                        src="${mapUrl}">
+                                    </iframe>
                                 </div>
                             </div>
                         </div>
@@ -648,11 +687,9 @@
             const mobileToggle = document.getElementById('mobileToggle');
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
-
             function toggleMenu() {
                 sidebar.classList.toggle('active');
                 overlay.classList.toggle('active');
-
                 if (sidebar.classList.contains('active')) {
                     document.body.style.overflow = 'hidden';
                 } else {
@@ -662,24 +699,58 @@
 
             mobileToggle.addEventListener('click', toggleMenu);
             overlay.addEventListener('click', toggleMenu);
-
-
             // --- Logic Xử lý Ẩn/Hiện Giá Vé và Thêm/Xóa Loại Xe ---
             const container = document.getElementById('vehicleConfigContainer');
             const btnAdd = document.getElementById('btnAddVehicle');
+            // 1. Hàm cập nhật lại các tùy chọn (Disable loại xe đã chọn)
+            function updateVehicleOptions() {
+                const selects = document.querySelectorAll('.vehicle-type-select');
+                const selectedValues = [];
+                // Lấy tất cả các ID loại xe đã được chọn
+                selects.forEach(select => {
+                    if (select.value !== "") {
+                        selectedValues.push(select.value);
+                    }
+                });
+                // Duyệt qua từng ô select để disable/enable các option
+                selects.forEach(select => {
+                    const options = select.querySelectorAll('option');
+                    options.forEach(option => {
+                        if (option.value === "")
+                            return; // Bỏ qua dòng "Chọn loại xe"
+
+                        // Nếu loại xe này đã bị chọn ở một ô KHÁC -> Disable nó
+                        if (selectedValues.includes(option.value) && option.value !== select.value) {
+                            option.disabled = true;
+                        } else {
+                            option.disabled = false;
+                        }
+                    });
+                });
+                // 2. Ẩn nút "Thêm loại xe" nếu đã thêm hết các loại xe có thể
+                // Lấy tổng số lượng loại xe có trong DB (đếm số option của 1 select bất kỳ, trừ đi dòng placeholder)
+                const totalAvailableVehicles = selects[0].querySelectorAll('option').length - 1;
+                if (selects.length >= totalAvailableVehicles) {
+                    btnAdd.style.display = 'none'; // Ẩn nút thêm
+                } else {
+                    btnAdd.style.display = 'inline-flex'; // Hiện lại nút thêm
+                }
+            }
 
             // Hàm kiểm tra và hiển thị khu vực Giá vé khi Chọn loại xe
             function handleSelectChange(event) {
                 if (event.target.classList.contains('vehicle-type-select')) {
                     const parentBlock = event.target.closest('.vehicle-config-block');
                     const pricingSection = parentBlock.querySelector('.pricing-section');
-
                     // Nếu người dùng đã chọn một giá trị (khác rỗng)
                     if (event.target.value !== "") {
                         pricingSection.classList.remove('d-none');
                     } else {
                         pricingSection.classList.add('d-none');
                     }
+
+                    // Cập nhật lại dropdown mỗi khi người dùng thay đổi lựa chọn
+                    updateVehicleOptions();
                 }
             }
 
@@ -691,6 +762,8 @@
                     // Kiểm tra, ít nhất phải giữ lại 1 khối cấu hình
                     if (container.children.length > 1) {
                         parentBlock.remove();
+                        // Cập nhật lại dropdown (giải phóng loại xe vừa xóa)
+                        updateVehicleOptions();
                     } else {
                         alert("Phải có ít nhất một cấu hình loại xe!");
                     }
@@ -700,7 +773,6 @@
             // Gắn sự kiện (Event Delegation) cho container
             container.addEventListener('change', handleSelectChange);
             container.addEventListener('click', handleRemoveClick);
-
             // Nút Thêm loại xe
             btnAdd.addEventListener('click', () => {
                 // Lấy HTML của khối đầu tiên làm mẫu
@@ -710,17 +782,18 @@
                 // Reset các giá trị trong khối mới
                 const select = newBlock.querySelector('.vehicle-type-select');
                 select.value = "";
-
                 const inputs = newBlock.querySelectorAll('input');
                 inputs.forEach(input => input.value = "");
-
                 // Ẩn lại phần giá vé ở khối mới
                 const pricingSection = newBlock.querySelector('.pricing-section');
                 pricingSection.classList.add('d-none');
-
                 // Thêm khối mới vào container
                 container.appendChild(newBlock);
+                // Cập nhật lại dropdown cho ô vừa thêm
+                updateVehicleOptions();
             });
+            // Chạy cập nhật lần đầu tiên khi trang vừa load xong
+            updateVehicleOptions();
 
         </script>
     </body>

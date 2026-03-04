@@ -14,30 +14,45 @@ import model.dto.SiteDensityDTO;
  */
 public class SiteDAO extends DBContext {
 
-    public void add(ParkingSite site) {
-        String sql = "INSERT INTO ParkingSites (site_name, address, region,manager_id, status) VALUES (?, ?, ?, ?, ?)";
+    public int addSiteAndGetId(ParkingSite site) {
+        String sql = """
+                     INSERT INTO ParkingSites (site_name, address, region, manager_id, operating_state) 
+                     VALUES (?, ?, ?, ?, ?);
+                     """;
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
 
             ps.setString(1, site.getSiteName());
             ps.setString(2, site.getAddress());
+            ps.setString(3, site.getRegion().name().toLowerCase());
 
-            ps.setString(3, site.getRegion().name());
+            // XỬ LÝ LƯU NULL NẾU managerId == 0
+            if (site.getManagerId() == 0) {
+                ps.setNull(4, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(4, site.getManagerId());
+            }
 
-            ps.setInt(4, site.getManagerId());
-            ps.setString(5, site.getSiteState().name());
+            ps.setString(5, site.getSiteState().name().toLowerCase());
 
             ps.executeUpdate();
+
+            // Lấy ID vừa tự động tăng để dùng cho việc lưu ParkingAreas
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
         } catch (SQLException e) {
-            System.out.println("Error add: " + e.getMessage());
+            System.out.println("Error SiteDAO.addSite: " + e.getMessage());
         }
+        return -1;
     }
 
-    public void update(ParkingSite newSiteData) {
+    public void updateParkingSite(ParkingSite newSiteData) {
         String sql
                 = """
                 UPDATE ParkingSites
-                SET site_name = ?, address = ?, region = ?, status = ?, manager_id = ? 
+                SET site_name = ?, address = ?, region = ?, operating_state = ?, manager_id = ? 
                 WHERE site_id = ?
                 """;
         try {
@@ -46,27 +61,47 @@ public class SiteDAO extends DBContext {
             ps.setString(1, newSiteData.getSiteName());
             ps.setString(2, newSiteData.getAddress());
 
-            ps.setString(3, newSiteData.getRegion().name());
-            ps.setString(4, newSiteData.getSiteState().name());
-            ps.setInt(5, newSiteData.getManagerId());
+            ps.setString(3, newSiteData.getRegion().name().toLowerCase());
+            ps.setString(4, newSiteData.getSiteState().name().toLowerCase());
+
+            // KIỂM TRA MANAGER ID
+            if (newSiteData.getManagerId() == 0) {
+                // Nếu là 0, set giá trị NULL cho cột manager_id (kiểu INT)
+                ps.setNull(5, java.sql.Types.INTEGER);
+            } else {
+                ps.setInt(5, newSiteData.getManagerId());
+            }
 
             ps.setInt(6, newSiteData.getSiteId());
 
             ps.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error update: " + e.getMessage());
+            System.out.println("Error SiteDAO.updateParkingSite: " + e.getMessage());
         }
     }
 
     // 5. Xóa (Delete)
-    public void delete(int id) {
-        String sql = "DELETE FROM ParkingSites WHERE site_id = ?";
+    public boolean deleteSiteBySiteIdAndChangeEmp(int siteId) {
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, id);
-            ps.executeUpdate();
+
+            // Bước 1: Giải phóng nhân viên (Set site_id = NULL cho các nhân viên thuộc site này)
+            String sqlUpdateEmployees = "UPDATE Employees SET site_id = NULL WHERE site_id = ?";
+            try (PreparedStatement psEmp = connection.prepareStatement(sqlUpdateEmployees)) {
+                psEmp.setInt(1, siteId);
+                psEmp.executeUpdate();
+            }
+
+            // Bước 2: Xóa mềm bãi xe (hoặc xóa cứng tùy bạn)
+            String sqlDeleteSite = "UPDATE ParkingSites SET status = 'inactive' WHERE site_id = ?";
+            try (PreparedStatement psSite = connection.prepareStatement(sqlDeleteSite)) {
+                psSite.setInt(1, siteId);
+                psSite.executeUpdate();
+            }
+
+            return true;
         } catch (SQLException e) {
-            System.out.println("Error delete: " + e.getMessage());
+            System.out.println("Error SiteDAO.deleteSiteBySiteId : " + e.getMessage());
+            return false;
         }
     }
 
@@ -100,31 +135,23 @@ public class SiteDAO extends DBContext {
         return list;
     }
 
-    public ParkingSite getById(int id) {
+    public ParkingSite getSiteById(int siteId) {
         String sql
                 = """
-                SELECT s.site_id, s.site_name,s.address, s.region, s.manager_id, s.status,SUM(a.totalSlots) AS total_slots
-                    FROM ParkingSites s
-                    JOIN ParkingAreas a ON s.site_id = a.site_id 
-                    WHERE s.site_id = ?
-                    GROUP BY 
-                        s.site_id,
-                        s.site_name,
-                        s.address,
-                        s.region,
-                        s.manager_id,
-                        s.status;
+                SELECT s.site_id, s.site_name,s.address, s.region, s.manager_id, s.operating_state
+                FROM ParkingSites s
+                WHERE s.site_id = ? AND s.status = 'active'
                 """;
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, id);
+            ps.setInt(1, siteId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return mapRowToSite(rs);
+                return mapRowToSite2(rs);
             }
         } catch (SQLException e) {
-            System.out.println("Error getById: " + e.getMessage());
+            System.out.println("Error SiteDAO.getSiteById: " + e.getMessage());
         }
         return null;
     }
@@ -208,7 +235,7 @@ public class SiteDAO extends DBContext {
         String name = rs.getString("site_name");
         String address = rs.getString("address");
         String regionStr = rs.getString("region");
-        String statusStr = rs.getString("status");
+        String stateStr = rs.getString("operating_state");
         int managerId = rs.getInt("manager_id");
         int totalSlots = rs.getInt("total_slots");
         ParkingSite.Region region = ParkingSite.Region.NORTH; // Default
@@ -222,14 +249,42 @@ public class SiteDAO extends DBContext {
 
         ParkingSite.State status = ParkingSite.State.CLOSED;
         try {
-            if (statusStr != null) {
-                status = ParkingSite.State.valueOf(statusStr.toUpperCase());
+            if (stateStr != null) {
+                status = ParkingSite.State.valueOf(stateStr.toUpperCase());
             }
         } catch (IllegalArgumentException e) {
-            System.out.println("Lỗi convert Status: " + statusStr);
+            System.out.println("Lỗi convert Status: " + stateStr);
         }
 
         return new ParkingSite(id, name, address, region, status, managerId, totalSlots);
+    }
+
+    private ParkingSite mapRowToSite2(ResultSet rs) throws SQLException {
+        int id = rs.getInt("site_id");
+        String name = rs.getString("site_name");
+        String address = rs.getString("address");
+        String regionStr = rs.getString("region");
+        String stateStr = rs.getString("operating_state");
+        int managerId = rs.getInt("manager_id");
+        ParkingSite.Region region = ParkingSite.Region.NORTH; // Default
+        try {
+            if (regionStr != null) {
+                region = ParkingSite.Region.valueOf(regionStr.toUpperCase());
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Lỗi convert Region: " + regionStr);
+        }
+
+        ParkingSite.State status = ParkingSite.State.CLOSED;
+        try {
+            if (stateStr != null) {
+                status = ParkingSite.State.valueOf(stateStr.toUpperCase());
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Lỗi convert Status: " + stateStr);
+        }
+
+        return new ParkingSite(id, name, address, region, status, managerId);
     }
 
     public List<ParkingSite> getAllSites() {

@@ -131,7 +131,6 @@ CREATE TABLE PriceConfigs (
     vehicle_type_id INT NOT NULL,
     type VARCHAR(20) NOT NULL CHECK (type IN ('hourly', 'monthly', 'yearly')),
     base_price BIGINT NOT NULL,
-    unit VARCHAR(20) NOT NULL, 
     status VARCHAR(10) DEFAULT 'active' CHECK (status IN ('active', 'inactive')), -- Xóa mềm
     FOREIGN KEY (site_id) REFERENCES ParkingSites(site_id),
     FOREIGN KEY (vehicle_type_id) REFERENCES VehicleTypes(vehicle_type_id)

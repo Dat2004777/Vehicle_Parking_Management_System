@@ -24,12 +24,12 @@ public class Account {
         this.username = username;
         this.role = role;
     }
-    
-     public Account(int accountId, String username, RoleEnum role, int employeeId) {
-         this.accountId = accountId;
-         this.username = username;
-         this.role = role;
-         this.employeeId = employeeId;
+
+    public Account(int accountId, String username, RoleEnum role, int employeeId) {
+        this.accountId = accountId;
+        this.username = username;
+        this.role = role;
+        this.employeeId = employeeId;
     }
 
     public int getAccount_id() {
@@ -37,7 +37,7 @@ public class Account {
     }
 
     public void setAccount_id(int accountId) {
-        this.accountId= accountId;
+        this.accountId = accountId;
     }
 
     public String getUsername() {
@@ -63,8 +63,7 @@ public class Account {
     public void setEmployeeId(int employeeId) {
         this.employeeId = employeeId;
     }
-    
-    
+
     public enum RoleEnum {
         ADMIN,
         STAFF,

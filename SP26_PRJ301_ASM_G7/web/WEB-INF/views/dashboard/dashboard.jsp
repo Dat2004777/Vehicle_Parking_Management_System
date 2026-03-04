@@ -779,7 +779,7 @@
 
                 // Nếu có giá trị, điều hướng trang kèm theo tham số query
                 if (siteId) {
-                    window.location.href = "dashboard?siteId=" + siteId;
+                    window.location.href = "${ctx}/dashboard?siteId=" + siteId;
                 }
             }
         </script>

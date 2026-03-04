@@ -15,7 +15,7 @@ import java.sql.ResultSet;
  */
 public class PriceConfigsDAO extends DBContext {
 
-    public void insertPriceConfigs(int siteId, List<PriceConfig> prices) {
+    public void insertPriceConfigs(List<PriceConfig> prices) {
         String sql = """
                      INSERT INTO PriceConfigs (site_id, vehicle_type_id, type, base_price) 
                      VALUES (?, ?, ?, ?)
@@ -24,14 +24,26 @@ public class PriceConfigsDAO extends DBContext {
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             for (PriceConfig price : prices) {
-                ps.setInt(1, siteId);
+                ps.setInt(1, price.getSiteId());
                 ps.setInt(2, price.getVehicleTypeId());
                 ps.setString(3, price.getType());
-                ps.setLong(1, price.getBasePrice());
+                ps.setLong(4, price.getBasePrice());
+                ps.executeUpdate();
             }
-            ps.executeQuery();
         } catch (Exception e) {
             System.out.println("Error PriceConfigsDAO.insertPriceConfigs: " + e.getMessage());
+        }
+    }
+
+    public void deletePriceConfigsBySiteId(int siteId) {
+        String sql = "DELETE FROM PriceConfigs WHERE site_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, siteId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Error PriceConfigsDAO.deletePriceConfigsBySiteId: " + e.getMessage());
         }
     }
 }

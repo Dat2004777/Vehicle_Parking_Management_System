@@ -4,7 +4,7 @@
  */
 package controller.dashboard;
 
-import dal.ParkingSessionDAO;
+import dal.SessionDAO;
 import dal.PaymentTransactionDAO;
 import dal.SiteDAO;
 import dal.SubscriptionDAO;
@@ -44,7 +44,7 @@ public class AdminDashboardController extends HttpServlet {
         PaymentTransactionDAO paymentTransactionDAO = new PaymentTransactionDAO();
         SiteDAO siteDAO = new SiteDAO();
         SubscriptionDAO subscriptionDAO = new SubscriptionDAO();
-        ParkingSessionDAO parkingSessionDAO = new ParkingSessionDAO();
+        SessionDAO parkingSessionDAO = new SessionDAO();
 
         String siteIdStr = request.getParameter("siteId");
 

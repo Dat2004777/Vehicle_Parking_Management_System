@@ -5,6 +5,7 @@ package model;
  * @author Admin
  */
 public class ParkingArea {
+
     private int areaId;
     private int siteId;
     private String areaName;
@@ -14,6 +15,12 @@ public class ParkingArea {
     public ParkingArea() {
     }
 
+    public ParkingArea(int siteId, int vehicleTypeId, int totalSlots) {
+        this.siteId = siteId;
+        this.vehicleTypeId = vehicleTypeId;
+        this.totalSlots = totalSlots;
+    }
+
     public ParkingArea(int areaId, int siteId, String areaName, int vehicleTypeId, int totalSlots) {
         this.areaId = areaId;
         this.siteId = siteId;
@@ -21,7 +28,7 @@ public class ParkingArea {
         this.vehicleTypeId = vehicleTypeId;
         this.totalSlots = totalSlots;
     }
-    
+
     public ParkingArea(int siteId, String areaName, int vehicleTypeId, int totalSlots) {
         this.siteId = siteId;
         this.areaName = areaName;
@@ -68,5 +75,5 @@ public class ParkingArea {
     public void setTotalSlots(int totalSlots) {
         this.totalSlots = totalSlots;
     }
-    
+
 }

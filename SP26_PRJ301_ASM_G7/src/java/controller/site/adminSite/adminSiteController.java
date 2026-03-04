@@ -68,7 +68,7 @@ public class AdminSiteController extends HttpServlet {
         for (SiteDensityDTO siteDensityDTO : siteDensityDTOs) {
             densityMap.put(siteDensityDTO.getSiteId(), siteDensityDTO);
         }
-        
+
         request.setAttribute("densityMap", densityMap);
         request.setAttribute("siteStateDTO", siteStateDTO);
         request.setAttribute("parkingSites", parkingSites);

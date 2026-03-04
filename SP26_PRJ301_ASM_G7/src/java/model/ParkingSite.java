@@ -23,6 +23,14 @@ public class ParkingSite {
         this.totalSlots = totalSlots;
     }
 
+    public ParkingSite(String siteName, String address, Region region, State siteState, int managerId) {
+        this.siteName = siteName;
+        this.address = address;
+        this.region = region;
+        this.siteState = siteState;
+        this.managerId = managerId;
+    }
+
     public ParkingSite(int siteId, String siteName, String address, Region region, State siteState, int managerId, int totalSlots) {
         this.siteId = siteId;
         this.siteName = siteName;

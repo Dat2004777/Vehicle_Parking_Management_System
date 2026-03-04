@@ -11,7 +11,7 @@ import java.sql.ResultSet;
  *
  * @author dat20
  */
-public class ParkingSessionDAO extends DBContext {
+public class SessionDAO extends DBContext {
 
     public int getCurrentParkedVehiclesInCurrentMonth() {
 
@@ -33,7 +33,7 @@ public class ParkingSessionDAO extends DBContext {
                 CurrentParkedVehicles = rs.getInt("total_parkingSessions");
             }
         } catch (Exception e) {
-            System.out.println("Error ParkingSessionDAO.getCurrentParkedVehiclesInCurrentMonth: " + e.getMessage());
+            System.out.println("Error SessionDAO.getCurrentParkedVehiclesInCurrentMonth: " + e.getMessage());
         }
 
         return CurrentParkedVehicles;
@@ -62,7 +62,7 @@ public class ParkingSessionDAO extends DBContext {
                 CurrentParkedVehicles = rs.getInt("total_parkingSessions");
             }
         } catch (Exception e) {
-            System.out.println("Error ParkingSessionDAO.getCurrentParkedVehiclesInCurrentMonthById: " + e.getMessage());
+            System.out.println("Error SessionDAO.getCurrentParkedVehiclesInCurrentMonthById: " + e.getMessage());
         }
 
         return CurrentParkedVehicles;

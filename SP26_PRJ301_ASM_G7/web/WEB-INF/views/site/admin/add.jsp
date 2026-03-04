@@ -527,7 +527,7 @@
                             <!-- Tên bãi xe -->
                             <div class="col-12">
                                 <label class="form-label">Tên bãi xe</label>
-                                <input name="siteName" type="text" class="form-control" placeholder="Ví dụ: Bãi xe ParkEasy Quận 1">
+                                <input name="siteName" type="text" class="form-control" placeholder="Ví dụ: Bãi xe ParkEasy Quận 1" required>
                             </div>
 
                             <!-- Địa chỉ -->
@@ -535,7 +535,7 @@
                                 <label class="form-label">Địa chỉ</label>
                                 <div class="input-group-custom">
                                     <div class="icon-wrapper"><i class="bi bi-geo-alt-fill"></i></div>
-                                    <input name="siteAddress" type="text" class="form-control" placeholder="Nhập địa chỉ chi tiết">
+                                    <input name="siteAddress" type="text" class="form-control" placeholder="Nhập địa chỉ chi tiết" required>
                                 </div>
                             </div>
 
@@ -543,7 +543,7 @@
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Khu vực</label>
                                 <select name="siteRegion" class="form-select">
-                                    <option value="" selected>Chọn khu vực</option>
+                                    <option value="0" selected disabled>Chọn khu vực</option>
                                     <c:forEach items="${formData.regions}" var="region">
                                         <option value="${region.name().toLowerCase()}">${region.label}</option>
                                     </c:forEach>
@@ -552,7 +552,7 @@
                             <div class="col-12 col-md-6">
                                 <label class="form-label">Nhân viên quản lý</label>
                                 <select name="siteManager" class="form-select">
-                                    <option value="" selected>Chưa có nhân viên</option>
+                                    <option value="0" selected>Chưa có nhân viên</option>
                                     <c:forEach items="${formData.availableManagers}" var="employee">
                                         <option value="${employee.employeeId}">${employee.getName()}</option>
                                     </c:forEach>
@@ -583,7 +583,7 @@
                                             <div class="col-12 col-md-5">
                                                 <label class="form-label">Loại xe</label>
                                                 <select name="vehicleType" class="form-select vehicle-type-select">
-                                                    <option value="" selected>Chọn loại xe</option>
+                                                    <option value="" selected disabled>Chọn loại xe</option>
                                                     <c:forEach items="${formData.vehicles}" var="vehicle">
                                                         <option value="${vehicle.vehicleId}">${vehicle.vehicleName.label}</option>
                                                     </c:forEach>
@@ -591,7 +591,7 @@
                                             </div>
                                             <div class="col-10 col-md-6">
                                                 <label class="form-label">Số lượng (Sức chứa)</label>
-                                                <input name="capacity" type="number" class="form-control" placeholder="Ví dụ: 500" min="0">
+                                                <input name="capacity" type="number" class="form-control" placeholder="Ví dụ: 500" min="0" required>
                                             </div>
                                             <div class="col-2 col-md-1 text-center pb-1">
                                                 <button type="button" class="btn-remove-vehicle" title="Xóa loại xe này"><i class="bi bi-trash-fill"></i></button>
@@ -604,11 +604,11 @@
                                             <div class="row g-3">
                                                 <div class="col-12 col-md-6">
                                                     <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo giờ (VNĐ)</label>
-                                                    <input name="hourlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 12.000đ">
+                                                    <input name="hourlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 12.000đ" required>
                                                 </div>
                                                 <div class="col-12 col-md-6">
                                                     <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo tháng (VNĐ)</label>
-                                                    <input name="monthlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 120.000đ">
+                                                    <input name="monthlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 120.000đ" required>
                                                 </div>
                                             </div>
                                         </div>
