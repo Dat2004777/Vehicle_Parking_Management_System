@@ -91,7 +91,7 @@ public class EstimatePriceAPI extends HttpServlet {
             json.append("\"price\": \"").append(priceFormatted).append("\"");
 
             // Nếu là case session thì nối thêm 2 trường thời gian
-            if (!timeInStr.isEmpty()) {
+            if (!timeInStr.isEmpty() && !durationStr.isEmpty()) {
                 json.append(", \"timeIn\": \"").append(timeInStr).append("\"");
                 json.append(", \"duration\": \"").append(durationStr).append("\"");
             }
