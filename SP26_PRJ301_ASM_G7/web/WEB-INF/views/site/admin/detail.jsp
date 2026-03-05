@@ -607,44 +607,44 @@
                                 <!-- Container chứa các khối cấu hình -->
                                 <div id="vehicleConfigContainer">
                                     <c:forEach items="${vehicleConfigDTOs}" var="config" varStatus="status">
-<!--                                         Khối cấu hình mặc định (có thể thêm/xóa) 
-                                        <div class="vehicle-config-block">
-                                            <div class="row g-3 align-items-end">
-                                                <div class="col-12 col-md-5">
-                                                    <label class="form-label">Loại xe</label>
-                                                    <select name="vehicleType" class="form-select vehicle-type-select">
-                                                        <option value="" selected disabled>Chọn loại xe</option>
-                                                        <c:forEach items="${formData.vehicles}" var="vehicle">
-                                                            <option value="${vehicle.vehicleId}" ${vehicle.vehicleId == config.vehicleTypeId ? 'selected' : ''}>${vehicle.vehicleName.label}</option>
-                                                        </c:forEach>
-                                                    </select>
-                                                </div>
-                                                <div class="col-10 col-md-6">
-                                                    <label class="form-label">Số lượng (Sức chứa)</label>
-                                                    <input name="capacity" type="number" class="form-control" placeholder="Ví dụ: 500" min="0" value="${config.capacity}">
-                                                </div>
-                                                <div class="col-2 col-md-1 text-center pb-1">
-                                                    <button type="button" class="btn-remove-vehicle" title="Xóa loại xe này"><i class="bi bi-trash-fill"></i></button>
-                                                </div>
-                                            </div>
+                                        <!--                                         Khối cấu hình mặc định (có thể thêm/xóa) 
+                                                                                <div class="vehicle-config-block">
+                                                                                    <div class="row g-3 align-items-end">
+                                                                                        <div class="col-12 col-md-5">
+                                                                                            <label class="form-label">Loại xe</label>
+                                                                                            <select name="vehicleType" class="form-select vehicle-type-select">
+                                                                                                <option value="" selected disabled>Chọn loại xe</option>
+                                        <c:forEach items="${formData.vehicles}" var="vehicle">
+                                            <option value="${vehicle.vehicleId}" ${vehicle.vehicleId == config.vehicleTypeId ? 'selected' : ''}>${vehicle.vehicleName.label}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="col-10 col-md-6">
+                                    <label class="form-label">Số lượng (Sức chứa)</label>
+                                    <input name="capacity" type="number" class="form-control" placeholder="Ví dụ: 500" min="0" value="${config.capacity}">
+                                </div>
+                                <div class="col-2 col-md-1 text-center pb-1">
+                                    <button type="button" class="btn-remove-vehicle" title="Xóa loại xe này"><i class="bi bi-trash-fill"></i></button>
+                                </div>
+                            </div>
 
-                                             Thiết lập giá vé (Ẩn mặc định, hiển thị bằng JS) 
-                                            <div class="pricing-section">
-                                                <h6 class="form-label mb-3">Thiết lập giá vé</h6>
-                                                <div class="row g-3">
-                                                    <div class="col-12 col-md-6">
-                                                        <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo giờ (VNĐ)</label>
-                                                        <input name="hourlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 12.000đ" value="${config.hourlyPrice}">
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo tháng (VNĐ)</label>
-                                                        <input name="monthlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 120.000đ" value="${config.monthlyPrice}">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>-->
+                             Thiết lập giá vé (Ẩn mặc định, hiển thị bằng JS) 
+                            <div class="pricing-section">
+                                <h6 class="form-label mb-3">Thiết lập giá vé</h6>
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                        <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo giờ (VNĐ)</label>
+                                        <input name="hourlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 12.000đ" value="${config.hourlyPrice}">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="ms-2 form-label-price fw-light text-muted">Giá vé theo tháng (VNĐ)</label>
+                                        <input name="monthlyPrice" type="text" class="form-control mt-2" placeholder="Ví dụ: 120.000đ" value="${config.monthlyPrice}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>-->
                                     </c:forEach>
-                                        
+
                                     <%-- Xác định danh sách cấu hình sẽ dùng để hiển thị --%>
                                     <c:set var="configsToDisplay" value="${not empty savedData ? savedData.vehicleConfigs : vehicleConfigDTOs}" />
 
@@ -818,7 +818,7 @@
                         // Cập nhật lại dropdown (giải phóng loại xe vừa xóa)
                         updateVehicleOptions();
                     } else {
-                        alert("Phải có ít nhất một cấu hình loại xe!");
+                        showToast("Phải có ít nhất một cấu hình loại xe!", false);
                     }
                 }
             }

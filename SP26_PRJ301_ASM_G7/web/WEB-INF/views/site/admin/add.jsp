@@ -775,7 +775,7 @@
                         // Cập nhật lại dropdown (giải phóng loại xe vừa xóa)
                         updateVehicleOptions();
                     } else {
-                        alert("Phải có ít nhất một cấu hình loại xe!");
+                        showToast("Phải có ít nhất một cấu hình loại xe!", false);
                     }
                 }
             }

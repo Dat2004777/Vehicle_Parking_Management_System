@@ -273,6 +273,29 @@
                 font-size: 1.25rem;
             }
 
+            /* Chiều cao cố định và thanh cuộn mượt mà */
+            .scrollable-density {
+                max-height: 250px; /* Bạn có thể chỉnh con số này (ví dụ 350px hoặc 400px) để khớp với chiều cao biểu đồ bên trái */
+                overflow-y: auto;
+                padding-right: 10px; /* Tạo khoảng trống để thanh cuộn không đè lên nội dung */
+            }
+
+            /* Tùy chỉnh thanh cuộn cho đẹp và hiện đại (Custom Scrollbar) */
+            .scrollable-density::-webkit-scrollbar {
+                width: 6px;
+            }
+            .scrollable-density::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 10px;
+            }
+            .scrollable-density::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 10px;
+            }
+            .scrollable-density::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
+
             /* Action Badges in Table */
             .badge-action {
                 display: inline-flex;
@@ -391,7 +414,7 @@
         <jsp:include page="../layout/admin-sidebar.jsp">
             <jsp:param name="activePage" value="adminDashboard" />
         </jsp:include>
-        
+
         <!-- Main Content -->
         <main class="main-content">
             <!-- Header -->
@@ -547,54 +570,56 @@
                                                                 <div class="custom-progress-bar pg-green" style="width: 15%"></div>
                                                             </div>
                                                         </div>-->
-                            <c:forEach items="${siteDensityDTOs}" var="site">
-                                <div class="mb-4">
+                            <div class="scrollable-density">
+                                <c:forEach items="${siteDensityDTOs}" var="site">
+                                    <div class="mb-4">
 
-                                    <c:choose>
-                                        <%-- TRƯỜNG HỢP 1: TẤT CẢ CÁC BÃI (siteId = 0 hoặc null) -> Hiện tổng quan --%>
-                                        <c:when test="${empty siteId or siteId == 0}">
-                                            <div class="d-flex justify-content-between text-sm mb-1">
-                                                <span class="fw-medium text-dark"><i class="bi bi-building"></i> ${site.siteName}</span>
-                                                <span class="text-muted small">${site.currentParked}/${site.maxCapacity}</span>
-                                            </div>
-
-                                            <div class="custom-progress">
-                                                <div class="custom-progress-bar ${site.densityPercentage > 90 ? 'pg-red' : site.densityPercentage > 75 ? 'pg-orange' : site.densityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
-                                                     style="width: ${site.densityPercentage}%">
-                                                </div>
-                                            </div>
-                                        </c:when>
-
-                                        <%-- TRƯỜNG HỢP 2: CHI TIẾT 1 BÃI (siteId > 0) -> Chỉ hiện Ô tô và Xe máy --%>
-                                        <c:otherwise>
-                                            <div class="mb-3">
+                                        <c:choose>
+                                            <%-- TRƯỜNG HỢP 1: TẤT CẢ CÁC BÃI (siteId = 0 hoặc null) -> Hiện tổng quan --%>
+                                            <c:when test="${empty siteId or siteId == 0}">
                                                 <div class="d-flex justify-content-between text-sm mb-1">
-                                                    <span class="fw-medium text-dark"><i class="bi bi-car-front"></i> Khu vực Ô tô</span>
-                                                    <span class="text-muted small">${site.carCurrentParked}/${site.carMaxCapacity}</span>
+                                                    <span class="fw-medium text-dark"><i class="bi bi-building"></i> ${site.siteName}</span>
+                                                    <span class="text-muted small">${site.currentParked}/${site.maxCapacity}</span>
                                                 </div>
-                                                <div class="custom-progress" style="height: 6px;">
-                                                    <div class="custom-progress-bar ${site.carDensityPercentage > 90 ? 'pg-red' : site.carDensityPercentage > 75 ? 'pg-orange' : site.carDensityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
-                                                         style="width: ${site.carDensityPercentage}%">
+
+                                                <div class="custom-progress">
+                                                    <div class="custom-progress-bar ${site.densityPercentage > 90 ? 'pg-red' : site.densityPercentage > 75 ? 'pg-orange' : site.densityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
+                                                         style="width: ${site.densityPercentage}%">
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </c:when>
 
-                                            <div>
-                                                <div class="d-flex justify-content-between text-sm mb-1">
-                                                    <span class="fw-medium text-dark"><i class="bi bi-bicycle"></i> Khu vực Xe máy</span>
-                                                    <span class="text-muted small">${site.motoCurrentParked}/${site.motoMaxCapacity}</span>
-                                                </div>
-                                                <div class="custom-progress" style="height: 6px;">
-                                                    <div class="custom-progress-bar ${site.motoDensityPercentage > 90 ? 'pg-red' : site.motoDensityPercentage > 75 ? 'pg-orange' : site.motoDensityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
-                                                         style="width: ${site.motoDensityPercentage}%">
+                                            <%-- TRƯỜNG HỢP 2: CHI TIẾT 1 BÃI (siteId > 0) -> Chỉ hiện Ô tô và Xe máy --%>
+                                            <c:otherwise>
+                                                <div class="mb-3">
+                                                    <div class="d-flex justify-content-between text-sm mb-1">
+                                                        <span class="fw-medium text-dark"><i class="bi bi-car-front"></i> Khu vực Ô tô</span>
+                                                        <span class="text-muted small">${site.carCurrentParked}/${site.carMaxCapacity}</span>
+                                                    </div>
+                                                    <div class="custom-progress" style="height: 6px;">
+                                                        <div class="custom-progress-bar ${site.carDensityPercentage > 90 ? 'pg-red' : site.carDensityPercentage > 75 ? 'pg-orange' : site.carDensityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
+                                                             style="width: ${site.carDensityPercentage}%">
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </c:otherwise>
-                                    </c:choose>
 
-                                </div>
-                            </c:forEach>
+                                                <div>
+                                                    <div class="d-flex justify-content-between text-sm mb-1">
+                                                        <span class="fw-medium text-dark"><i class="bi bi-bicycle"></i> Khu vực Xe máy</span>
+                                                        <span class="text-muted small">${site.motoCurrentParked}/${site.motoMaxCapacity}</span>
+                                                    </div>
+                                                    <div class="custom-progress" style="height: 6px;">
+                                                        <div class="custom-progress-bar ${site.motoDensityPercentage > 90 ? 'pg-red' : site.motoDensityPercentage > 75 ? 'pg-orange' : site.motoDensityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
+                                                             style="width: ${site.motoDensityPercentage}%">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </c:otherwise>
+                                        </c:choose>
+
+                                    </div>
+                                </c:forEach>
+                            </div>
                         </div>
                     </div>
                 </div>

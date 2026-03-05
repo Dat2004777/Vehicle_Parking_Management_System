@@ -367,6 +367,38 @@
                 background-color: #f8fafc;
             }
 
+            /* Container cho bảng có khả năng cuộn */
+            .table-scroll-container {
+                max-height: 400px; /* Bạn có thể điều chỉnh độ dài danh sách tại đây */
+                overflow-y: auto;
+                position: relative;
+                border-radius: 8px;
+            }
+
+            /* Giữ phần tiêu đề bảng luôn cố định ở trên cùng (Sticky Header) */
+            .table-scroll-container table thead {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background-color: #ffffff; /* Phải có nền để không bị nội dung bên dưới hiện đè lên */
+                box-shadow: 0 1px 0 var(--border-color); /* Đường kẻ mờ ngăn cách tiêu đề */
+            }
+
+            /* Tùy chỉnh thanh cuộn cho đồng bộ với Dashboard */
+            .table-scroll-container::-webkit-scrollbar {
+                width: 6px;
+            }
+            .table-scroll-container::-webkit-scrollbar-track {
+                background: #f1f5f9;
+            }
+            .table-scroll-container::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 10px;
+            }
+            .table-scroll-container::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
+
             /* ==================== RESPONSIVE ==================== */
             #mobileToggle {
                 display: none;
@@ -540,91 +572,82 @@
 
                     <!-- Table -->
                     <div class="table-responsive">
-                        <table class="table table-borderless align-middle text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>TÊN BÃI XE</th>
-                                    <th>ĐỊA CHỈ</th>
-                                    <th class="text-center">TRỐNG</th>
-                                    <th class="text-center">TỔNG CHỖ</th>
-                                    <th>TRẠNG THÁI</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach var="site" items="${parkingSites}">
-                                    <tr class="clickable-row" onclick="window.location.href = '${ctx}/site/detail?siteId=${site.siteId}'">
-                                        <td>
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="type-icon type-p-blue">P</div>
-                                                <div>
-                                                    <div class="lot-name">${site.siteName}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="text-muted">
-                                            <i class="bi bi-geo-alt me-1"></i> ${site.address}
-                                        </td>
-                                        <c:set var="densityData" value="${densityMap[site.siteId]}" />
-
-                                        <td class="text-center fw-bold ${
-                                            densityData != null && densityData.densityPercentage > 90 ? 'text-danger-custom' : 
-                                                densityData != null && densityData.densityPercentage > 75 ? 'text-warning-custom' : 
-                                                'text-success-custom'
-                                            }">
-                                            ${densityData != null ? densityData.availableCapacity : 0}
-                                        </td>
-                                        <td class="text-center fw-bold text-dark">
-                                            ${densityData != null ? densityData.maxCapacity : 0}
-                                        </td>
-                                        <td>
-                                            <span class="custom-badge ${site.siteState == 'OPERATING' ? 'badge-active' : 
-                                                                        site.siteState == 'CLOSED' ? 'badge-full' : 'badge-maintenance'}">
-                                                <span class="dot ${site.siteState == 'OPERATING' ? 'dot-green' : 
-                                                                   site.siteState == 'CLOSED' ? 'dot-red' : 'dot-yellow'}">
-                                                </span> 
-                                                ${site.siteState.label}
-                                            </span>
-                                        </td>
+                        <div class="table-scroll-container">
+                            <table class="table table-borderless align-middle text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>TÊN BÃI XE</th>
+                                        <th>ĐỊA CHỈ</th>
+                                        <th class="text-center">TRỐNG</th>
+                                        <th class="text-center">TỔNG CHỖ</th>
+                                        <th>TRẠNG THÁI</th>
                                     </tr>
-                                    <!--                                <iframe 
-                                                                        width="100%" 
-                                                                        height="300" 
-                                                                        frameborder="0" 
-                                                                        scrolling="no" 
-                                                                        marginheight="0" 
-                                                                        marginwidth="0" 
-                                                                        style="border:0;"
-                                                                        title="Bản đồ vị trí bãi xe"
-                                                                        allowfullscreen="" 
-                                                                        loading="lazy"
-                                                                        src="https://maps.google.com/maps?q=${site.address}&hl=vi&z=16&output=embed">
-                                                                    </iframe>-->
-                                    <!--                                <c:url value="https://maps.google.com/maps" var="mapUrl">
-                                        <c:param name="q" value="${site.address}" />
-                                        <c:param name="hl" value="vi" />
-                                        <c:param name="z" value="16" />
-                                        <c:param name="output" value="embed" />
-                                    </c:url>
-    
-                                    <iframe 
-                                        width="100%" 
-                                        height="300" 
-                                        style="border:0; border-radius: 8px;" 
-                                        src="${mapUrl}">
-                                    </iframe>-->
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="site" items="${parkingSites}">
+                                        <tr class="clickable-row" onclick="window.location.href = '${ctx}/site/detail?siteId=${site.siteId}'">
+                                            <td>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="type-icon type-p-blue">P</div>
+                                                    <div>
+                                                        <div class="lot-name">${site.siteName}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-muted">
+                                                <i class="bi bi-geo-alt me-1"></i> ${site.address}
+                                            </td>
+                                            <c:set var="densityData" value="${densityMap[site.siteId]}" />
 
-                    <!-- Pagination -->
-                    <div class="pagination-container">
-                        <div class="d-flex gap-2">
-                            <button class="btn-page" disabled>Trước</button>
-                            <button class="btn-page">Tiếp</button>
-                        </div>
-                        <div class="text-muted" style="font-size: 0.875rem;">
-                            Trang <span class="fw-bold text-dark">1</span> của <span class="fw-bold text-dark">3</span>
+                                            <td class="text-center fw-bold ${
+                                                densityData != null && densityData.densityPercentage > 90 ? 'text-danger-custom' : 
+                                                    densityData != null && densityData.densityPercentage > 75 ? 'text-warning-custom' : 
+                                                    'text-success-custom'
+                                                }">
+                                                ${densityData != null ? densityData.availableCapacity : 0}
+                                            </td>
+                                            <td class="text-center fw-bold text-dark">
+                                                ${densityData != null ? densityData.maxCapacity : 0}
+                                            </td>
+                                            <td>
+                                                <span class="custom-badge ${site.siteState == 'OPERATING' ? 'badge-active' : 
+                                                                            site.siteState == 'CLOSED' ? 'badge-full' : 'badge-maintenance'}">
+                                                    <span class="dot ${site.siteState == 'OPERATING' ? 'dot-green' : 
+                                                                       site.siteState == 'CLOSED' ? 'dot-red' : 'dot-yellow'}">
+                                                    </span> 
+                                                    ${site.siteState.label}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <!--                                <iframe 
+                                                                            width="100%" 
+                                                                            height="300" 
+                                                                            frameborder="0" 
+                                                                            scrolling="no" 
+                                                                            marginheight="0" 
+                                                                            marginwidth="0" 
+                                                                            style="border:0;"
+                                                                            title="Bản đồ vị trí bãi xe"
+                                                                            allowfullscreen="" 
+                                                                            loading="lazy"
+                                                                            src="https://maps.google.com/maps?q=${site.address}&hl=vi&z=16&output=embed">
+                                                                        </iframe>-->
+                                        <!--                                <c:url value="https://maps.google.com/maps" var="mapUrl">
+                                            <c:param name="q" value="${site.address}" />
+                                            <c:param name="hl" value="vi" />
+                                            <c:param name="z" value="16" />
+                                            <c:param name="output" value="embed" />
+                                        </c:url>
+        
+                                        <iframe 
+                                            width="100%" 
+                                            height="300" 
+                                            style="border:0; border-radius: 8px;" 
+                                            src="${mapUrl}">
+                                        </iframe>-->
+                                    </c:forEach>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -639,25 +662,25 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
-                                        // --- Mobile Sidebar Toggle Logic ---
-                                        const mobileToggle = document.getElementById('mobileToggle');
-                                        const sidebar = document.getElementById('sidebar');
-                                        const overlay = document.getElementById('sidebarOverlay');
+                                            // --- Mobile Sidebar Toggle Logic ---
+                                            const mobileToggle = document.getElementById('mobileToggle');
+                                            const sidebar = document.getElementById('sidebar');
+                                            const overlay = document.getElementById('sidebarOverlay');
 
-                                        function toggleMenu() {
-                                            sidebar.classList.toggle('active');
-                                            overlay.classList.toggle('active');
+                                            function toggleMenu() {
+                                                sidebar.classList.toggle('active');
+                                                overlay.classList.toggle('active');
 
-                                            // Prevent body scroll when menu is open on mobile
-                                            if (sidebar.classList.contains('active')) {
-                                                document.body.style.overflow = 'hidden';
-                                            } else {
-                                                document.body.style.overflow = '';
+                                                // Prevent body scroll when menu is open on mobile
+                                                if (sidebar.classList.contains('active')) {
+                                                    document.body.style.overflow = 'hidden';
+                                                } else {
+                                                    document.body.style.overflow = '';
+                                                }
                                             }
-                                        }
 
-                                        mobileToggle.addEventListener('click', toggleMenu);
-                                        overlay.addEventListener('click', toggleMenu);
+                                            mobileToggle.addEventListener('click', toggleMenu);
+                                            overlay.addEventListener('click', toggleMenu);
         </script>
 
         <script>
