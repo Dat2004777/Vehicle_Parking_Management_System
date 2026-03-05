@@ -9,6 +9,10 @@
         <title>Tra Cứu Thẻ Và Xe - ParkStaff</title>
         <jsp:include page="/WEB-INF/views/layout/layout.jsp"/>
         <style>
+            body {
+                padding-top: var(--navbar-height);
+            }
+            
             .card-custom {
                 border: none;
                 border-radius: 12px;

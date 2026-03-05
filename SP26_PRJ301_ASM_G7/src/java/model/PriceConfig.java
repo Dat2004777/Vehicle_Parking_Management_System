@@ -9,7 +9,8 @@ package model;
  * @author dat20
  */
 public class PriceConfig {
-
+    
+    private int configId;
     private int siteId;
     private int vehicleTypeId;
     private String type;
@@ -18,11 +19,20 @@ public class PriceConfig {
     public PriceConfig() {
     }
 
-    public PriceConfig(int siteId, int vehicleTypeId, String type, long basePrice) {
+    public PriceConfig(int configId, int siteId, int vehicleTypeId, String type, long basePrice) {
+        this.configId = configId;
         this.siteId = siteId;
         this.vehicleTypeId = vehicleTypeId;
         this.type = type;
         this.basePrice = basePrice;
+    }
+
+    public int getConfigId() {
+        return configId;
+    }
+
+    public void setConfigId(int configId) {
+        this.configId = configId;
     }
 
     public int getSiteId() {
@@ -56,5 +66,7 @@ public class PriceConfig {
     public void setBasePrice(long basePrice) {
         this.basePrice = basePrice;
     }
+
+    
 
 }

@@ -8,6 +8,9 @@
 
 
     <style>
+        body {
+            padding-top: var(--navbar-height);
+        }
         /* Tối ưu hóa card để chứa nội dung cuộn */
         .history-card {
             border-radius: 16px;
@@ -78,7 +81,7 @@
         <jsp:include page="/WEB-INF/views/layout/staff-header.jsp">
             <jsp:param name="pageTitle" value="Lịch sử ra vào | Smart Parking" />
         </jsp:include>
-        
+
         <main class="container-fluid d-flex justify-content-center py-3 py-md-4" style="max-width: 1400px;">
 
             <div class="offcanvas offcanvas-start border-0 shadow" tabindex="-1" id="sidebarOffcanvas" style="width: 280px;">

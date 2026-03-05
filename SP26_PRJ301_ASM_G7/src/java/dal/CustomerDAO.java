@@ -6,6 +6,9 @@ package dal;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement; 
+import java.sql.Types;
 import model.Customer;
 
 /**
@@ -73,12 +76,90 @@ public class CustomerDAO extends DBContext {
 
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
-            return rs.next(); 
+            return rs.next();
 
         } catch (Exception e) {
             System.out.println("Lỗi lấy user-email");
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public Customer getByPhone(String phone) {
+        String sql = "SELECT * FROM Customers WHERE phone = ? AND status = 'active'";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Customer c = new Customer();
+                c.setCustomerId(rs.getInt("customer_id"));
+                // Gộp tên để dùng cho UI ParkEasy
+                c.setFirstname(rs.getNString("first_name"));
+                c.setLastname(rs.getNString("last_name"));
+                c.setEmail(rs.getString("email"));
+                return c;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Tạo mới một khách hàng và trả về ID tự tăng (Identity) vừa được tạo
+     *
+     * @param customer Đối tượng Customer chứa data
+     * @return customer_id vừa được tạo, hoặc ném ra Exception nếu lỗi
+     */
+    public int insertAndReturnId(Customer customer) throws Exception {
+        // Cột customer_id là tự tăng nên KHÔNG đưa vào câu INSERT
+        String sql = "INSERT INTO [Customers] "
+                + "([first_name], [last_name], [phone], [email], [wallet_amount], [account_id]) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+
+        // CHÚ Ý: Phải có Statement.RETURN_GENERATED_KEYS ở đây
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            // 1 & 2. Tên và Họ
+            ps.setString(1, customer.getFirstname());
+            ps.setString(2, customer.getLastname());
+
+            // 3. Số điện thoại (Bắt buộc)
+            ps.setString(3, customer.getPhone());
+
+            // 4. Email (Có thể null do form nhân viên không nhập)
+            if (customer.getEmail() != null && !customer.getEmail().isEmpty()) {
+                ps.setString(4, customer.getEmail());
+            } else {
+                ps.setNull(4, Types.VARCHAR); // Set NULL chuẩn SQL
+            }
+
+            // 5. Số dư ví mặc định là 0 đ cho khách mới tinh
+            ps.setLong(5, 0);
+
+            // 6. Account_ID (Khách offline chưa có tài khoản đăng nhập -> NULL)
+            // (Giả sử bạn dùng Integer object cho account_id, nếu là int nguyên thủy thì check > 0)
+            ps.setNull(6, Types.INTEGER);
+
+            // Thực thi INSERT
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new Exception("Thêm khách hàng thất bại, không có dòng nào được tạo.");
+            }
+
+            // Hứng cái ID vừa sinh ra
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1); // Trả về giá trị của cột tự tăng
+                } else {
+                    throw new Exception("Thêm khách hàng thành công nhưng không lấy được ID.");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Lỗi Database khi tạo khách hàng: " + e.getMessage());
         }
     }
 }

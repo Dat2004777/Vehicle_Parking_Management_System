@@ -134,7 +134,6 @@ public class StaffDashboardController extends HttpServlet {
             int occupiedSlots = sessionDAO.countActiveSessionsByArea(area.getAreaId());
             int availableInArea = area.getTotalSlots() - occupiedSlots;
 
-            // TẠO ĐỐI TƯỢNG VEHICLE TYPE (Dùng chung cho cả Map và AreaDetailDTO)
             // Lưu ý: Đảm bảo class VehicleType đã có hàm equals() và hashCode() theo vehicleTypeId
             VehicleType vt = new VehicleType(area.getVehicleTypeId(), area.getVehicleTypeName());
 

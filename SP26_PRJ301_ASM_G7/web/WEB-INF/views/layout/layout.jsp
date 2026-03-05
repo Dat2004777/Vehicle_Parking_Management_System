@@ -1,7 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
-<!--<link href="${pageContext.request.contextPath}/assets/js/bootstrap.min.js" rel="stylesheet">-->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +22,6 @@
         color: var(--text-main);
         -webkit-font-smoothing: antialiased;
         background-color: var(--bs-body-bg);
-        padding-top: var(--navbar-height);
     }
 
     /* --- Custom Badges --- */

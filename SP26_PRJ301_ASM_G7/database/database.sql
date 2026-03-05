@@ -87,7 +87,7 @@ CREATE TABLE Customers (
     phone VARCHAR(20) NOT NULL,
     email VARCHAR(100),
     wallet_amount BIGINT DEFAULT 0,
-    account_id INT NOT NULL UNIQUE, 
+    account_id INT, 
     status VARCHAR(10) DEFAULT 'active' CHECK (status IN ('active', 'inactive')), -- Xóa mềm
     FOREIGN KEY (account_id) REFERENCES Accounts(account_id) ON DELETE CASCADE
 );

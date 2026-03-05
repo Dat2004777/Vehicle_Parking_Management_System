@@ -9,31 +9,33 @@ package model;
  * @author ADMIN
  */
 public class Customer {
-    private int customer_id; //PK
+    private int customerId; //PK
     private String firstname;
     private String lastname;
     private String phone;
     private String email;
-    private long wallet_amount;
-    private int account_id; //FK tới Account
-    
-    
-    public Customer(int customer_id, String firstname, String lastname, String phone, String email, long wallet_amount, int account_id) {
-        this.customer_id = customer_id;
+    private long walletAmount;
+    private int accountId; //FK tới Account
+
+    public Customer() {
+    }
+
+    public Customer(int customerId, String firstname, String lastname, String phone, String email, long walletAmount, int accountId) {
+        this.customerId = customerId;
         this.firstname = firstname;
         this.lastname = lastname;
         this.phone = phone;
         this.email = email;
-        this.wallet_amount = wallet_amount;
-        this.account_id = account_id;
-    }
-    
-    public int getCustomer_id() {
-        return customer_id;
+        this.walletAmount = walletAmount;
+        this.accountId = accountId;
     }
 
-    public void setCustomer_id(int customer_id) {
-        this.customer_id = customer_id;
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
     }
 
     public String getFirstname() {
@@ -68,20 +70,23 @@ public class Customer {
         this.email = email;
     }
 
-    public long getWallet_amount() {
-        return wallet_amount;
+    public long getWalletAmount() {
+        return walletAmount;
     }
 
-    public void setWallet_amount(long wallet_amount) {
-        this.wallet_amount = wallet_amount;
+    public void setWalletAmount(long walletAmount) {
+        this.walletAmount = walletAmount;
     }
 
-    public int getAccount_id() {
-        return account_id;
+    public int getAccountId() {
+        return accountId;
     }
 
-    public void setAccount_id(int account_id) {
-        this.account_id = account_id;
+    public void setAccountId(int accountId) {
+        this.accountId = accountId;
     }
+    
+    
+    
 
 }

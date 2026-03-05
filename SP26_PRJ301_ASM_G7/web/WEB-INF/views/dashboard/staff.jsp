@@ -8,6 +8,10 @@
         <title>Cổng Nhân Viên - Kiểm Soát Xe</title>
         <jsp:include page="/WEB-INF/views/layout/layout.jsp"/>
         <style>
+            body {
+                padding-top: var(--navbar-height);
+            }
+
             /* THỐNG KÊ (STATS CARDS) */
             .stat-card {
                 border: none;
@@ -476,11 +480,10 @@
 
             <c:if test="${not empty errMsg or not empty sucMsg}">
                 <script>
-                    // Đợi HTML load xong toàn bộ (bao gồm cả cái khung Toast) rồi mới bắn thông báo
                     document.addEventListener("DOMContentLoaded", function () {
 
                     <c:if test="${not empty errMsg}">
-                        // Dùng dấu backtick (`) thay vì nháy đơn (') để tránh lỗi khi chuỗi có chứa dấu nháy
+
                         showToast('error', `${errMsg}`);
                     </c:if>
 
@@ -491,6 +494,7 @@
                     });
                 </script>
             </c:if>
+
         </main>
 
 
@@ -569,7 +573,7 @@
                         }
                         if (el.plateInput)
                             el.plateInput.value = '';
-                    }
+                }
                 }
 
                 // --- HÀM XỬ LÝ SUBMIT (ĐÃ CẬP NHẬT EVENT) ---
@@ -615,7 +619,7 @@
                     params.append('cardId', cardId);
                     params.append('plateNumber', plateNumber);
                     params.append('siteId', ${staff.siteId});
-                    
+
                     fetch('${pageContext.request.contextPath}/api/parking/estimate-price', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'},

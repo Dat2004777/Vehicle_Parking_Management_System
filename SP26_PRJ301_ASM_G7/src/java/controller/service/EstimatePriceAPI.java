@@ -104,7 +104,7 @@ public class EstimatePriceAPI extends HttpServlet {
             response.getWriter().write("{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
         } catch (Exception e) {
             e.printStackTrace();
-            response.getWriter().write("{\"success\": false, \"message\": \"Lỗi hệ thống trong quá trình xử lý.\"}");
+            response.getWriter().write("{\"success\"z: false, \"message\": \"Lỗi hệ thống trong quá trình xử lý.\"}");
         }
     }
 }
