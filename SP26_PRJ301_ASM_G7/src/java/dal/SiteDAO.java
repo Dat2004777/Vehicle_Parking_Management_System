@@ -81,7 +81,7 @@ public class SiteDAO extends DBContext {
     }
 
     // 5. Xóa (Delete)
-    public boolean deleteSiteBySiteIdAndChangeEmp(int siteId) {
+    public void deleteSiteBySiteIdAndChangeEmp(int siteId) {
         try {
 
             // Bước 1: Giải phóng nhân viên (Set site_id = NULL cho các nhân viên thuộc site này)
@@ -98,10 +98,8 @@ public class SiteDAO extends DBContext {
                 psSite.executeUpdate();
             }
 
-            return true;
         } catch (SQLException e) {
-            System.out.println("Error SiteDAO.deleteSiteBySiteId : " + e.getMessage());
-            return false;
+            System.out.println("Error SiteDAO.deleteSiteBySiteIdAndChangeEmp : " + e.getMessage());
         }
     }
 

@@ -129,7 +129,7 @@
         <a href="${ctx}/site" class="nav-item-link ${param.activePage == 'adminSite' ? 'active' : ''}">
             <i class="bi bi-car-front"></i> Quản lý bãi xe
         </a>
-        <a href="#" class="nav-item-link">
+        <a href="${ctx}/employee" class="nav-item-link ${param.activePage == 'adminEmployee' ? 'active' : ''}">
             <i class="bi bi-people"></i> Nhân viên
         </a>
         <a href="#" class="nav-item-link">

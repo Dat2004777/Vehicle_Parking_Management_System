@@ -4,6 +4,7 @@
  */
 package controller.site.adminSite;
 
+import dal.CardDAO;
 import dal.SiteDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -23,28 +24,32 @@ import utils.ValidationUtils;
 public class DeleteSiteController extends HttpServlet {
 
     private SiteDAO siteDAO = new SiteDAO();
+    private CardDAO cardDAO = new CardDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession httpSession = request.getSession();
-        String siteIdStr = request.getParameter("siteId");
 
-        int valideSiteId = ValidationUtils.requireValidInt(siteIdStr, "SiteId không được trống!");
-
-        if (siteDAO.deleteSiteBySiteIdAndChangeEmp(valideSiteId)) {
-            httpSession.setAttribute("successMessage", "Xóa bãi xe thành công");
-            response.sendRedirect(httpSession.getAttribute("ctx") + "/site");
-        } else {
-            httpSession.setAttribute("errorMessage", "Xóa bãi xe thất bại");
-            response.sendRedirect(httpSession.getAttribute("ctx") + "/site");
-        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession httpSession = request.getSession();
+        String siteIdStr = request.getParameter("siteId");
 
+        try {
+            int valideSiteId = ValidationUtils.requireValidInt(siteIdStr, "SiteId không được trống!");
+
+            siteDAO.deleteSiteBySiteIdAndChangeEmp(valideSiteId);
+            cardDAO.softDeleteAllCardBySiteId(valideSiteId);
+
+            httpSession.setAttribute("successMessage", "Xóa bãi xe thành công");
+            response.sendRedirect(httpSession.getAttribute("ctx") + "/site");
+        } catch (Exception e) {
+            httpSession.setAttribute("errorMessage", "Xóa bãi xe thất bại");
+            response.sendRedirect(httpSession.getAttribute("ctx") + "/site");
+        }
     }
 
 }

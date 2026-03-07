@@ -34,4 +34,20 @@ public class CardDAO extends DBContext {
         }
 
     }
+
+    public void softDeleteAllCardBySiteId(int siteId) {
+        String sql = """
+                     UPDATE ParkingCards SET status = 'inactive'
+                     WHERE site_id = ?
+                     """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, siteId);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println("Error CardDAO.softDeleteAllCardBySiteId: " + e.getMessage());
+        }
+    }
 }

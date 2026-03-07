@@ -533,7 +533,7 @@
                         <i class="bi bi-list"></i>
                     </button>
                     <h1 class="page-title">Chi tiết bãi xe</h1>
-                    <a class="btn btn-delete ms-auto" href="${ctx}/site/detail/delete?siteId=${not empty siteId ? siteId : parkingSite.siteId}">Xóa bãi xe</a>
+                    <button class="btn btn-delete ms-auto" type="button" id="btnDeleteSite">Xóa bãi xe</button>
                 </div>
             </header>
 
@@ -605,8 +605,8 @@
                                     <input id="cardQuantityInput" name="cardQuantity" type="number" class="form-control" 
                                            placeholder="Nhập số lượng thẻ thêm mới..." 
                                            min="1">
-                                    <input type="hidden" id="siteIdForCard" value="${not empty siteId ? siteId : parkingSite.siteId}">
-                                    <button href="${ctx}/site/add-card?siteId=${not empty siteId ? siteId : parkingSite.siteId}" class="btn btn-outline-primary fw-bold" type="button" id="btnAddCards">
+                                    <input type="hidden" id="siteId" value="${not empty siteId ? siteId : parkingSite.siteId}">
+                                    <button class="btn btn-outline-primary fw-bold" type="button" id="btnAddCards">
                                         <i class="bi bi-plus-lg me-1"></i> Thêm vé
                                     </button>
                                 </div>
@@ -866,7 +866,7 @@
 
             document.getElementById('btnAddCards').addEventListener('click', function () {
                 const quantity = document.getElementById('cardQuantityInput').value;
-                const siteId = document.getElementById('siteIdForCard').value;
+                const siteId = document.getElementById('siteId').value;
 
                 if (!quantity || quantity <= 0) {
                     showToast("Vui lòng nhập số lượng thẻ hợp lệ!", false);
@@ -890,6 +890,25 @@
 
                 form.appendChild(inputSiteId);
                 form.appendChild(inputQty);
+                document.body.appendChild(form);
+
+                form.submit(); // Gửi dữ liệu đi
+            });
+
+            document.getElementById('btnDeleteSite').addEventListener('click', function () {
+                const siteId = document.getElementById('siteId').value;
+
+                // Tạo một form ẩn để gửi dữ liệu theo kiểu POST truyền thống (để Servlet dễ nhận)
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '${ctx}/site/detail/delete'; // URL Servlet của bạn
+
+                const inputSiteId = document.createElement('input');
+                inputSiteId.type = 'hidden';
+                inputSiteId.name = 'siteId';
+                inputSiteId.value = siteId;
+
+                form.appendChild(inputSiteId);
                 document.body.appendChild(form);
 
                 form.submit(); // Gửi dữ liệu đi
