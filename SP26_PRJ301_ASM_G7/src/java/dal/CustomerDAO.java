@@ -7,7 +7,7 @@ package dal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement; 
+import java.sql.Statement;
 import java.sql.Types;
 import model.Customer;
 
@@ -161,6 +161,8 @@ public class CustomerDAO extends DBContext {
             e.printStackTrace();
             throw new Exception("Lỗi Database khi tạo khách hàng: " + e.getMessage());
         }
+    }
+
     public boolean updateWalletAmount(int customerId, long newAmount) {
         String sql = "UPDATE Customers SET wallet_amount = ? WHERE customer_id = ?";
 

@@ -10,14 +10,14 @@ public class SiteDetailDTO {
     private int siteId;
     private String siteName;
     private String address;
-    private ParkingSite.Status operatingState;
+    private ParkingSite.State operatingState;
     private int totalCapacity;
     private int totalOccupied;
     private int totalAvailable;
     private List<AreaDetailDTO> areas;
     private Map<VehicleType, Integer> slotPerVehicle;
 
-    public SiteDetailDTO(String siteName, String address, ParkingSite.Status operatingState, List<AreaDetailDTO> areas) {
+    public SiteDetailDTO(String siteName, String address, ParkingSite.State operatingState, List<AreaDetailDTO> areas) {
         this.siteName = siteName;
         this.address = address;
         this.operatingState = operatingState;
@@ -40,7 +40,7 @@ public class SiteDetailDTO {
         return address;
     }
 
-    public ParkingSite.Status getOperatingState() {
+    public ParkingSite.State getOperatingState() {
         return operatingState;
     }
 
