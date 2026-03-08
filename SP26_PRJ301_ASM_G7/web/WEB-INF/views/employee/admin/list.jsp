@@ -401,12 +401,6 @@
                         </c:forEach>
                     </select>
 
-                    <select name="statusFilter" class="form-select filter-select">
-                        <option value="" selected>Tất cả trạng thái</option>
-                        <option value="1">Đang làm việc</option>
-                        <option value="2">Đang nghỉ</option>
-                    </select>
-
                     <a href="${ctx}/employee/add" class="btn btn-primary text-decoration-none">
                         <i class="bi bi-plus-lg"></i> Thêm nhân viên mới
                     </a>

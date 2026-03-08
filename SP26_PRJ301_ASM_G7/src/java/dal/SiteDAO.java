@@ -487,4 +487,18 @@ public class SiteDAO extends DBContext {
         }
         return list;
     }
+
+    public void setNullManagerIdWhenChangeSiteEmployee(int employeeId) {
+        String sql = """
+               Update ParkingSites set manager_id = NULL WHERE manager_id = ?
+               """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, employeeId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Error siteDAO.setNullManagerIdWhenChangeSiteEmployee: " + e.getMessage());
+        }
+    }
 }

@@ -16,6 +16,10 @@ public class RandomCardId {
     public static String generateCardId() {
         return "CARD-" + UUID.randomUUID().toString().toUpperCase();
     }
+    
+    public static String generateRandomUsername() {
+        return UUID.randomUUID().toString().toUpperCase();
+    }
 
     //them siteId vào để tỉ lệ trùng
     public static String generateCardId(int siteId) {

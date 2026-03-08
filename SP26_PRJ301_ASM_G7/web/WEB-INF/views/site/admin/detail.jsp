@@ -541,7 +541,8 @@
             <div class="content-area">
 
                 <div class="page-header">
-                    <p class="page-subtitle">Vui lòng điền các thông tin chi tiết dưới đây để đăng ký bãi đỗ xe mới vào hệ thống.</p>
+                    <h1 class="page-title fs-4">Thông tin bãi xe</h1>
+                    <p class="page-subtitle mt-2">Có thể thay đổi các thông tin chi tiết dưới đây để cập nhật thông tin bãi đỗ xe vào hệ thống.</p>
                 </div>
 
                 <!-- Form Card -->

@@ -188,7 +188,7 @@ public class EmployeeDAO extends DBContext {
 
     public List<Employee> getAllEmployeeForDetailSite(int siteId) {
         List<Employee> list = new ArrayList<>();
-        String sql = "SELECT * FROM Employees e WHERE e.status = 'active' AND (e.site_id = ? OR e.site_id IS NULL)";
+        String sql = "SELECT * FROM Employees e WHERE e.status = 'active' AND e.site_id = ?";
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -240,7 +240,7 @@ public class EmployeeDAO extends DBContext {
         return null;
     }
 
-    public void add(Employee emp) {
+    public void addEmployee(Employee emp) {
         String sql = "INSERT INTO Employees (account_id, firstname, lastname, phone, site_id) VALUES (?, ?, ?, ?, ?)";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -249,12 +249,37 @@ public class EmployeeDAO extends DBContext {
             ps.setString(2, emp.getFirstName());
             ps.setString(3, emp.getLastName());
             ps.setString(4, emp.getPhone());
-            ps.setInt(5, emp.getSiteId());
+
+            // Kiểm tra xem có null hay không
+            if (emp.getSiteId() == 0) {
+                // Nếu null thì báo cho SQL biết là lưu giá trị NULL kiểu số nguyên
+                ps.setNull(5, java.sql.Types.INTEGER);
+            } else {
+                // Nếu có giá trị thì setInt bình thường
+                ps.setInt(5, emp.getSiteId());
+            }
 
             ps.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error EmployeeDAO.add: " + e.getMessage());
+            System.out.println("Error EmployeeDAO.addEmployee: " + e.getMessage());
         }
+    }
+// Hàm kiểm tra số điện thoại đã tồn tại hay chưa
+
+    public boolean isPhoneExist(String phone) {
+        // Kiểm tra trong bảng Employees (hoặc bảng Accounts tùy thiết kế của bạn)
+        String sql = "SELECT 1 FROM Employees WHERE phone = ? AND status = 'active'";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, phone);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return true; // Đã tồn tại
+            }
+        } catch (SQLException e) {
+            System.out.println("Error EmployeeDAO.isPhoneExist: " + e.getMessage());
+        }
+        return false; // Chưa tồn tại, an toàn để dùng
     }
 
     public void update(Employee emp) {
@@ -335,7 +360,7 @@ public class EmployeeDAO extends DBContext {
 
         int oldManagerId = 0;
         String sqlGetOldManagerId = "SELECT manager_id FROM ParkingSites WHERE site_id = ?";
-        String removeSiteIdForOldEmployee = "UPDATE Employees SET site_id = NULL WHERE employee_id = ?";
+        String removeSiteIdForOldEmployee = "UPDATE Employees SET site_id = ? WHERE employee_id = ?";
         String setSiteIdForNewEmployee = "UPDATE Employees SET site_id = ? WHERE employee_id = ?";
 
         try {
@@ -351,7 +376,8 @@ public class EmployeeDAO extends DBContext {
             // xoa site_id cho emp cu
             if (oldManagerId != 0 && oldManagerId != newEmployeeId) {
                 try (PreparedStatement psRel = connection.prepareStatement(removeSiteIdForOldEmployee)) {
-                    psRel.setInt(1, oldManagerId);
+                    psRel.setInt(1, parkingSite.getSiteId());
+                    psRel.setInt(2, oldManagerId);
                     psRel.executeUpdate();
                 }
             }
@@ -397,6 +423,90 @@ public class EmployeeDAO extends DBContext {
             System.out.println("Lỗi: Không lấy được empId");
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    public Employee getEmployeeById(int employeeId) {
+        String sql = """
+                     SELECT employee_id, account_id, firstname, lastname, phone, site_id FROM Employees
+                     WHERE employee_id = ? AND status = 'active'
+                     """;
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, employeeId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Employee employee = new Employee(
+                        rs.getInt("employee_id"),
+                        rs.getInt("account_id"),
+                        rs.getString("firstname"),
+                        rs.getString("lastname"),
+                        rs.getString("phone"),
+                        rs.getInt("site_id"));
+
+                return employee;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error EmployeeDAO.getEmployeeById: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public void softDeleteEmployeeById(int employeeId) {
+        String sql = """
+                     UPDATE Employees SET status = 'inactive' WHERE employee_id = ?
+                     """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, employeeId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Error EmployeeDAO.softDeleteEmployeeById: " + e.getMessage());
+        }
+    }
+
+    public int getEmployeeAcountId(int employeeId) {
+        String sql = """
+                     SELECT account_id FROM Employees WHERE employee_id = ?
+                     """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, employeeId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("account_id");
+            }
+        } catch (Exception e) {
+            System.out.println("Error EmployeeDAO.softDeleteEmployeeById: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
+    public void updateEmployee(Employee employee) {
+        String sql = "UPDATE Employees SET firstname = ?, lastname = ?, phone = ?, site_id = ? WHERE employee_id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, employee.getFirstName());
+            ps.setString(2, employee.getLastName());
+            ps.setString(3, employee.getPhone());
+
+            // XỬ LÝ DỊCH SỐ 0 THÀNH NULL SQL
+            if (employee.getSiteId() == 0) {
+                ps.setNull(4, java.sql.Types.INTEGER); // Gửi chữ NULL xuống DB
+            } else {
+                ps.setInt(4, employee.getSiteId()); // Gửi số ID bãi xe xuống DB
+            }
+
+            ps.setInt(5, employee.getEmployeeId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error EmployeeDAO.updateEmployee: " + e.getMessage());
         }
     }
 }

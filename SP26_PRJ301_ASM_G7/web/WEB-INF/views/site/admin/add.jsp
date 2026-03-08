@@ -517,7 +517,8 @@
             <div class="content-area">
 
                 <div class="page-header">
-                    <p class="page-subtitle">Vui lòng điền các thông tin chi tiết dưới đây để đăng ký bãi đỗ xe mới vào hệ thống.</p>
+                    <h1 class="page-title fs-4">Thông tin bãi xe</h1>
+                    <p class="page-subtitle mt-2">Vui lòng điền các thông tin chi tiết dưới đây để đăng ký bãi đỗ xe mới vào hệ thống.</p>
                 </div>
 
                 <!-- Form Card -->
@@ -549,7 +550,7 @@
                                     </c:forEach>
                                 </select>
                             </div>
-                            <div class="col-12 col-md-6">
+<!--                            <div class="col-12 col-md-6">
                                 <label class="form-label">Nhân viên quản lý</label>
                                 <select name="siteManager" class="form-select">
                                     <option value="0" selected>Chưa có nhân viên</option>
@@ -557,7 +558,7 @@
                                         <option value="${employee.employeeId}" ${employee.employeeId == savedData.siteManagerId ? 'selected' : ''}>${employee.getName()}</option>
                                     </c:forEach>
                                 </select>
-                            </div>
+                            </div>-->
 
                             <!-- Trạng thái ban đầu -->
                             <div class="col-12 col-md-6">

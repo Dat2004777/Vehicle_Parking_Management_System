@@ -32,6 +32,10 @@ public class Account {
         this.employeeId = employeeId;
     }
 
+    public Account(RoleEnum role) {
+        this.role = role;
+    }
+
     public int getAccount_id() {
         return accountId;
     }
