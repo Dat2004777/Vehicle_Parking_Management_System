@@ -48,7 +48,7 @@ public class StaffDashboardController extends HttpServlet {
         }
         
         try {
-
+            // Tạm thời gán cứng ID bãi xe theo employee để test giao diện
             int currentSiteId = emp.getSiteId();
             SiteDetailDTO overviewData = buildSiteOverview(currentSiteId);
             request.setAttribute("overview", overviewData);
@@ -134,15 +134,18 @@ public class StaffDashboardController extends HttpServlet {
             int occupiedSlots = sessionDAO.countActiveSessionsByArea(area.getAreaId());
             int availableInArea = area.getTotalSlots() - occupiedSlots;
 
+            // Lưu ý: Đảm bảo class VehicleType đã có hàm equals() và hashCode() theo vehicleTypeId
             VehicleType vt = new VehicleType(area.getVehicleTypeId(), area.getVehicleTypeName());
 
+            // CỘNG DỒN VÀO MAP
             int currentAvailable = slotPerVehicleMap.getOrDefault(vt, 0);
             slotPerVehicleMap.put(vt, currentAvailable + availableInArea);
 
+            // ĐÓNG GÓI VÀO DTO CHI TIẾT KHU VỰC
             AreaDetailDTO dto = new AreaDetailDTO(
                     area.getAreaId(),
                     area.getAreaName(),
-                    vt, 
+                    vt, // Truyền luôn object vt vừa tạo ở trên vào đây cho đồng bộ
                     area.getTotalSlots(),
                     occupiedSlots
             );
@@ -153,7 +156,7 @@ public class StaffDashboardController extends HttpServlet {
         SiteDetailDTO overview = new SiteDetailDTO(
                 site.getSiteName(),
                 site.getAddress(),
-                site.getSiteStatus(), 
+                site.getSiteStatus(), // Dựa theo DB của bạn là operating_state
                 areaList
         );
 
