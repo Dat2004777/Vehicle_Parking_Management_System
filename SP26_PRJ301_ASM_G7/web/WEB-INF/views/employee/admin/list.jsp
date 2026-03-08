@@ -250,6 +250,11 @@
                 font-weight: 500;
                 border: 1px solid transparent;
             }
+            .role-red {
+                background-color: #fef2f2; /* Nền đỏ cực nhạt */
+                color: #dc2626; /* Chữ đỏ đậm */
+                border-color: #fecaca; /* Viền đỏ nhạt */
+            }
             .role-blue {
                 background-color: #eff6ff;
                 color: #2563eb;
@@ -384,18 +389,20 @@
                 <div class="filter-section">
                     <div class="search-box">
                         <i class="bi bi-search"></i>
-                        <input type="text" class="form-control" placeholder="Tìm theo tên hoặc mã nhân viên...">
+                        <input value="${param.employeeSearch}" id="employeeSearch" name="employeeSearch" type="text" class="form-control" placeholder="Tìm theo tên hoặc mã nhân viên...">
                     </div>
 
-                    <select class="form-select filter-select">
-                        <option selected>Tất cả chức vụ</option>
-                        <option value="1">Nhân viên trực bãi</option>
-                        <option value="2">Kế toán</option>
-                        <option value="3">Giám sát</option>
+                    <select name="roleFilter" class="form-select filter-select">
+                        <option value="" selected>Tất cả chức vụ</option>
+                        <c:forEach var="role" items="${roles}">
+                            <option value="${role.name()}" ${param.role == role.name() ? 'selected' : ''}>
+                                ${role.label}
+                            </option>
+                        </c:forEach>
                     </select>
 
-                    <select class="form-select filter-select">
-                        <option selected>Tất cả trạng thái</option>
+                    <select name="statusFilter" class="form-select filter-select">
+                        <option value="" selected>Tất cả trạng thái</option>
                         <option value="1">Đang làm việc</option>
                         <option value="2">Đang nghỉ</option>
                     </select>
@@ -415,73 +422,26 @@
                                         <th>MÃ NV</th>
                                         <th>CHỨC VỤ</th>
                                         <th>BÃI XE PHỤ TRÁCH</th>
-                                        <th>TRẠNG THÁI</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="clickable-row" onclick="window.location.href = '#'">
-                                        <td>
-                                            <div class="user-info">
-                                                <div class="avatar-initials">NA</div>
-                                                <div>
-                                                    <div class="user-name">Nguyễn Văn An</div>
-                                                    <div class="user-email">an.nguyen@parking.com</div>
+                                    <c:forEach var="employee" items="${listEmployees}">
+                                        <tr class="clickable-row" onclick="window.location.href = '${ctx}/employee/detail?employeeId=${employee.employeeId}'">
+                                            <td>
+                                                <div class="user-info">
+                                                    <div class="avatar-initials" style="color: #6366f1; background-color: #e0e7ff;">${employee.getAvatarInitials()}</div>
+                                                    <div>
+                                                        <div class="user-name">${employee.getName()}</div>
+                                                        <div class="user-email">${employee.phone}</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td>NV001</td>
-                                        <td><span class="role-badge role-blue">Nhân viên trực bãi</span></td>
-                                        <td>Bãi xe A - Tầng 1</td>
-                                        <td>
-                                            <div class="status-wrapper">
-                                                <span class="status-dot active"></span>
-                                                <span class="status-text-active">Đang làm việc</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="clickable-row" onclick="window.location.href = '#'">
-                                        <td>
-                                            <div class="user-info">
-                                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&facepad=2&w=100&h=100&q=80" alt="Avatar" class="avatar-img">
-                                                <div>
-                                                    <div class="user-name">Trần Thị Bình</div>
-                                                    <div class="user-email">binh.tran@parking.com</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>NV002</td>
-                                        <td><span class="role-badge role-purple">Kế toán</span></td>
-                                        <td>Văn phòng chính</td>
-                                        <td>
-                                            <div class="status-wrapper">
-                                                <span class="status-dot active"></span>
-                                                <span class="status-text-active">Đang làm việc</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    <tr class="clickable-row" onclick="window.location.href = '#'">
-                                        <td>
-                                            <div class="user-info">
-                                                <div class="avatar-initials" style="color: #6366f1; background-color: #e0e7ff;">LC</div>
-                                                <div>
-                                                    <div class="user-name">Lê Văn Cường</div>
-                                                    <div class="user-email">cuong.le@parking.com</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>NV003</td>
-                                        <td><span class="role-badge role-orange">Giám sát</span></td>
-                                        <td>Bãi xe B - Tầng hầm</td>
-                                        <td>
-                                            <div class="status-wrapper">
-                                                <span class="status-dot inactive"></span>
-                                                <span class="status-text-inactive">Đang nghỉ</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-
+                                            </td>
+                                            <td>${employee.getDisplayEmployeeId()}</td>
+                                            <td><span class="role-badge ${employee.role == 'ADMIN' ? 'role-red' : 
+                                                                          employee.role == 'MANAGER' ? 'role-orange' : 'role-blue'}">${employee.role.label}</span></td>
+                                            <td>${employee.siteName}</td>
+                                        </tr>
+                                    </c:forEach>
                                 </tbody>
                             </table>
                         </div>
@@ -496,29 +456,44 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
-                                        // --- Mobile Sidebar Toggle Logic (Đồng bộ chuẩn) ---
-                                        const mobileToggle = document.getElementById('mobileToggle');
-                                        const sidebar = document.querySelector('.sidebar'); // Lấy class .sidebar từ JSP layout nếu có
-                                        const overlay = document.getElementById('sidebarOverlay');
+                                            // --- Mobile Sidebar Toggle Logic (Đồng bộ chuẩn) ---
+                                            const mobileToggle = document.getElementById('mobileToggle');
+                                            const sidebar = document.querySelector('.sidebar'); // Lấy class .sidebar từ JSP layout nếu có
+                                            const overlay = document.getElementById('sidebarOverlay');
 
-                                        function toggleMenu() {
-                                            // Đảm bảo class active đồng nhất với layout sidebar
-                                            sidebar.classList.toggle('active');
-                                            overlay.classList.toggle('active');
+                                            function toggleMenu() {
+                                                // Đảm bảo class active đồng nhất với layout sidebar
+                                                sidebar.classList.toggle('active');
+                                                overlay.classList.toggle('active');
 
-                                            if (sidebar.classList.contains('active')) {
-                                                document.body.style.overflow = 'hidden';
-                                            } else {
-                                                document.body.style.overflow = '';
+                                                if (sidebar.classList.contains('active')) {
+                                                    document.body.style.overflow = 'hidden';
+                                                } else {
+                                                    document.body.style.overflow = '';
+                                                }
                                             }
-                                        }
 
-                                        if (mobileToggle) {
-                                            mobileToggle.addEventListener('click', toggleMenu);
-                                        }
-                                        if (overlay) {
-                                            overlay.addEventListener('click', toggleMenu);
-                                        }
+                                            if (mobileToggle) {
+                                                mobileToggle.addEventListener('click', toggleMenu);
+                                            }
+                                            if (overlay) {
+                                                overlay.addEventListener('click', toggleMenu);
+                                            }
+
+                                            document.getElementById('employeeSearch').addEventListener('change', function () {
+                                                const query = this.value.trim();
+                                                const currentUrl = new URL(window.location.href);
+
+                                                // Sử dụng URLSearchParams để quản lý param chuyên nghiệp hơn
+                                                if (query) {
+                                                    currentUrl.searchParams.set('employeeSearch', query); // Đặt tên param khớp với Servlet của bạn
+                                                } else {
+                                                    currentUrl.searchParams.delete('employeeSearch'); // Xóa nếu ô search trống
+                                                }
+
+                                                // Chuyển hướng trang
+                                                window.location.href = currentUrl.toString();
+                                            });
         </script>
     </body>
 </html>

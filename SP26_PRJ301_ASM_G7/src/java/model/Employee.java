@@ -84,4 +84,8 @@ public class Employee {
     public String getName() {
         return lastName + " " + firstName;
     }
+
+    public String getDisplayEmployeeId() {
+        return "E" + employeeId;
+    }
 }

@@ -5,10 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Employee;
 import model.ParkingSite;
+import model.dto.AdminListEmployeeDTO;
 
 public class EmployeeDAO extends DBContext {
 
@@ -25,6 +24,164 @@ public class EmployeeDAO extends DBContext {
             }
         } catch (SQLException e) {
             System.out.println("Error EmployeeDAO.getAllEmployee: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<AdminListEmployeeDTO> getAllEmployeeWithTheirSite() {
+        List<AdminListEmployeeDTO> list = new ArrayList<>();
+        String sql = """
+                     SELECT 
+                         e.employee_id, 
+                         e.firstname, 
+                         e.lastname, 
+                         e.phone, 
+                         ps.site_name, 
+                         CASE 
+                             -- Chỉ khi role gốc là 'staff' VÀ trùng ID quản lý bãi xe thì mới thành 'manager'
+                             WHEN a.role = 'staff' AND e.employee_id = ps.manager_id THEN 'manager'
+                             
+                             -- Tất cả các trường hợp còn lại (như admin, hoặc staff bình thường) đều giữ nguyên role gốc
+                             ELSE a.role 
+                         END AS role
+                     FROM Employees e 
+                     LEFT JOIN ParkingSites ps 
+                         ON ps.site_id = e.site_id
+                     LEFT JOIN Accounts a
+                         ON a.account_id = e.account_id
+                     WHERE e.status = 'active';
+                     """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int employeeId = rs.getInt("employee_id");
+                String firstName = rs.getString("firstname");
+                String lastName = rs.getString("lastname");
+                String phone = rs.getString("phone");
+                String siteName = rs.getString("site_name");
+                String role = rs.getString("role");
+                AdminListEmployeeDTO adminListEmployeeDTO = new AdminListEmployeeDTO(
+                        employeeId,
+                        firstName,
+                        lastName,
+                        phone,
+                        siteName,
+                        AdminListEmployeeDTO.Role.valueOf(role.toUpperCase().trim())
+                );
+
+                list.add(adminListEmployeeDTO);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error EmployeeDAO.getAllEmployeeWithTheirSite: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<AdminListEmployeeDTO> employeeSearch(String employeeSearch) {
+        List<AdminListEmployeeDTO> list = new ArrayList<>();
+        String sql = """
+                     SELECT 
+                         e.employee_id, 
+                         e.firstname, 
+                         e.lastname, 
+                         e.phone, 
+                         ps.site_name, 
+                         CASE 
+                             -- Chỉ khi role gốc là 'staff' VÀ trùng ID quản lý bãi xe thì mới thành 'manager'
+                             WHEN a.role = 'staff' AND e.employee_id = ps.manager_id THEN 'manager'
+                             
+                             -- Tất cả các trường hợp còn lại (như admin, hoặc staff bình thường) đều giữ nguyên role gốc
+                             ELSE a.role 
+                         END AS role
+                     FROM Employees e 
+                     LEFT JOIN ParkingSites ps 
+                         ON ps.site_id = e.site_id
+                     LEFT JOIN Accounts a
+                         ON a.account_id = e.account_id
+                     WHERE CONCAT(e.lastname, ' ', e.firstname) LIKE ? AND e.status = 'active';
+                     """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, "%" + employeeSearch + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int employeeId = rs.getInt("employee_id");
+                String firstName = rs.getString("firstname");
+                String lastName = rs.getString("lastname");
+                String phone = rs.getString("phone");
+                String siteName = rs.getString("site_name");
+                String role = rs.getString("role");
+                AdminListEmployeeDTO adminListEmployeeDTO = new AdminListEmployeeDTO(
+                        employeeId,
+                        firstName,
+                        lastName,
+                        phone,
+                        siteName,
+                        AdminListEmployeeDTO.Role.valueOf(role.toUpperCase().trim())
+                );
+
+                list.add(adminListEmployeeDTO);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error EmployeeDAO.employeeSearch: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public List<AdminListEmployeeDTO> employeeSearchByEmployeeId(int employeeSearch) {
+        List<AdminListEmployeeDTO> list = new ArrayList<>();
+        String sql = """
+                     SELECT 
+                         e.employee_id, 
+                         e.firstname, 
+                         e.lastname, 
+                         e.phone, 
+                         ps.site_name, 
+                         CASE 
+                             -- Chỉ khi role gốc là 'staff' VÀ trùng ID quản lý bãi xe thì mới thành 'manager'
+                             WHEN a.role = 'staff' AND e.employee_id = ps.manager_id THEN 'manager'
+                             
+                             -- Tất cả các trường hợp còn lại (như admin, hoặc staff bình thường) đều giữ nguyên role gốc
+                             ELSE a.role 
+                         END AS role
+                     FROM Employees e 
+                     LEFT JOIN ParkingSites ps 
+                         ON ps.site_id = e.site_id
+                     LEFT JOIN Accounts a
+                         ON a.account_id = e.account_id
+                     WHERE e.employee_id = ? AND e.status = 'active';
+                     """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, employeeSearch);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int employeeId = rs.getInt("employee_id");
+                String firstName = rs.getString("firstname");
+                String lastName = rs.getString("lastname");
+                String phone = rs.getString("phone");
+                String siteName = rs.getString("site_name");
+                String role = rs.getString("role");
+                AdminListEmployeeDTO adminListEmployeeDTO = new AdminListEmployeeDTO(
+                        employeeId,
+                        firstName,
+                        lastName,
+                        phone,
+                        siteName,
+                        AdminListEmployeeDTO.Role.valueOf(role.toUpperCase().trim())
+                );
+
+                list.add(adminListEmployeeDTO);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error EmployeeDAO.employeeSearchByEmployeeId: " + e.getMessage());
         }
         return list;
     }
