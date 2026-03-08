@@ -20,16 +20,18 @@ public class Customer {
     public Customer() {
     }
 
+    
+    
     public Customer(int customerId, String firstname, String lastname, String phone, String email, long walletAmount, int accountId) {
         this.customerId = customerId;
         this.firstname = firstname;
         this.lastname = lastname;
         this.phone = phone;
         this.email = email;
-        this.walletAmount = walletAmount;
+        this.walletAmount= walletAmount;
         this.accountId = accountId;
     }
-
+    
     public int getCustomerId() {
         return customerId;
     }

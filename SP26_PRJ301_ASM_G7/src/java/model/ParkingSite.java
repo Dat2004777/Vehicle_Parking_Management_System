@@ -10,11 +10,14 @@ public class ParkingSite {
     private String siteName;
     private String address;
     private Region region;
-    private Status siteStatus;
+    private State siteStatus;
     private int managerId;
     private int totalSlots;
 
-    public ParkingSite(String siteName, String address, Region region, Status siteStatus, int managerId, int totalSlots) {
+    public ParkingSite(){        
+    }
+    
+    public ParkingSite(String siteName, String address, Region region, State siteStatus, int managerId, int totalSlots) {
         this.siteName = siteName;
         this.address = address;
         this.region = region;
@@ -23,7 +26,7 @@ public class ParkingSite {
         this.totalSlots = totalSlots;
     }
     
-    public ParkingSite(int siteId, String siteName, String address, Region region, Status siteStatus, int managerId, int totalSlots) {
+    public ParkingSite(int siteId, String siteName, String address, Region region, State siteStatus, int managerId, int totalSlots) {
         this.siteId = siteId;
         this.siteName = siteName;
         this.address = address;
@@ -66,11 +69,11 @@ public class ParkingSite {
         this.region = region;
     }
 
-    public Status getSiteStatus() {
+    public State getSiteStatus() {
         return siteStatus;
     }
 
-    public void setSiteStatus(Status siteStatus) {
+    public void setSiteStatus(State siteStatus) {
         this.siteStatus = siteStatus;
     }
 
@@ -108,14 +111,14 @@ public class ParkingSite {
 
     }
 
-    public enum Status {
-        ACTIVE("Đang hoạt động"),
+    public enum State {
+        OPERATING("Đang hoạt động"),
         MAINTENANCE("Bảo trì"),
         CLOSED("Đóng cửa");
 
         private final String label;
 
-        private Status(String label) {
+        private State(String label) {
             this.label = label;
         }
 

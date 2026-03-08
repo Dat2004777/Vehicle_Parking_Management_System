@@ -1,9 +1,17 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package model;
 
 import java.time.LocalDateTime;
 
+/**
+ *
+ * @author ADMIN
+ */
 public class Subscription {
-    private int subscriptionId;
+     private int subscriptionId;
     private int customerId;
     private String cardId;
     private String licensePlate;
@@ -100,11 +108,4 @@ public class Subscription {
         this.appliedPrice = appliedPrice;
     }
 
-   
-    
-
-    @Override
-    public String toString() {
-        return "Subscription{" + "id=" + subscriptionId + ", plate=" + licensePlate + ", expiry=" + endDate + '}';
-    }
 }

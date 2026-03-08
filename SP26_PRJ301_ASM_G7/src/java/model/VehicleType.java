@@ -15,29 +15,41 @@ public class VehicleType {
 
     public VehicleType() {
     }
-    
-    
+
     public VehicleType(int vehicleTypeId, String vehicleTypeName) {
         this.vehicleTypeId = vehicleTypeId;
         this.vehicleTypeName = vehicleTypeName;
+    }
+
+    private VehicleName vehicleName;
+
+    public VehicleType(int vehicleTypeId, VehicleName vehicleName) {
+        this.vehicleTypeId = vehicleTypeId;
+        this.vehicleName = vehicleName;
     }
 
     public int getVehicleTypeId() {
         return vehicleTypeId;
     }
 
+    
+
     public String getVehicleTypeName() {
         return vehicleTypeName;
     }
+
+   
 
     public void setVehicleTypeId(int vehicleTypeId) {
         this.vehicleTypeId = vehicleTypeId;
     }
 
+    
+
     public void setVehicleTypeName(String vehicleTypeName) {
         this.vehicleTypeName = vehicleTypeName;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -54,5 +66,28 @@ public class VehicleType {
     @Override
     public int hashCode() {
         return java.util.Objects.hash(vehicleTypeId);
+
+    }
+    public VehicleName getVehicleName() {
+        return vehicleName;
+    }
+
+    public void setVehicleName(VehicleName vehicleName) {
+        this.vehicleName = vehicleName;
+    }
+
+    public enum VehicleName {
+        CAR("Ôtô"),
+        MOTORBIKE("Xe máy");
+
+        private final String label;
+
+        private VehicleName(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 }

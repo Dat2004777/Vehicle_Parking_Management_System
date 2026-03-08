@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package dal;
 
 import java.sql.PreparedStatement;
@@ -7,9 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import model.ParkingCard;
 
-public class CardDAO extends DBContext {
-
+/**
+ *
+ * @author ADMIN
+ */
+public class CardDAO extends DBContext{
     // 1. Lấy tất cả thẻ (Get All)
+
     public List<ParkingCard> getAll() {
         List<ParkingCard> list = new ArrayList<>();
         String sql = "SELECT * FROM ParkingCards";
@@ -82,7 +90,6 @@ public class CardDAO extends DBContext {
     }
 
     // --- CÁC METHOD NGHIỆP VỤ QUAN TRỌNG ---
-
     // 6. Lấy danh sách thẻ của một bãi xe cụ thể
     public List<ParkingCard> getBySite(int siteId) { // Đã sửa tham số thành int
         List<ParkingCard> list = new ArrayList<>();
@@ -145,7 +152,33 @@ public class CardDAO extends DBContext {
             e.printStackTrace();
         }
     }
-
+    
+    //Update Card State
+    public boolean updateCard(int siteId, String cardId, String state){
+        
+        String sql = 
+                """
+                UPDATE ParkingCards
+                SET card_state = ? 
+                WHERE site_id = ?
+                AND card_id = ?
+                """;
+        
+        try(PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setString(1,state);
+            ps.setInt(2,siteId);
+            ps.setString(3,cardId);
+            
+            int affectedRows = ps.executeUpdate();
+            
+            return affectedRows > 0;
+            
+        }catch(Exception e){
+            System.out.println("Lỗi update Card");
+            e.printStackTrace();
+            return false;
+        }
+    }
     // --- Helper Mapping ---
     private ParkingCard mapRowToCard(ResultSet rs) throws SQLException {
         String statusStr = rs.getString("card_state");
@@ -157,11 +190,11 @@ public class CardDAO extends DBContext {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
-        
+
         return new ParkingCard(
-            rs.getString("card_id"),
-            rs.getInt("site_id"), // Đã sửa thành getInt
-            status
+                rs.getString("card_id"),
+                rs.getInt("site_id"), // Đã sửa thành getInt
+                status
         );
     }
 }

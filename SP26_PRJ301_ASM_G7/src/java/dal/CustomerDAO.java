@@ -161,5 +161,17 @@ public class CustomerDAO extends DBContext {
             e.printStackTrace();
             throw new Exception("Lỗi Database khi tạo khách hàng: " + e.getMessage());
         }
+    public boolean updateWalletAmount(int customerId, long newAmount) {
+        String sql = "UPDATE Customers SET wallet_amount = ? WHERE customer_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, newAmount);
+            ps.setInt(2, customerId);
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

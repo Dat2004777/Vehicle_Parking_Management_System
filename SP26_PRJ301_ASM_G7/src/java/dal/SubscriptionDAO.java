@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.Timestamp;
 import model.Subscription;
-
+/**
+ *
+ * @author ADMIN
+ */
 public class SubscriptionDAO extends DBContext {
-
-// =========================================================================
+    // =========================================================================
     // 1. KIỂM TRA BIỂN SỐ ĐÃ CÓ VÉ CÒN HẠN CHƯA
     // =========================================================================
     public boolean hasActiveSubscriptionByPlate(String plate) {
@@ -122,7 +124,6 @@ public class SubscriptionDAO extends DBContext {
         }
         return null;
     }
-
     // Hàm lấy danh sách các biển số xe DUY NHẤT của 1 khách hàng
     public List<String> getDistinctPlatesByCustomerId(int customerId) {
         List<String> plates = new ArrayList<>();
@@ -202,7 +203,6 @@ public class SubscriptionDAO extends DBContext {
 
         return false;
     }
-
     /**
      * Thêm mới vé tháng và trả về ID tự tăng (subscription_id)
      *
@@ -250,5 +250,52 @@ public class SubscriptionDAO extends DBContext {
         }
 
         return -1; // Trả về -1 nếu có lỗi xảy ra
+    }
+    
+    public void updateSubscription(int subscriptionId){
+        String sql =
+                """
+                UPDATE Subscriptions
+                SET status = 'inactive'
+                WHERE subscription_id = ?
+                """;
+        
+        try(PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setInt(1, subscriptionId);
+            
+            ps.executeUpdate();
+        }catch(Exception e){
+            System.out.println("Loi update subscrition status");
+            e.printStackTrace();
+        }
+    }
+    
+    public boolean checkSubscription(int siteId, String licensePlate){
+        String sql =
+                """
+                SELECT TOP 1 1
+                FROM Subscriptions s
+                JOIN ParkingCards c ON s.card_id = c.card_id
+                WHERE c.site_id = ?
+                AND s.license_plate = ?
+                AND s.sub_state = 'active'
+                AND s.status = 'active'
+                AND GETDATE() BETWEEN s.start_date AND s.end_date
+                """;
+        
+        
+        try(PreparedStatement ps = connection.prepareStatement(sql)){
+            
+            ps.setInt(1,siteId);
+            ps.setString(2,licensePlate);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            return rs.next();
+        }catch(Exception e){
+            System.out.println("Loi check Subscription");
+            e.printStackTrace();
+            return false;
+        }
     }
 }

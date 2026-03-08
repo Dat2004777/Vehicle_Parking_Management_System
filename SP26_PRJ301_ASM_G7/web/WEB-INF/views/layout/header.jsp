@@ -176,10 +176,10 @@
                     <a class="nav-link active" href="${pageContext.request.contextPath}">Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Đặt chỗ</a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/sites?action=booking">Đặt chỗ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Mua vé tháng</a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/sites?action=buying">Mua vé tháng</a>
                 </li>
             </ul>
             <c:choose>
