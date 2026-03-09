@@ -1,12 +1,13 @@
 package model;
 
 public class Employee {
-    private int employeeId; 
-    private int accountId;  
+
+    private int employeeId;
+    private int accountId;
     private String firstName;
     private String lastName;
     private String phone;
-    private int siteId;    
+    private int siteId;
 
     public Employee() {
     }
@@ -18,7 +19,7 @@ public class Employee {
         this.phone = phone;
         this.siteId = siteId;
     }
-    
+
     public Employee(int employeeId, int accountId, String firstName, String lastName, String phone, int siteId) {
         this.employeeId = employeeId;
         this.accountId = accountId;
@@ -79,9 +80,12 @@ public class Employee {
     public void setSiteId(int siteId) {
         this.siteId = siteId;
     }
-    
-    public String getName () {
-        return firstName + " " + lastName;
+
+    public String getName() {
+        return lastName + " " + firstName;
     }
-    
+
+    public String getDisplayEmployeeId() {
+        return "E" + employeeId;
+    }
 }

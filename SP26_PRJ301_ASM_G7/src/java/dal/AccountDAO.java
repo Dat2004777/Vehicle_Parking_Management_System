@@ -8,6 +8,7 @@ import model.Account;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import utils.RandomCardId;
 
 /**
  *
@@ -89,6 +90,58 @@ public class AccountDAO extends DBContext {
         } catch (Exception e) {
             System.out.println("Lỗi thêm giá trị");
             return -1;
+        }
+    }
+
+    public Account getAccountRole(int accountId) {
+        String sql_1
+                = """
+                SELECT role FROM Accounts
+                  WHERE account_id = ? AND status = 'active'
+                """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql_1);
+            ps.setInt(1, accountId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String role = rs.getString("role");
+                Account account = new Account(Account.RoleEnum.valueOf(role.toUpperCase()));
+                return account;
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error AccountDAO.getAccountById: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public void softDeleteAccount(int accountId) {
+        String sql = """
+                     UPDATE Accounts SET username = ?, status = 'inactive' WHERE account_id = ?
+                     """;
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            String deleteUsername = RandomCardId.generateRandomUsername();
+            ps.setString(1, deleteUsername);
+            ps.setInt(2, accountId);
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            System.out.println("Error AccountDAO.softDeleteAccount: " + e.getMessage());
+        }
+    }
+
+    public void updateUsername(int accountId, String validPhone) {
+        String sql = "UPDATE Accounts SET username = ? WHERE account_id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, validPhone);
+            ps.setInt(2, accountId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Error AccountDAO.updateUsername: " + e.getMessage());
         }
     }
 }

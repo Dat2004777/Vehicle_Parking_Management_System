@@ -14,13 +14,13 @@ public class AreaDAO extends DBContext {
         List<ParkingArea> list = new ArrayList<>();
         // Tối ưu: JOIN thẳng với bảng VehicleTypes để lấy tên loại xe
         String sql = "SELECT pa.*, vt.name AS vehicle_type_name " +
-                     "FROM [ParkingAreas] pa " +
-                     "LEFT JOIN [VehicleTypes] vt ON pa.vehicle_type_id = vt.vehicle_type_id " +
-                     "WHERE pa.site_id = ? AND pa.status = 'active'";
+                "FROM [ParkingAreas] pa " +
+                "LEFT JOIN [VehicleTypes] vt ON pa.vehicle_type_id = vt.vehicle_type_id " +
+                "WHERE pa.site_id = ? AND pa.status = 'active'";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, siteId);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     list.add(mapRowToArea(rs));
@@ -35,13 +35,13 @@ public class AreaDAO extends DBContext {
     // 2. LẤY CHI TIẾT 1 KHU VỰC KÈM LOẠI XE (Dùng cho form Update)
     public ParkingArea getAreaById(int areaId) {
         String sql = "SELECT pa.*, vt.name AS vehicle_type_name " +
-                     "FROM [ParkingAreas] pa " +
-                     "LEFT JOIN [VehicleTypes] vt ON pa.vehicle_type_id = vt.vehicle_type_id " +
-                     "WHERE pa.area_id = ?";
-        
+                "FROM [ParkingAreas] pa " +
+                "LEFT JOIN [VehicleTypes] vt ON pa.vehicle_type_id = vt.vehicle_type_id " +
+                "WHERE pa.area_id = ?";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, areaId);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapRowToArea(rs);
@@ -53,28 +53,66 @@ public class AreaDAO extends DBContext {
         return null;
     }
 
-    // 3. THÊM KHU VỰC MỚI
-    public boolean insertArea(ParkingArea area) {
-        String sql = "INSERT INTO [ParkingAreas] (site_id, area_name, vehicle_type_id, totalSlots) VALUES (?, ?, ?, ?)";
-        
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, area.getSiteId());
-            ps.setString(2, area.getAreaName());
-            ps.setInt(3, area.getVehicleTypeId());
-            ps.setInt(4, area.getTotalSlots());
+    // 1. LẤY TẤT CẢ KHU VỰC CỦA 1 BÃI XE (Quan trọng nhất cho trang Detail)
+    public List<ParkingArea> getAreasBySiteD(int siteId) {
+        List<ParkingArea> list = new ArrayList<>();
+        String sql = "SELECT * FROM ParkingAreas WHERE site_id = ?";
 
-            return ps.executeUpdate() > 0;
+        try (
+                PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, siteId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapRowToAreaD(rs, 0));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return list;
+    }
+
+    // 2. LẤY CHI TIẾT 1 KHU VỰC (Để ném vào form Update)
+    public ParkingArea getAreaByIdD(int areaId) {
+        String sql = "SELECT * FROM ParkingAreas WHERE area_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, areaId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return mapRowToAreaD(rs, 0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // 3. THÊM KHU VỰC MỚI
+    public void insertAreas(List<ParkingArea> areas) {
+        String sql = """
+                INSERT INTO ParkingAreas (site_id, vehicle_type_id, totalSlots) VALUES (?, ?, ?)
+                """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            for (ParkingArea area : areas) {
+                ps.setInt(1, area.getSiteId());
+                ps.setInt(2, area.getVehicleTypeId());
+                ps.setInt(3, area.getTotalSlots());
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            System.out.println("Error AreaDAO.insertAreas: " + e.getMessage());
+        }
     }
 
     // 4. CẬP NHẬT KHU VỰC
     public boolean updateArea(ParkingArea area) {
         // Đã sửa lại lỗi sai tên cột từ total_slots thành totalSlots cho khớp với SQL
         String sql = "UPDATE [ParkingAreas] SET area_name = ?, vehicle_type_id = ?, totalSlots = ? WHERE area_id = ?";
-        
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, area.getAreaName());
             ps.setInt(2, area.getVehicleTypeId());
@@ -88,23 +126,22 @@ public class AreaDAO extends DBContext {
         return false;
     }
 
-    // 5. XÓA KHU VỰC (Soft Delete)
-    public boolean deleteArea(int areaId) {
-        String sql = "UPDATE [ParkingAreas] SET status = 'inactive' WHERE area_id = ?";
-        
+    // 5. XÓA KHU VỰC
+    public void deleteAreaBySiteId(int siteId) {
+        String sql = "DELETE FROM ParkingAreas WHERE site_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, areaId);
-            return ps.executeUpdate() > 0;
+
+            ps.setInt(1, siteId);
+            ps.executeUpdate();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Error AreaDAO.deleteAreaBySiteId: " + e.getMessage());
         }
-        return false;
     }
 
     // 6. XÓA TẤT CẢ KHU VỰC CỦA 1 SITE
     public boolean deleteAreasBySite(int siteId) {
         String sql = "UPDATE [ParkingAreas] SET status = 'inactive' WHERE site_id = ?";
-        
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, siteId);
             return ps.executeUpdate() > 0;
@@ -113,7 +150,7 @@ public class AreaDAO extends DBContext {
         }
         return false;
     }
-    
+
     // ==========================================
     // HÀM MAPPER NỘI BỘ
     // ==========================================
@@ -123,11 +160,21 @@ public class AreaDAO extends DBContext {
         String name = rs.getString("area_name");
         int vehicleTypeId = rs.getInt("vehicle_type_id");
         int totalSlots = rs.getInt("totalSlots");
-        
+
         // Trích xuất thêm Tên loại xe từ câu lệnh JOIN
         String vehicleTypeName = rs.getString("vehicle_type_name");
-        
+
         // Trả về Entity kèm theo tên loại xe
         return new ParkingArea(id, siteId, name, vehicleTypeId, totalSlots, vehicleTypeName);
+    }
+
+    private ParkingArea mapRowToAreaD(ResultSet rs, int tmp) throws SQLException {
+        int id = rs.getInt("area_id");
+        int siteId = rs.getInt("site_id");
+        String name = rs.getString("area_name");
+        int vehicleTypeId = rs.getInt("vehicle_type_id");
+        int totalSlots = rs.getInt("total_slots");
+
+        return new ParkingArea(siteId, siteId, name, vehicleTypeId, totalSlots);
     }
 }

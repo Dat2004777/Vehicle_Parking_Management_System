@@ -4,6 +4,8 @@
     Author     : dat20
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -18,7 +20,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
         <!-- Bootstrap 5 CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
 
         <!-- Bootstrap Icons -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -271,6 +273,29 @@
                 font-size: 1.25rem;
             }
 
+            /* Chiều cao cố định và thanh cuộn mượt mà */
+            .scrollable-density {
+                max-height: 250px; /* Bạn có thể chỉnh con số này (ví dụ 350px hoặc 400px) để khớp với chiều cao biểu đồ bên trái */
+                overflow-y: auto;
+                padding-right: 10px; /* Tạo khoảng trống để thanh cuộn không đè lên nội dung */
+            }
+
+            /* Tùy chỉnh thanh cuộn cho đẹp và hiện đại (Custom Scrollbar) */
+            .scrollable-density::-webkit-scrollbar {
+                width: 6px;
+            }
+            .scrollable-density::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 10px;
+            }
+            .scrollable-density::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 10px;
+            }
+            .scrollable-density::-webkit-scrollbar-thumb:hover {
+                background: #94a3b8;
+            }
+
             /* Action Badges in Table */
             .badge-action {
                 display: inline-flex;
@@ -376,7 +401,7 @@
 
             @media (max-width: 767.98px) {
                 .search-container {
-                    display: none;
+                    width: 100%;
                 } /* Hide search on mobile header to save space */
                 .stat-card-value {
                     font-size: 1.75rem;
@@ -386,7 +411,9 @@
     </head>
     <body>
 
-        <%@include file="../layout/sidebar.jsp" %>
+        <jsp:include page="../layout/admin-sidebar.jsp">
+            <jsp:param name="activePage" value="adminDashboard" />
+        </jsp:include>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -398,25 +425,32 @@
                     </button>
                     <h1 class="page-title">Tổng quan hệ thống</h1>
                 </div>
-
-                <div class="header-actions">
-                    <div class="search-container">
-                        <i class="bi bi-search"></i>
-                        <input type="text" class="search-input" placeholder="Tìm biển số, người dùng, vé...">
-                    </div>
-
-                    <button class="btn-icon">
-                        <i class="bi bi-bell"></i>
-                        <span class="notification-dot"></span>
-                    </button>
-                    <button class="btn-icon">
-                        <i class="bi bi-gear"></i>
-                    </button>
-                </div>
             </header>
 
             <!-- Content Area -->
             <div class="content-area">
+
+                <!-- selectionBox -->
+                <div class="header-actions mb-4">
+                    <div class="search-container">
+                        <i class="bi bi-search"></i>
+                        <!--<input type="text" class="search-input" placeholder="Tìm biển số, người dùng, vé...">-->
+                        <select class="search-input" onchange="siteSearch(this)">
+                            <option value="0" selected>Tất cả</option>
+                            <c:forEach var="activeSites" items="${dashboardDTO.allActiveSites}">
+                                <option value="${activeSites.siteId}" ${param.siteId == activeSites.siteId ? 'selected' : ''}>${activeSites.siteName}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <!--                    <button class="btn-icon">
+                                            <i class="bi bi-bell"></i>
+                                            <span class="notification-dot"></span>
+                                        </button>
+                                        <button class="btn-icon">
+                                            <i class="bi bi-gear"></i>
+                                        </button>-->
+                </div>
 
                 <!-- Top Stats Row -->
                 <div class="row g-4 mb-4">
@@ -427,11 +461,11 @@
                                 <div class="stat-card-title">Tổng doanh thu</div>
                                 <div class="stat-icon icon-blue"><i class="bi bi-cash-stack"></i></div>
                             </div>
-                            <div class="stat-card-value">$12,450</div>
-                            <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.875rem;">
-                                <span class="trend-badge"><i class="bi bi-arrow-up-right"></i> +12.5%</span> 
-                                <span>so với tháng trước</span>
-                            </div>
+                            <div class="stat-card-value"><fmt:formatNumber value="${dashboardDTO.totalAmount}" type="number" pattern="#,##0"/> đ</div>
+                            <!--                            <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.875rem;">
+                                                            <span class="trend-badge"><i class="bi bi-arrow-up-right"></i> +12.5%</span> 
+                                                            <span>so với tháng trước</span>
+                                                        </div>-->
                         </div>
                     </div>
 
@@ -442,16 +476,16 @@
                                 <div class="stat-card-title">Xe đang đỗ</div>
                                 <div class="stat-icon icon-orange"><i class="bi bi-car-front"></i></div>
                             </div>
-                            <div class="stat-card-value mb-2">843</div>
-                            <div>
-                                <div class="d-flex justify-content-between text-muted" style="font-size: 0.75rem;">
-                                    <span>Tỷ lệ lấp đầy</span>
-                                    <span class="fw-bold text-dark">85%</span>
-                                </div>
-                                <div class="custom-progress">
-                                    <div class="custom-progress-bar pg-orange" style="width: 85%"></div>
-                                </div>
-                            </div>
+                            <div class="stat-card-value mb-2">${dashboardDTO.currentParkedVehicles}</div>
+                            <!--                            <div>
+                                                            <div class="d-flex justify-content-between text-muted" style="font-size: 0.75rem;">
+                                                                <span>Tỷ lệ lấp đầy</span>
+                                                                <span class="fw-bold text-dark">85%</span>
+                                                            </div>
+                                                            <div class="custom-progress">
+                                                                <div class="custom-progress-bar pg-orange" style="width: 85%"></div>
+                                                            </div>
+                                                        </div>-->
                         </div>
                     </div>
 
@@ -462,11 +496,11 @@
                                 <div class="stat-card-title">Vé đã bán</div>
                                 <div class="stat-icon icon-purple"><i class="bi bi-card-heading"></i></div>
                             </div>
-                            <div class="stat-card-value">120</div>
-                            <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.875rem;">
-                                <span class="trend-badge"><i class="bi bi-arrow-up-right"></i> +4.2%</span> 
-                                <span>Đăng ký mới</span>
-                            </div>
+                            <div class="stat-card-value">${dashboardDTO.totalSubscription}</div>
+                            <!--                            <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.875rem;">
+                                                            <span class="trend-badge"><i class="bi bi-arrow-up-right"></i> +4.2%</span> 
+                                                            <span>Đăng ký mới</span>
+                                                        </div>-->
                         </div>
                     </div>
                 </div>
@@ -477,13 +511,13 @@
                     <div class="col-12 col-lg-8">
                         <div class="custom-card d-flex flex-column">
                             <div class="card-header-flex">
-                                <h3 class="card-title-h3">Xu hướng doanh thu</h3>
+                                <h3 class="card-title-h3">Doanh thu</h3>
                                 <div class="btn-group" role="group">
                                     <input type="radio" class="btn-check" name="btnradio" id="btnWeek" autocomplete="off" checked>
                                     <label class="btn btn-outline-secondary btn-sm" for="btnWeek">Theo tuần</label>
-
-                                    <input type="radio" class="btn-check" name="btnradio" id="btnMonth" autocomplete="off">
-                                    <label class="btn btn-outline-secondary btn-sm" for="btnMonth">Theo tháng</label>
+                                    <!--
+                                                                        <input type="radio" class="btn-check" name="btnradio" id="btnMonth" autocomplete="off">
+                                                                        <label class="btn btn-outline-secondary btn-sm" for="btnMonth">Theo tháng</label>-->
                                 </div>
                             </div>
                             <div class="flex-grow-1" style="position: relative; min-height: 250px;">
@@ -497,128 +531,178 @@
                         <div class="custom-card">
                             <h3 class="card-title-h3 mb-4">Mật độ bãi xe</h3>
 
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between text-sm mb-1">
-                                    <span class="fw-medium text-dark">Nhà xe phía Bắc (A)</span>
-                                    <span class="text-muted small">230/250</span>
-                                </div>
-                                <div class="custom-progress">
-                                    <div class="custom-progress-bar pg-red" style="width: 92%"></div>
-                                </div>
-                            </div>
+                            <!--                            <div class="mb-4">
+                                                            <div class="d-flex justify-content-between text-sm mb-1">
+                                                                <span class="fw-medium text-dark">Nhà xe phía Bắc (A)</span>
+                                                                <span class="text-muted small">230/250</span>
+                                                            </div>
+                                                            <div class="custom-progress">
+                                                                <div class="custom-progress-bar pg-red" style="width: 92%"></div>
+                                                            </div>
+                                                        </div>
+                            
+                                                        <div class="mb-4">
+                                                            <div class="d-flex justify-content-between text-sm mb-1">
+                                                                <span class="fw-medium text-dark">Bãi xe phía Nam (B)</span>
+                                                                <span class="text-muted small">145/300</span>
+                                                            </div>
+                                                            <div class="custom-progress">
+                                                                <div class="custom-progress-bar pg-blue" style="width: 48%"></div>
+                                                            </div>
+                                                        </div>
+                            
+                                                        <div class="mb-4">
+                                                            <div class="d-flex justify-content-between text-sm mb-1">
+                                                                <span class="fw-medium text-dark">Tầng hầm (VIP)</span>
+                                                                <span class="text-muted small">45/50</span>
+                                                            </div>
+                                                            <div class="custom-progress">
+                                                                <div class="custom-progress-bar pg-orange" style="width: 90%"></div>
+                                                            </div>
+                                                        </div>
+                            
+                                                        <div>
+                                                            <div class="d-flex justify-content-between text-sm mb-1">
+                                                                <span class="fw-medium text-dark">Khu vực khách</span>
+                                                                <span class="text-muted small">12/80</span>
+                                                            </div>
+                                                            <div class="custom-progress">
+                                                                <div class="custom-progress-bar pg-green" style="width: 15%"></div>
+                                                            </div>
+                                                        </div>-->
+                            <div class="scrollable-density">
+                                <c:forEach items="${siteDensityDTOs}" var="site">
+                                    <div class="mb-4">
 
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between text-sm mb-1">
-                                    <span class="fw-medium text-dark">Bãi xe phía Nam (B)</span>
-                                    <span class="text-muted small">145/300</span>
-                                </div>
-                                <div class="custom-progress">
-                                    <div class="custom-progress-bar pg-blue" style="width: 48%"></div>
-                                </div>
-                            </div>
+                                        <c:choose>
+                                            <%-- TRƯỜNG HỢP 1: TẤT CẢ CÁC BÃI (siteId = 0 hoặc null) -> Hiện tổng quan --%>
+                                            <c:when test="${empty siteId or siteId == 0}">
+                                                <div class="d-flex justify-content-between text-sm mb-1">
+                                                    <span class="fw-medium text-dark"><i class="bi bi-building"></i> ${site.siteName}</span>
+                                                    <span class="text-muted small">${site.currentParked}/${site.maxCapacity}</span>
+                                                </div>
 
-                            <div class="mb-4">
-                                <div class="d-flex justify-content-between text-sm mb-1">
-                                    <span class="fw-medium text-dark">Tầng hầm (VIP)</span>
-                                    <span class="text-muted small">45/50</span>
-                                </div>
-                                <div class="custom-progress">
-                                    <div class="custom-progress-bar pg-orange" style="width: 90%"></div>
-                                </div>
-                            </div>
+                                                <div class="custom-progress">
+                                                    <div class="custom-progress-bar ${site.densityPercentage > 90 ? 'pg-red' : site.densityPercentage > 75 ? 'pg-orange' : site.densityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
+                                                         style="width: ${site.densityPercentage}%">
+                                                    </div>
+                                                </div>
+                                            </c:when>
 
-                            <div>
-                                <div class="d-flex justify-content-between text-sm mb-1">
-                                    <span class="fw-medium text-dark">Khu vực khách</span>
-                                    <span class="text-muted small">12/80</span>
-                                </div>
-                                <div class="custom-progress">
-                                    <div class="custom-progress-bar pg-green" style="width: 15%"></div>
-                                </div>
+                                            <%-- TRƯỜNG HỢP 2: CHI TIẾT 1 BÃI (siteId > 0) -> Chỉ hiện Ô tô và Xe máy --%>
+                                            <c:otherwise>
+                                                <div class="mb-3">
+                                                    <div class="d-flex justify-content-between text-sm mb-1">
+                                                        <span class="fw-medium text-dark"><i class="bi bi-car-front"></i> Khu vực Ô tô</span>
+                                                        <span class="text-muted small">${site.carCurrentParked}/${site.carMaxCapacity}</span>
+                                                    </div>
+                                                    <div class="custom-progress" style="height: 6px;">
+                                                        <div class="custom-progress-bar ${site.carDensityPercentage > 90 ? 'pg-red' : site.carDensityPercentage > 75 ? 'pg-orange' : site.carDensityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
+                                                             style="width: ${site.carDensityPercentage}%">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <div class="d-flex justify-content-between text-sm mb-1">
+                                                        <span class="fw-medium text-dark"><i class="bi bi-bicycle"></i> Khu vực Xe máy</span>
+                                                        <span class="text-muted small">${site.motoCurrentParked}/${site.motoMaxCapacity}</span>
+                                                    </div>
+                                                    <div class="custom-progress" style="height: 6px;">
+                                                        <div class="custom-progress-bar ${site.motoDensityPercentage > 90 ? 'pg-red' : site.motoDensityPercentage > 75 ? 'pg-orange' : site.motoDensityPercentage > 50 ? 'pg-blue' : 'pg-green'}" 
+                                                             style="width: ${site.motoDensityPercentage}%">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </c:otherwise>
+                                        </c:choose>
+
+                                    </div>
+                                </c:forEach>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Activity Table -->
-                <div class="custom-card">
-                    <div class="card-header-flex mb-0">
-                        <h3 class="card-title-h3">Hoạt động gần đây</h3>
-                        <a href="#" class="link-primary">Xem tất cả <i class="bi bi-arrow-right"></i></a>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-borderless text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>XE / CHỦ SỞ HỮU</th>
-                                    <th>VỊ TRÍ</th>
-                                    <th>HÀNH ĐỘNG</th>
-                                    <th>THỜI GIAN</th>
-                                    <th>TRẠNG THÁI</th>
-                                    <th>SỐ TIỀN</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Row 1 -->
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="avatar-box"><i class="bi bi-car-front-fill"></i></div>
-                                            <div>
-                                                <div class="fw-bold text-dark">ABC-1234</div>
-                                                <div class="text-muted" style="font-size: 0.75rem;">BMW X5 - Đen</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Nhà xe phía Bắc (A)</td>
-                                    <td><span class="badge-action action-entry"><i class="bi bi-box-arrow-in-right"></i> Vào</span></td>
-                                    <td>24 Th10, 08:30 Sáng</td>
-                                    <td><span class="status-indicator"><span class="dot dot-green"></span>Hoạt động</span></td>
-                                    <td class="fw-bold text-dark">-</td>
-                                </tr>
-
-                                <!-- Row 2 -->
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="avatar-box"><i class="bi bi-person-fill"></i></div>
-                                            <div>
-                                                <div class="fw-bold text-dark">XYZ-9876</div>
-                                                <div class="text-muted" style="font-size: 0.75rem;">Honda Civic - Bạc</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Bãi xe phía Nam (B)</td>
-                                    <td><span class="badge-action action-exit"><i class="bi bi-box-arrow-right"></i> Ra</span></td>
-                                    <td>24 Th10, 08:15 Sáng</td>
-                                    <td><span class="status-indicator"><span class="dot dot-green"></span>Đã thanh toán</span></td>
-                                    <td class="fw-bold text-dark">$12.50</td>
-                                </tr>
-
-                                <!-- Row 3 -->
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="avatar-box"><i class="bi bi-car-front-fill"></i></div>
-                                            <div>
-                                                <div class="fw-bold text-dark">LMN-4567</div>
-                                                <div class="text-muted" style="font-size: 0.75rem;">Tesla Model 3 - Trắng</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Tầng hầm (VIP)</td>
-                                    <td><span class="badge-action action-pass"><i class="bi bi-patch-check-fill"></i> Vé</span></td>
-                                    <td>24 Th10, 08:05 Sáng</td>
-                                    <td><span class="status-indicator"><span class="dot dot-green"></span>Đã xác minh</span></td>
-                                    <td class="fw-bold text-dark">Tháng</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
+                <!--                 Recent Activity Table 
+                                <div class="custom-card">
+                                    <div class="card-header-flex mb-0">
+                                        <h3 class="card-title-h3">Hoạt động gần đây</h3>
+                                        <a href="#" class="link-primary">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+                                    </div>
+                
+                                    <div class="table-responsive">
+                                        <table class="table table-borderless text-nowrap">
+                                            <thead>
+                                                <tr>
+                                                    <th>XE / CHỦ SỞ HỮU</th>
+                                                    <th>VỊ TRÍ</th>
+                                                    <th>HÀNH ĐỘNG</th>
+                                                    <th>THỜI GIAN</th>
+                                                    <th>TRẠNG THÁI</th>
+                                                    <th>SỐ TIỀN</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                 Row 1 
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-3">
+                                                            <div class="avatar-box"><i class="bi bi-car-front-fill"></i></div>
+                                                            <div>
+                                                                <div class="fw-bold text-dark">ABC-1234</div>
+                                                                <div class="text-muted" style="font-size: 0.75rem;">BMW X5 - Đen</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>Nhà xe phía Bắc (A)</td>
+                                                    <td><span class="badge-action action-entry"><i class="bi bi-box-arrow-in-right"></i> Vào</span></td>
+                                                    <td>24 Th10, 08:30 Sáng</td>
+                                                    <td><span class="status-indicator"><span class="dot dot-green"></span>Hoạt động</span></td>
+                                                    <td class="fw-bold text-dark">-</td>
+                                                </tr>
+                
+                                                 Row 2 
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-3">
+                                                            <div class="avatar-box"><i class="bi bi-person-fill"></i></div>
+                                                            <div>
+                                                                <div class="fw-bold text-dark">XYZ-9876</div>
+                                                                <div class="text-muted" style="font-size: 0.75rem;">Honda Civic - Bạc</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>Bãi xe phía Nam (B)</td>
+                                                    <td><span class="badge-action action-exit"><i class="bi bi-box-arrow-right"></i> Ra</span></td>
+                                                    <td>24 Th10, 08:15 Sáng</td>
+                                                    <td><span class="status-indicator"><span class="dot dot-green"></span>Đã thanh toán</span></td>
+                                                    <td class="fw-bold text-dark">$12.50</td>
+                                                </tr>
+                
+                                                 Row 3 
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center gap-3">
+                                                            <div class="avatar-box"><i class="bi bi-car-front-fill"></i></div>
+                                                            <div>
+                                                                <div class="fw-bold text-dark">LMN-4567</div>
+                                                                <div class="text-muted" style="font-size: 0.75rem;">Tesla Model 3 - Trắng</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>Tầng hầm (VIP)</td>
+                                                    <td><span class="badge-action action-pass"><i class="bi bi-patch-check-fill"></i> Vé</span></td>
+                                                    <td>24 Th10, 08:05 Sáng</td>
+                                                    <td><span class="status-indicator"><span class="dot dot-green"></span>Đã xác minh</span></td>
+                                                    <td class="fw-bold text-dark">Tháng</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                
+                            </div>-->
         </main>
 
         <!-- Scripts -->
@@ -626,89 +710,103 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <script>
-            // --- Mobile Sidebar Toggle Logic ---
-            const mobileToggle = document.getElementById('mobileToggle');
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
+                            // --- Mobile Sidebar Toggle Logic ---
+                            const mobileToggle = document.getElementById('mobileToggle');
+                            const sidebar = document.getElementById('sidebar');
+                            const overlay = document.getElementById('sidebarOverlay');
 
-            function toggleMenu() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
+                            function toggleMenu() {
+                                sidebar.classList.toggle('active');
+                                overlay.classList.toggle('active');
 
-                // Prevent body scroll when menu is open on mobile
-                if (sidebar.classList.contains('active')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
-            }
-
-            mobileToggle.addEventListener('click', toggleMenu);
-            overlay.addEventListener('click', toggleMenu);
-
-            // --- Chart.js Setup ---
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-
-            // Tạo gradient màu xanh cho biểu đồ
-            let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.25)'); // Màu xanh nhạt trên cùng
-            gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');    // Mờ dần xuống dưới
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-                    datasets: [{
-                            label: 'Doanh thu',
-                            data: [2500, 3800, 5200, 4100, 4800, 6500, 7200],
-                            borderColor: '#3b82f6', // Màu viền xanh
-                            backgroundColor: gradient,
-                            borderWidth: 3,
-                            pointBackgroundColor: '#ffffff',
-                            pointBorderColor: '#3b82f6',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            fill: true,
-                            tension: 0.4 // Độ cong mượt mà của đường line
-                        }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {display: false},
-                        tooltip: {
-                            backgroundColor: '#0f172a',
-                            padding: 12,
-                            titleFont: {family: 'Inter', size: 13},
-                            bodyFont: {family: 'Inter', size: 14, weight: 'bold'},
-                            displayColors: false,
-                            callbacks: {
-                                label: function (context) {
-                                    return '$' + context.parsed.y;
+                                // Prevent body scroll when menu is open on mobile
+                                if (sidebar.classList.contains('active')) {
+                                    document.body.style.overflow = 'hidden';
+                                } else {
+                                    document.body.style.overflow = '';
                                 }
                             }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            display: false, // Ẩn cột dọc (Y-axis) giống thiết kế
-                            beginAtZero: true
-                        },
-                        x: {
-                            grid: {
-                                display: false, // Ẩn lưới sọc dọc
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {family: 'Inter', size: 12},
-                                color: '#94a3b8'
-                            }
-                        }
-                    }
+
+                            mobileToggle.addEventListener('click', toggleMenu);
+                            overlay.addEventListener('click', toggleMenu);
+
+                            // --- Chart.js Setup ---
+                            const ctx = document.getElementById('revenueChart').getContext('2d');
+
+                            // Tạo gradient màu xanh cho biểu đồ
+                            let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.25)'); // Màu xanh nhạt trên cùng
+                            gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');    // Mờ dần xuống dưới
+
+                            const dataFromDB = ${chartData};
+
+                            new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                                    datasets: [{
+                                            label: 'Doanh thu',
+                                            data: dataFromDB,
+                                            borderColor: '#3b82f6', // Màu viền xanh
+                                            backgroundColor: gradient,
+                                            borderWidth: 3,
+                                            pointBackgroundColor: '#ffffff',
+                                            pointBorderColor: '#3b82f6',
+                                            pointBorderWidth: 2,
+                                            pointRadius: 4,
+                                            pointHoverRadius: 6,
+                                            fill: true,
+                                            tension: 0.4 // Độ cong mượt mà của đường line
+                                        }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {display: false},
+                                        tooltip: {
+                                            backgroundColor: '#0f172a',
+                                            padding: 12,
+                                            titleFont: {family: 'Inter', size: 13},
+                                            bodyFont: {family: 'Inter', size: 14, weight: 'bold'},
+                                            displayColors: false,
+                                            callbacks: {
+                                                label: function (context) {
+                                                    return context.parsed.y.toLocaleString('vi-VN') + ' VNĐ';
+                                                }
+                                            }
+                                        }
+                                    },
+                                    scales: {
+                                        y: {
+                                            display: false, // Ẩn cột dọc (Y-axis) giống thiết kế
+                                            beginAtZero: true
+                                        },
+                                        x: {
+                                            grid: {
+                                                display: false, // Ẩn lưới sọc dọc
+                                                drawBorder: false
+                                            },
+                                            ticks: {
+                                                font: {family: 'Inter', size: 12},
+                                                color: '#94a3b8'
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+        </script>
+
+        <script>
+            function siteSearch(selectElement) {
+                // Lấy giá trị siteId từ option được chọn
+                const siteId = selectElement.value;
+
+                // Nếu có giá trị, điều hướng trang kèm theo tham số query
+                if (siteId) {
+                    window.location.href = "${ctx}/dashboard?siteId=" + siteId;
                 }
-            });
+            }
         </script>
     </body>
 </html>

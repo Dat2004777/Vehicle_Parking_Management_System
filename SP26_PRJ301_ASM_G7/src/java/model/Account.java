@@ -12,7 +12,6 @@ public class Account {
 
     private int accountId;
     private String username;
-    private String password;
     private RoleEnum role;
     private int employeeId;
 
@@ -24,12 +23,16 @@ public class Account {
         this.username = username;
         this.role = role;
     }
-    
-     public Account(int accountId, String username, RoleEnum role, int employeeId) {
-         this.accountId = accountId;
-         this.username = username;
-         this.role = role;
-         this.employeeId = employeeId;
+
+    public Account(int accountId, String username, RoleEnum role, int employeeId) {
+        this.accountId = accountId;
+        this.username = username;
+        this.role = role;
+        this.employeeId = employeeId;
+    }
+
+    public Account(RoleEnum role) {
+        this.role = role;
     }
 
     public int getAccountId() {
@@ -63,8 +66,7 @@ public class Account {
     public void setEmployeeId(int employeeId) {
         this.employeeId = employeeId;
     }
-    
-    
+
     public enum RoleEnum {
         ADMIN,
         STAFF,

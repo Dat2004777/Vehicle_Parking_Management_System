@@ -194,6 +194,16 @@
 
     }
 
+    /* Hiệu ứng cho nút Đăng xuất */
+    .logout-btn {
+        color: var(--text-muted);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .logout-btn:hover {
+        color: #ef4444; /* Đổi sang màu đỏ (Red-500) khi hover */
+        transform: translateX(2px); /* Nhích nhẹ icon sang phải tạo cảm giác tương tác */
+    }
 </style>
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -205,13 +215,19 @@
     </div>
 
     <div class="sidebar-nav">
-        <a href="${ctx}/dashboard" class="nav-item-link ${param.activepage == 'dashboard' || empty param.activepage ? 'active' : ''}">
+        <a href="${ctx}/dashboard" class="nav-item-link ${param.activePage == 'adminDashboard' ? 'active' : ''}">
             <i class="bi bi-grid-1x2"></i> Bảng điều khiển
         </a>
 
         <div class="nav-section-title">QUẢN LÝ</div>
-        <a href="${ctx}/search" class="nav-item-link ${param.activepage == 'search' ? 'active' : ''}">
-            <i class="bi bi-car-front"></i> Truy vấn phương tiện
+        <a href="${ctx}/site" class="nav-item-link ${param.activePage == 'adminSite' ? 'active' : ''}">
+            <i class="bi bi-car-front"></i> Quản lý bãi xe
+        </a>
+        <a href="${ctx}/employee" class="nav-item-link ${param.activePage == 'adminEmployee' ? 'active' : ''}">
+            <i class="bi bi-people"></i> Nhân viên
+        </a>
+        <a href="#" class="nav-item-link">
+            <i class="bi bi-card-heading"></i> Vé tháng
         </a>
 
         <a href="${ctx}/subscription" class="nav-item-link ${param.activepage == 'subscription' ? 'active' : ''}">
@@ -228,8 +244,8 @@
         <img src="https://ui-avatars.com/api/?name=${account.username}&background=e2e8f0&color=334155" alt="Avatar" class="user-avatar">
         <div class="flex-grow-1 overflow-hidden">
             <div class="fw-bold text-dark text-truncate" style="font-size: 0.875rem;">${account.username}</div>
-            <div class="text-muted text-truncate" style="font-size: 0.75rem;">Quản trị viên cấp cao</div>
+            <div class="text-muted text-truncate" style="font-size: 0.75rem;">${account.role}</div>
         </div>
-        <a href="${pageContext.request.contextPath}/logout" class="text-muted ms-auto" aria-label="Đăng xuất"><i class="bi bi-box-arrow-right fs-5"></i></a>
+            <a href="${pageContext.request.contextPath}/logout" class="logout-btn text-muted ms-auto" aria-label="Đăng xuất"><i class="bi bi-box-arrow-right fs-5"></i></a>
     </div>
 </aside>
