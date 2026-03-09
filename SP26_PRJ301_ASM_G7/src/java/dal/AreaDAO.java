@@ -10,7 +10,7 @@ import java.util.List;
 public class AreaDAO extends DBContext {
 
     // 1. LẤY TẤT CẢ KHU VỰC CỦA 1 BÃI XE (Quan trọng nhất cho trang Detail)
-    public List<ParkingArea> getAreasBySite(int siteId) {
+    public List<ParkingArea> getAreasBySiteD(int siteId) {
         List<ParkingArea> list = new ArrayList<>();
         String sql = "SELECT * FROM ParkingAreas WHERE site_id = ?";
 
@@ -21,7 +21,7 @@ public class AreaDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                list.add(mapRowToArea(rs, 0));
+                list.add(mapRowToAreaD(rs, 0));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -30,7 +30,7 @@ public class AreaDAO extends DBContext {
     }
 
     // 2. LẤY CHI TIẾT 1 KHU VỰC (Để ném vào form Update)
-    public ParkingArea getAreaById(int areaId) {
+    public ParkingArea getAreaByIdD(int areaId) {
         String sql = "SELECT * FROM ParkingAreas WHERE area_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -38,7 +38,7 @@ public class AreaDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return mapRowToArea(rs, 0);
+                return mapRowToAreaD(rs, 0);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,7 +105,7 @@ public class AreaDAO extends DBContext {
         return false;
     }
 
-    private ParkingArea mapRowToArea(ResultSet rs, int tmp) throws SQLException {
+    private ParkingArea mapRowToAreaD(ResultSet rs, int tmp) throws SQLException {
         int id = rs.getInt("area_id");
         int siteId = rs.getInt("site_id");
         String name = rs.getString("area_name");
