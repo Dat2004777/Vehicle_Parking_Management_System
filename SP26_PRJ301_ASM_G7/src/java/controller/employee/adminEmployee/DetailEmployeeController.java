@@ -130,8 +130,6 @@ public class DetailEmployeeController extends HttpServlet {
             response.sendRedirect(session.getAttribute("ctx") + "/employee");
 
         } catch (Exception e) {
-            e.printStackTrace();
-
             // Nếu có bất kỳ lỗi gì (thiếu tên, sai sđt, sai pass...), nó sẽ nhảy vào đây
             request.setAttribute("errorMessage", e.getMessage());
 
@@ -143,6 +141,7 @@ public class DetailEmployeeController extends HttpServlet {
             request.setAttribute("phone", phone);
             request.setAttribute("saveSiteId", siteIdStr);
             request.setAttribute("listSites", listSites);
+            request.setAttribute("employeeId", employeeIdStr);
 
             // Load lại nhân viên cũ (để giữ ID và các phần không được sửa)
             Employee tempEmp = new Employee();
