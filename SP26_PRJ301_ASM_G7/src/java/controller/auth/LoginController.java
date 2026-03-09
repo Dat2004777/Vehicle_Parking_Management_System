@@ -117,7 +117,7 @@ public class LoginController extends HttpServlet {
                     session.setAttribute("admin", empDAO.getById(adminId));
                     session.setAttribute("rolePrefix", UrlConstants.URL_ADMIN);
                     session.setAttribute("ctx", contextPath + UrlConstants.URL_ADMIN);
-                    response.sendRedirect(contextPath + UrlConstants.URL_ADMIN);
+                    response.sendRedirect(contextPath + UrlConstants.URL_ADMIN + "/dashboard");
                     return;
                 case STAFF:
                     int staffId = empDAO.getEmployeeId(acc.getAccountId(), "staff");

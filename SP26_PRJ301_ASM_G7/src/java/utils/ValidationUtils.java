@@ -123,6 +123,22 @@ public class ValidationUtils {
         }
         return parsedValue;
     }
+    
+    public static int requireIntInRange(String value, int min, int max, String errorMessage) {
+        int parsedValue = requireValidInt(value, errorMessage);
+        if (parsedValue < min || parsedValue > max) {
+            throw new IllegalArgumentException(errorMessage + " - Phải lớn hơn " + min + " và nhỏ hơn " + max);
+        }
+        return parsedValue;
+    }
+    
+    public static long requireLongInRange(String value, int min, int max, String errorMessage) {
+        long parsedValue = requireValidLong(value, errorMessage);
+        if (parsedValue < min || parsedValue > max) {
+            throw new IllegalArgumentException(errorMessage + " - Phải lớn hơn " + min + " và nhỏ hơn " + max);
+        }
+        return parsedValue;
+    }
 
     // ==========================================
     // 3. KIỂM TRA ENUM (RẤT QUAN TRỌNG)
@@ -197,6 +213,7 @@ public class ValidationUtils {
     }
 
     /**
+     * Kiểm tra phonenumber xem đúng format là gồm 10 chữ số và bắt đầu bằng chữ số 0 (theo VN)
      * Kiểm tra phonenumber xem đúng format là gồm 10 chữ số và bắt đầu bằng chữ
      * số 0 (theo VN)
      *

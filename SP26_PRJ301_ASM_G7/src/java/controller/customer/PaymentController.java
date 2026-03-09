@@ -77,7 +77,7 @@ public class PaymentController extends HttpServlet {
         SiteDAO siteDAO = new SiteDAO();
         PriceConfigDAO priceConfigDAO = new PriceConfigDAO();
         
-        ParkingSite site = new ParkingSite();
+        ParkingSite site = new ParkingSite(id, name, address, region, status, managerId, totalSlots);
         List<VehicleBasePriceDTO> vehicles = new ArrayList<>();
         try {
             site = siteDAO.getById(Integer.parseInt(siteId));

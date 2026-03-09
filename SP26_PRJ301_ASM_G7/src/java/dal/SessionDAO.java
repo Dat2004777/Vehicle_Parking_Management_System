@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package dal;
 
 import java.sql.PreparedStatement;
@@ -15,11 +19,11 @@ public class SessionDAO extends DBContext {
     // 1. Hàm đếm số xe ĐANG CÓ TRONG BÃI (Dùng cho 3 thẻ thống kê to ở trên)
     public int countActiveSessions(int siteId) {
         String sql = """
-                     SELECT COUNT(*)
-                     FROM ParkingSessions s
-                     JOIN ParkingCards c ON s.card_id = c.card_id
-                     WHERE c.site_id = ? AND s.status = 'active' AND s.session_state = 'parked'
-                     """;
+                SELECT COUNT(*)
+                FROM ParkingSessions s
+                JOIN ParkingCards c ON s.card_id = c.card_id
+                WHERE c.site_id = ? AND s.status = 'active' AND s.session_state = 'parked'
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
@@ -40,12 +44,12 @@ public class SessionDAO extends DBContext {
     public int countActiveSessionsByArea(int areaId) {
         int count = 0;
         String sql = """
-                     SELECT COUNT(*)
-                     FROM ParkingSessions s
-                     JOIN ParkingCards c ON s.card_id = c.card_id
-                     JOIN ParkingAreas a ON a.site_id = c.site_id
-                     WHERE a.area_id = ? AND s.status = 'active' AND s.session_state = 'parked' AND a.vehicle_type_id = s.vehicle_type_id
-                     """;
+                SELECT COUNT(*)
+                FROM ParkingSessions s
+                JOIN ParkingCards c ON s.card_id = c.card_id
+                JOIN ParkingAreas a ON a.site_id = c.site_id
+                WHERE a.area_id = ? AND s.status = 'active' AND s.session_state = 'parked' AND a.vehicle_type_id = s.vehicle_type_id
+                """;
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, areaId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -64,12 +68,12 @@ public class SessionDAO extends DBContext {
 
         // 1. Dùng StringBuilder để xây dựng câu SQL động
         StringBuilder sql = new StringBuilder("""
-            SELECT TOP (?) s.session_id, s.card_id, c.site_id, s.license_plate, 
-                           s.entry_time, s.exit_time, s.session_state, s.status
-            FROM ParkingSessions s
-            JOIN ParkingCards c ON s.card_id = c.card_id
-            WHERE c.site_id = ? AND s.status = 'active'
-            """);
+                SELECT TOP (?) s.session_id, s.card_id, c.site_id, s.license_plate,
+                               s.entry_time, s.exit_time, s.session_state, s.status
+                FROM ParkingSessions s
+                JOIN ParkingCards c ON s.card_id = c.card_id
+                WHERE c.site_id = ? AND s.status = 'active'
+                """);
 
         // 2. Kiểm tra state: Nếu khác null và không rỗng thì nối thêm điều kiện WHERE
         boolean hasStateFilter = state != null && !state.trim().isEmpty();
@@ -126,7 +130,8 @@ public class SessionDAO extends DBContext {
                 + "(card_id, vehicle_type_id, license_plate, session_type, session_state) "
                 + "VALUES (?, ?, ?, ?, ?)";
 
-        // Chỉ dùng try-with-resources cho PreparedStatement để không làm đóng mất connection tổng
+        // Chỉ dùng try-with-resources cho PreparedStatement để không làm đóng mất
+        // connection tổng
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, session.getCardId());
@@ -175,13 +180,13 @@ public class SessionDAO extends DBContext {
     public boolean isVehicleInLot(String licensePlate, int siteId) {
         // Dùng hàm COUNT, chỉ trả về 1 con số duy nhất là 0 hoặc >0. Siêu nhẹ!
         String sql = """
-                 SELECT COUNT(1) FROM ParkingSessions s
-                 JOIN ParkingCards c ON s.card_id = c.card_id
-                 WHERE c.site_id = ? 
-                   AND s.status = 'active'
-                   AND s.session_state = 'parked' 
-                   AND s.license_plate = ?
-                 """;
+                SELECT COUNT(1) FROM ParkingSessions s
+                JOIN ParkingCards c ON s.card_id = c.card_id
+                WHERE c.site_id = ?
+                  AND s.status = 'active'
+                  AND s.session_state = 'parked'
+                  AND s.license_plate = ?
+                """;
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, siteId);
             ps.setString(2, licensePlate); // Truyền trực tiếp biển số xuống DB
@@ -246,21 +251,21 @@ public class SessionDAO extends DBContext {
 
     public LocalDateTime getExpectedTimeOut(String cardId) {
         String sql = """
-                 SELECT 
-                     CASE 
-                         WHEN s.session_type = 'noncasual' THEN 
-                             COALESCE(
-                                 (SELECT TOP 1 sub.end_date FROM Subscriptions sub 
-                                  WHERE sub.card_id = s.card_id AND sub.sub_state = 'active'
-                                  ORDER BY sub.end_date DESC),
-                                 (SELECT TOP 1 b.end_time FROM Bookings b 
-                                  WHERE b.card_id = s.card_id AND b.booking_state = 'completed')
-                             )
-                         ELSE NULL 
-                     END AS expected_time_out
-                 FROM ParkingSessions s
-                 WHERE s.card_id = ? AND s.session_state = 'parked';
-                 """;
+                SELECT
+                    CASE
+                        WHEN s.session_type = 'noncasual' THEN
+                            COALESCE(
+                                (SELECT TOP 1 sub.end_date FROM Subscriptions sub
+                                 WHERE sub.card_id = s.card_id AND sub.sub_state = 'active'
+                                 ORDER BY sub.end_date DESC),
+                                (SELECT TOP 1 b.end_time FROM Bookings b
+                                 WHERE b.card_id = s.card_id AND b.booking_state = 'completed')
+                            )
+                        ELSE NULL
+                    END AS expected_time_out
+                FROM ParkingSessions s
+                WHERE s.card_id = ? AND s.session_state = 'parked';
+                """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, cardId);
@@ -342,5 +347,60 @@ public class SessionDAO extends DBContext {
         session.setStatus(rs.getString("status"));
 
         return session;
+    }
+
+    public int getCurrentParkedVehiclesInCurrentMonth() {
+
+        String sql = """
+                SELECT COUNT(ps.session_id) as total_parkingSessions
+                FROM ParkingSessions ps
+                WHERE MONTH(ps.entry_time) = MONTH(GETDATE())
+                 	AND YEAR(ps.entry_time) = YEAR(GETDATE())
+                 	AND ps.session_state = 'parked'
+                 """;
+
+        int CurrentParkedVehicles = 0;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                CurrentParkedVehicles = rs.getInt("total_parkingSessions");
+            }
+        } catch (Exception e) {
+            System.out.println("Error SessionDAO.getCurrentParkedVehiclesInCurrentMonth: " + e.getMessage());
+        }
+
+        return CurrentParkedVehicles;
+    }
+
+    public int getCurrentParkedVehiclesInCurrentMonthById(int siteId) {
+
+        String sql = """
+                SELECT COUNT(ps.session_id) as total_parkingSessions
+                FROM ParkingSessions ps
+                JOIN ParkingCards pc ON ps.card_id = pc.card_id
+                WHERE MONTH(ps.entry_time) = MONTH(GETDATE())
+                 	AND YEAR(ps.entry_time) = YEAR(GETDATE())
+                 	AND ps.session_state = 'parked'
+                    AND pc.site_id = ?
+                 """;
+
+        int CurrentParkedVehicles = 0;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, siteId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                CurrentParkedVehicles = rs.getInt("total_parkingSessions");
+            }
+        } catch (Exception e) {
+            System.out.println("Error SessionDAO.getCurrentParkedVehiclesInCurrentMonthById: " + e.getMessage());
+        }
+
+        return CurrentParkedVehicles;
     }
 }

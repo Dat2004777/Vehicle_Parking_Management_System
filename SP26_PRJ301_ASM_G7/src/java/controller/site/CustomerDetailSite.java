@@ -97,7 +97,7 @@ public class CustomerDetailSite extends HttpServlet {
     private void redirectToBookingPage(HttpServletRequest request, HttpServletResponse response, String siteId)
             throws ServletException, IOException {
         List<VehicleBasePriceDTO> vehicles = new ArrayList<>();
-        ParkingSite site = new ParkingSite();
+        ParkingSite site = new ParkingSite(id, name, address, region, status, managerId, totalSlots);
 
         try {
             site = siteDAO.getById(Integer.parseInt(siteId));
@@ -113,7 +113,7 @@ public class CustomerDetailSite extends HttpServlet {
     private void redirectToBuyingPage(HttpServletRequest request, HttpServletResponse response, String siteId)
             throws ServletException, IOException {
         List<VehicleBasePriceDTO> vehicles = new ArrayList<>();
-        ParkingSite site = new ParkingSite();
+        ParkingSite site = new ParkingSite(id, name, address, region, status, managerId, totalSlots);
         try {
             site = siteDAO.getById(Integer.parseInt(siteId));
             vehicles = priceConfigDAO.getBasePriceMonth(Integer.parseInt(siteId));
@@ -159,7 +159,7 @@ public class CustomerDetailSite extends HttpServlet {
 
         //lay lai danh sach
         List<VehicleBasePriceDTO> vehicles = new ArrayList<>();
-        ParkingSite site = new ParkingSite();
+        ParkingSite site = new ParkingSite(id, name, address, region, status, managerId, totalSlots);
 
         try {
             site = siteDAO.getById(Integer.parseInt(siteId));

@@ -8,7 +8,6 @@ import java.util.List;
 import model.PriceConfig;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -20,9 +19,9 @@ public class PriceConfigsDAO extends DBContext {
 
     public void insertPriceConfigs(int siteId, List<PriceConfig> prices) {
         String sql = """
-                     INSERT INTO PriceConfigs (site_id, vehicle_type_id, type, base_price) 
-                     VALUES (?, ?, ?, ?)
-                     """;
+                INSERT INTO PriceConfigs (site_id, vehicle_type_id, type, base_price)
+                VALUES (?, ?, ?, ?)
+                """;
 
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -33,6 +32,26 @@ public class PriceConfigsDAO extends DBContext {
                 ps.setLong(1, price.getBasePrice());
             }
             ps.executeQuery();
+        } catch (Exception e) {
+            System.out.println("Error PriceConfigsDAO.insertPriceConfigs: " + e.getMessage());
+        }
+    }
+
+    public void insertPriceConfigs(List<PriceConfig> prices) {
+        String sql = """
+                INSERT INTO PriceConfigs (site_id, vehicle_type_id, type, base_price)
+                VALUES (?, ?, ?, ?)
+                """;
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            for (PriceConfig price : prices) {
+                ps.setInt(1, price.getSiteId());
+                ps.setInt(2, price.getVehicleTypeId());
+                ps.setString(3, price.getType());
+                ps.setLong(4, price.getBasePrice());
+                ps.executeUpdate();
+            }
         } catch (Exception e) {
             System.out.println("Error PriceConfigsDAO.insertPriceConfigs: " + e.getMessage());
         }
@@ -81,7 +100,8 @@ public class PriceConfigsDAO extends DBContext {
                     pc.setSiteId(rs.getInt("site_id"));
                     pc.setVehicleTypeId(rs.getInt("vehicle_type_id"));
 
-                    // Cột 'type' trong DB chính là 'subType' (monthly, quarterly...) mà ta dùng ở Controller
+                    // Cột 'type' trong DB chính là 'subType' (monthly, quarterly...) mà ta dùng ở
+                    // Controller
                     pc.setType(rs.getString("type"));
 
                     // Cột 'base_price' trong DB map vào biến 'price' trong Object
@@ -131,5 +151,17 @@ public class PriceConfigsDAO extends DBContext {
         }
 
         return null; // Không tìm thấy hoặc có lỗi
+    }
+
+    public void deletePriceConfigsBySiteId(int siteId) {
+        String sql = "DELETE FROM PriceConfigs WHERE site_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, siteId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Error PriceConfigsDAO.deletePriceConfigsBySiteId: " + e.getMessage());
+        }
     }
 }

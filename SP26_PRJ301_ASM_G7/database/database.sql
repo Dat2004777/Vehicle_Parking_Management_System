@@ -101,7 +101,6 @@ GO
 CREATE TABLE ParkingAreas (
     area_id INT IDENTITY(1,1) PRIMARY KEY,
     site_id INT NOT NULL,
-    area_name NVARCHAR(50) NOT NULL,
     vehicle_type_id INT NOT NULL,
     totalSlots INT DEFAULT 0,
     status VARCHAR(10) DEFAULT 'active' CHECK (status IN ('active', 'inactive')), -- Xóa mềm
@@ -238,10 +237,10 @@ INSERT INTO Customers (first_name, last_name, phone, email, wallet_amount, accou
 (N'An', N'Phạm', '0988888888', 'an@gmail.com', 500000, 4),
 (N'Bình', N'Đỗ', '0977777777', 'binh@gmail.com', 100000, 5);
 
-INSERT INTO ParkingAreas (site_id, area_name, vehicle_type_id, totalSlots) VALUES 
-(1, N'Khu A - Hầm Ô tô', 1, 50),
-(1, N'Khu B - Sân xe máy', 2, 200),
-(2, N'Khu C - Ngoài trời', 1, 100);
+INSERT INTO ParkingAreas (site_id, vehicle_type_id, totalSlots) VALUES 
+(1, 1, 50),
+(1, 2, 200),
+(2, 1, 100);
 
 INSERT INTO ParkingCards (card_id, site_id, card_state) VALUES 
 ('CARD-HN-001', 1, 'assigned'), 
