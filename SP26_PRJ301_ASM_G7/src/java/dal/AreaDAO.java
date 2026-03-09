@@ -21,7 +21,7 @@ public class AreaDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                list.add(mapRowToArea(rs));
+                list.add(mapRowToArea(rs, 0));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,7 +38,7 @@ public class AreaDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return mapRowToArea(rs);
+                return mapRowToArea(rs, 0);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,7 +105,7 @@ public class AreaDAO extends DBContext {
         return false;
     }
 
-    private ParkingArea mapRowToArea(ResultSet rs) throws SQLException {
+    private ParkingArea mapRowToArea(ResultSet rs, int tmp) throws SQLException {
         int id = rs.getInt("area_id");
         int siteId = rs.getInt("site_id");
         String name = rs.getString("area_name");
