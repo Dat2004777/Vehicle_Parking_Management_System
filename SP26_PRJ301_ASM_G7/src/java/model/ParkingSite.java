@@ -10,28 +10,28 @@ public class ParkingSite {
     private String siteName;
     private String address;
     private Region region;
-    private State siteStatus;
+    private State siteState;
     private int managerId;
     private int totalSlots;
 
     public ParkingSite(){        
     }
     
-    public ParkingSite(String siteName, String address, Region region, State siteStatus, int managerId, int totalSlots) {
+    public ParkingSite(String siteName, String address, Region region, State siteState, int managerId, int totalSlots) {
         this.siteName = siteName;
         this.address = address;
         this.region = region;
-        this.siteStatus = siteStatus;
+        this.siteState = siteState;
         this.managerId = managerId;
         this.totalSlots = totalSlots;
     }
     
-    public ParkingSite(int siteId, String siteName, String address, Region region, State siteStatus, int managerId, int totalSlots) {
+    public ParkingSite(int siteId, String siteName, String address, Region region, State siteState, int managerId, int totalSlots) {
         this.siteId = siteId;
         this.siteName = siteName;
         this.address = address;
         this.region = region;
-        this.siteStatus = siteStatus;
+        this.siteState = siteState;
         this.managerId = managerId;
         this.totalSlots = totalSlots;
     }
@@ -69,12 +69,12 @@ public class ParkingSite {
         this.region = region;
     }
 
-    public State getSiteStatus() {
-        return siteStatus;
+    public State getSiteState() {
+        return siteState;
     }
 
-    public void setSiteStatus(State siteStatus) {
-        this.siteStatus = siteStatus;
+    public void setSiteState(State siteState) {
+        this.siteState = siteState;
     }
 
     public int getManagerId() {

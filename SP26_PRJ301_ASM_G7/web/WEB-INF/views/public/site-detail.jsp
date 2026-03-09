@@ -190,21 +190,21 @@
                                     <h5 class="fw-bold mt-4 mb-3">Trạng thái hoạt động</h5>
                                     <p class="mb-1 text-muted"><i class="bi bi-clock"></i> Giờ mở cửa: <strong>06:00 - 23:00</strong></p>
                                     <c:choose>
-                                        <c:when test="${requestScope.site.siteStatus eq 'OPERATING'}">
+                                        <c:when test="${requestScope.site.siteState eq 'OPERATING'}">
                                             <p class="mb-0 text-muted mt-3">
-                                                <span class="badge-feature badge-success-custom p-2">${requestScope.site.siteStatus.label}</span>
+                                                <span class="badge-feature badge-success-custom p-2">${requestScope.site.siteState.label}</span>
                                             </p>
                                         </c:when>
 
-                                        <c:when test="${requestScope.site.siteStatus eq 'MAINTENANCE'}">
+                                        <c:when test="${requestScope.site.siteState eq 'MAINTENANCE'}">
                                             <p class="mb-0 text-muted mt-3">
-                                                <span class="badge-feature badge-warning-custom p-2">${requestScope.site.siteStatus.label}</span>
+                                                <span class="badge-feature badge-warning-custom p-2">${requestScope.site.siteState.label}</span>
                                             </p>
                                         </c:when>
 
                                         <c:otherwise>
                                             <p class="mb-0 text-muted mt-3">
-                                                <span class="badge-feature badge-danger-custom p-2">${requestScope.site.siteStatus.label}</span>
+                                                <span class="badge-feature badge-danger-custom p-2">${requestScope.site.siteState.label}</span>
                                             </p>
                                         </c:otherwise>
                                     </c:choose>
@@ -321,7 +321,7 @@
                                 <small class="text-muted">Đã bao gồm VAT</small>
                             </div>
                             <c:choose>
-                                <c:when test="${requestScope.site.siteStatus eq 'OPERATING'}">
+                                <c:when test="${requestScope.site.siteState eq 'OPERATING'}">
                                     <button type="submit" class="btn btn-primary btn-confirm shadow-sm">
                                         Xác nhận đặt chỗ <i class="bi bi-arrow-right ms-2"></i>
                                     </button>

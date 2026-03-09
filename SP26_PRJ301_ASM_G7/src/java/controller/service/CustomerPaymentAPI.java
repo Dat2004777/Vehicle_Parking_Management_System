@@ -196,7 +196,7 @@ public class CustomerPaymentAPI extends HttpServlet {
                 bookingDAO.updateBookingState( bookingId, "accepted");
 
                 // update card
-                cardDAO.updateCard(Integer.parseInt(siteId), card.getCardId(), "using");
+                cardDAO.updateCard(Integer.parseInt(siteId), card.getCardId(), "assigned");
 
                 //update payment transaction
                 paymentDAO.updatePaymentStatus(txn, "completed");
@@ -321,7 +321,7 @@ public class CustomerPaymentAPI extends HttpServlet {
                 );
 
                 // update card
-                cardDAO.updateCard(Integer.parseInt(siteId), card.getCardId(), "using");
+                cardDAO.updateCard(Integer.parseInt(siteId), card.getCardId(), "assigned");
 
                 //update payment transaction
                 paymentDAO.updatePaymentStatus(txn, "completed");

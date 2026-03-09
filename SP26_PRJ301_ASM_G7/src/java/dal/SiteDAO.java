@@ -25,7 +25,7 @@ public class SiteDAO extends DBContext {
             ps.setString(3, site.getRegion().name());
 
             ps.setInt(4, site.getManagerId());
-            ps.setString(5, site.getSiteStatus().name());
+            ps.setString(5, site.getSiteState().name());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -47,7 +47,7 @@ public class SiteDAO extends DBContext {
             ps.setString(2, newSiteData.getAddress());
 
             ps.setString(3, newSiteData.getRegion().name());
-            ps.setString(4, newSiteData.getSiteStatus().name());
+            ps.setString(4, newSiteData.getSiteState().name());
             ps.setInt(5, newSiteData.getManagerId());
 
             ps.setInt(6, newSiteData.getSiteId());
@@ -232,7 +232,7 @@ public class SiteDAO extends DBContext {
                 site.setSiteName(rs.getString("site_name"));
                 site.setAddress(rs.getString("address"));
                 site.setRegion(ParkingSite.Region.valueOf(rs.getString("region").toUpperCase()));
-                site.setSiteStatus(ParkingSite.State.valueOf(rs.getString("operating_state").toUpperCase()));
+                site.setSiteState(ParkingSite.State.valueOf(rs.getString("operating_state").toUpperCase()));
                 site.setTotalSlots(rs.getInt("availableSlots"));
 
                 list.add(site);
@@ -308,7 +308,7 @@ public class SiteDAO extends DBContext {
                 site.setSiteName(rs.getString("site_name"));
                 site.setAddress(rs.getString("address"));
                 site.setRegion(ParkingSite.Region.valueOf(rs.getString("region").toUpperCase()));
-                site.setSiteStatus(ParkingSite.State.valueOf(rs.getString("operating_state").toUpperCase()));
+                site.setSiteState(ParkingSite.State.valueOf(rs.getString("operating_state").toUpperCase()));
                 site.setTotalSlots(rs.getInt("availableSlots"));
 
                 list.add(site);

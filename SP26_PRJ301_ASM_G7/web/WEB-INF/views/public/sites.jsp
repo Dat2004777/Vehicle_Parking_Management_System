@@ -327,7 +327,7 @@
                                             <div class="d-flex justify-content-between align-items-start">
                                                 <h4 class="card-title fw-bold fs-3 mt-3">${s.siteName}</h4>
                                                 <div class="rating-box">
-                                                    <c:if test="${s.siteStatus eq 'OPERATING'}">
+                                                    <c:if test="${s.siteState eq 'OPERATING'}">
                                                         <i class="bi bi-box"></i>
                                                         <span class=" fw-bold text-dark small"> Còn ${s.totalSlots} slots</span>
                                                     </c:if>
@@ -337,21 +337,21 @@
                                             <p class="text-secondary mb-3"><i class="bi bi-geo-alt me-2"></i>${s.region.label}</p>
 
                                             <c:choose>
-                                                <c:when test="${s.siteStatus eq 'OPERATING'}">
-                                                    <span class="badge badge-success-custom ">${s.siteStatus.label}</span>
+                                                <c:when test="${s.siteState eq 'OPERATING'}">
+                                                    <span class="badge badge-success-custom ">${s.siteState.label}</span>
                                                 </c:when>
-                                                <c:when test="${s.siteStatus eq 'MAINTENANCE'}">
-                                                    <span class="badge badge-danger-custom">${s.siteStatus.label}</span>
+                                                <c:when test="${s.siteState eq 'MAINTENANCE'}">
+                                                    <span class="badge badge-danger-custom">${s.siteState.label}</span>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="badge badge-warning-custom">${s.siteStatus.label}</span>
+                                                    <span class="badge badge-warning-custom">${s.siteState.label}</span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </div>
                                         <c:choose>
                                             <c:when test="${param.action eq 'booking'}">
                                                 <c:choose>
-                                                    <c:when test="${s.siteStatus eq 'OPERATING'}">
+                                                    <c:when test="${s.siteState eq 'OPERATING'}">
                                                         <div class="d-flex justify-content-end mt-4">
                                                             <a href="${pageContext.request.contextPath}/sites/site-detail?action=${param.action}&siteId=${s.siteId}" class="btn btn-primary btn-book px-4 py-2"  onclick="event.stopPropagation()">Đặt ngay</a>
                                                         </div>
@@ -367,7 +367,7 @@
 
                                             <c:otherwise>
                                                 <c:choose>
-                                                    <c:when test="${s.siteStatus eq 'OPERATING'}">
+                                                    <c:when test="${s.siteState eq 'OPERATING'}">
                                                         <div class="d-flex justify-content-end mt-4">
                                                             <a href="${pageContext.request.contextPath}/sites/site-detail?action=${param.action}&siteId=${s.siteId}" class="btn btn-primary btn-book px-4 py-2"  onclick="event.stopPropagation()">Mua thẻ</a>
                                                         </div>
