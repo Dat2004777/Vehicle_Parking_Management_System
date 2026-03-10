@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.Timestamp;
 import model.Subscription;
+import model.dto.HistorySubscriptionDTO;
 
 /**
  *
@@ -350,5 +351,60 @@ public class SubscriptionDAO extends DBContext {
         }
 
         return totalSubscription;
+    }
+    
+    public List<HistorySubscriptionDTO> getAllSubscription(int customerId){
+        String sql = 
+                """
+                SELECT 
+                    s.subscription_id,
+                    s.license_plate,
+                    vt.vehicle_type_id AS vehicle_type,
+                    ps.site_name,
+                    s.card_id,
+                    s.start_date,
+                    s.end_date,
+                    DATEDIFF(day, GETDATE(), s.end_date) AS days_remaining,
+                    s.sub_state,
+                    s.applied_price
+                FROM Subscriptions s
+                JOIN VehicleTypes vt 
+                    ON s.vehicle_type_id = vt.vehicle_type_id
+                JOIN ParkingCards pc 
+                    ON s.card_id = pc.card_id
+                JOIN ParkingSites ps 
+                    ON pc.site_id = ps.site_id
+                WHERE s.customer_id = ?
+                AND s.status = 'active';
+                """;
+        
+        try(PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setInt(1,customerId);
+            
+            List<HistorySubscriptionDTO> list = new ArrayList<>();
+            
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                Subscription subscription = new Subscription();
+                subscription.setSubscriptionId(rs.getInt("subscription_id"));
+                subscription.setLicensePlate(rs.getString("license_plate"));
+                subscription.setVehicleTypeId(rs.getInt("vehicle_type"));
+                subscription.setCardId(rs.getString("card_id"));
+                subscription.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
+                subscription.setSubState(rs.getString("sub_state"));
+                subscription.setAppliedPrice(rs.getLong("applied_price"));
+                HistorySubscriptionDTO historySubscriptionDTO = new HistorySubscriptionDTO();
+                historySubscriptionDTO.setSubscription(subscription);
+                historySubscriptionDTO.setSiteName(rs.getString("site_name"));
+                historySubscriptionDTO.setDayRemain(rs.getInt("days_remaining"));
+                list.add(historySubscriptionDTO);
+            }
+            
+            return list;
+        }catch(Exception e){
+            System.out.println("Lỗi lấy ra danh sách Subscriptions");
+            e.printStackTrace();
+            return null;
+        }
     }
 }

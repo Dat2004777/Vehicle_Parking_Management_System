@@ -176,4 +176,27 @@ public class CustomerDAO extends DBContext {
         }
         return false;
     }
+    
+    public boolean updateCustomerInfo(Customer customer, String firstname, String lastname, String phone){
+         String sql =
+                """
+                UPDATE Customers
+                SET first_name = ?, last_name = ?, phone = ?
+                WHERE customer_id = ?
+                """;
+         
+         try(PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setString(1,firstname);
+            ps.setString(2,lastname);
+            ps.setString(3,phone);
+            ps.setInt(4, customer.getCustomerId());
+             
+            int row = ps.executeUpdate();
+            return row > 0;
+        }catch(Exception e){
+            System.out.println("Lỗi cập nhật giá trị của Customer");
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

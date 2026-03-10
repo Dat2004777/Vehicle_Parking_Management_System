@@ -51,7 +51,11 @@
         height: 3px;
         width: 100%;
         background: currentColor;
-        animation: toastProgress 5s linear forwards;
+        animation: toastProgress 5s linear;
+    }
+    
+    .card {
+        background-color: #fff;
     }
 
     @keyframes toastProgress {
@@ -79,7 +83,7 @@
     }
 
     .custom-toast.show {
-        animation: slideInFromRight 0.35s ease-out forwards;
+        animation: slideInFromRight 0.35s ease-out;
     }
 
     /* Mobile */
@@ -111,7 +115,7 @@
         }
 
         .custom-toast.show {
-            animation: slideDown .35s ease-out forwards;
+            animation: slideDown .35s ease-out;
         }
 
     }
