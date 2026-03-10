@@ -52,7 +52,7 @@
     </head>
     <body>
         <%@include file="/WEB-INF/views/layout/header.jsp" %>
-
+        <%@include file="/WEB-INF/views/layout/customer-layout.jsp" %>
         <div class="py-5">
             <div class="container">
                 <div class="row g-4">
@@ -205,7 +205,23 @@
                 oldPass.addEventListener("input", checkPasswordChange);
                 newPass.addEventListener("input", checkPasswordChange);
                 confirmPass.addEventListener("input", checkPasswordChange);
+                
+                
+                // ===== XỬ LÝ HIỂN THỊ TOAST TỪ URL PARAMETERS =====
+                const urlParams = new URLSearchParams(window.location.search);
+                const successParam = urlParams.get("success");
 
+                if (successParam === "true") {
+                    // Gọi hàm showToast từ file customerToast.jsp
+                    showToast("success", "Cập nhật thông tin thành công!");
+                    
+                    // Xóa parameter trên URL để tránh hiện lại khi F5
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } 
+                else if (successParam === "false") {
+                    showToast("error", "Cập nhật không thành công. Vui lòng kiểm tra lại!");
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
             });
 
             // Toggle hiển thị Mật khẩu (Eye Icon)
@@ -252,24 +268,24 @@
 
             });
 
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get("success") === "false") {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Fail to update!',
-                    confirmButtonText: 'Try Again'
-                }).then(() => {
-                    window.location.href = contextPath + "/customer-info";
-                });
-            } else if (urlParams.get("success") === "true") {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Update Successfully!',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    window.location.href = contextPath + "/customer-info";
-                });
-            }
+//            const urlParams = new URLSearchParams(window.location.search);
+//            if (urlParams.get("success") === "false") {
+//                Swal.fire({
+//                    icon: 'error',
+//                    title: 'Fail to update!',
+//                    confirmButtonText: 'Try Again'
+//                }).then(() => {
+//                    window.location.href = contextPath + "/customer-info";
+//                });
+//            } else if (urlParams.get("success") === "true") {
+//                Swal.fire({
+//                    icon: 'success',
+//                    title: 'Update Successfully!',
+//                    confirmButtonText: 'OK'
+//                }).then(() => {
+//                    window.location.href = contextPath + "/customer-info";
+//                });
+//            }
         </script>
     </body>
 </html>

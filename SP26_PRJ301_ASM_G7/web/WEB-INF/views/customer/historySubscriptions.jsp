@@ -5,6 +5,8 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -52,13 +54,13 @@
     </head>
     <body>
         <%@include file="/WEB-INF/views/layout/header.jsp" %>
-
+        <%@include file="/WEB-INF/views/layout/customer-layout.jsp" %>
         <div class="container py-5">
             <div class="row g-4">
                 <!--Side bar-->
-                 <jsp:include page="/WEB-INF/views/layout/customerSidebar.jsp">
-                        <jsp:param name="activePage" value="history-subscriptions"/>
-                    </jsp:include>
+                <jsp:include page="/WEB-INF/views/layout/customerSidebar.jsp">
+                    <jsp:param name="activePage" value="history-subscriptions"/>
+                </jsp:include>
 
                 <!--Content-->  
                 <div class="col-lg-9">
@@ -69,78 +71,150 @@
                                 <h5 class="fw-bold text-purple mb-0">Vé tháng hiện tại</h5>
                                 <button class="btn btn-outline-primary btn-sm px-3">+ Đăng ký mới</button>
                             </div>
-
-                            <div class="card border border-primary p-3 mb-3 shadow-sm"
-                                 style="border-width: 2px !important;">
-
-                                <div class="row align-items-center">
-
-                                    <!-- Nội dung -->
-                                    <div class="col-12 col-md-8 mb-3 mb-md-0">
-
-                                        <h6 class="fw-bold">
-                                            Vé Ô tô - Bãi FPT Cầu Giấy
-                                            <span class="ms-2 badge bg-success-subtle text-success fw-bold">
-                                                Đang hoạt động
-                                            </span>
-                                        </h6>
-
-                                        <p class="mb-1 small text-muted">
-                                            <i class="bi bi-car-front"></i> Biển số: 30A-123.45
-                                        </p>
-
-                                        <p class="mb-0 small text-muted">
-                                            <i class="bi bi-clock"></i>
-                                            Hết hạn:
-                                            <span class="text-danger fw-bold">
-                                                28/02/2026
-                                            </span>
-                                            (Còn 30 ngày)
-                                        </p>
+                            <c:choose>
+                                <c:when test="${empty requestScope.subscriptions}">
+                                    <div class="text-center py-5 border rounded bg-white shadow-sm">
+                                        <div class="mb-3">
+                                            <i class="bi bi-ticket-perforated text-muted" style="font-size: 3rem;"></i>
+                                        </div>
+                                        <h6 class="text-secondary fw-bold">Hiện tại bạn chưa đăng ký vé tháng nào!</h6>
+                                        <p class="small text-muted mb-4">Đăng ký vé tháng để tiết kiệm chi phí và hưởng nhiều ưu đãi hơn.</p>
                                     </div>
+                                </c:when>
 
-                                    <!-- Button -->
-                                    <div class="col-12 col-md-4 text-md-end">
-                                        <button class="btn btn-purple btn-sm w-md-auto">
-                                            Gia hạn ngay
-                                        </button>
-                                    </div>
+                                <c:otherwise>
+                                    <c:forEach items="${requestScope.subscriptions}" var="sub">
 
-                                </div>
-                            </div>
+                                        <%-- TRƯỜNG HỢP: ĐANG HOẠT ĐỘNG --%>
+                                        <c:if test="${sub.subscription.subState eq 'active'}">
+                                            <div class="card border border-primary p-3 mb-3 shadow-sm" style="border-width: 2px !important;">
+                                                <div class="row align-items-center">
+                                                    <div class="col-12 col-md-8 mb-3 mb-md-0">
+                                                        <h6 class="fw-bold">
+                                                            ${sub.subscription.vehicleTypeId == 1 ? 'Vé Ô Tô' : 'Vé Xe Máy'} - Bãi xe ${sub.siteName}
+                                                            <span class="ms-2 badge bg-success-subtle text-success fw-bold">Đang hoạt động</span>
+                                                        </h6>
+                                                        <p class="mb-1 small text-muted">
+                                                            <i class="bi ${sub.subscription.vehicleTypeId == 1 ? 'bi-car-front' : 'bi-bicycle'}"></i> 
+                                                            Biển số: ${sub.subscription.licensePlate}
+                                                        </p>
+                                                        <p class="mb-0 small text-muted">
+                                                            <i class="bi bi-clock"></i> Hết hạn:
+                                                            <span class="text-danger fw-bold">
+                                                                <fmt:parseDate value="${sub.subscription.endDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDate" type="both" />
+                                                                <fmt:formatDate value="${parsedDate}" pattern="dd/MM/yyyy" />
+                                                            </span>
+                                                            (Còn ${sub.dayRemain} ngày)
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-12 col-md-4 text-md-end">
+                                                        <a href="#" class="btn btn-purple btn-sm w-md-auto">Gia hạn ngay</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:if>
 
-                            <div class="card border p-3 shadow-sm bg-light">
+                                        <%-- TRƯỜNG HỢP: HẾT HẠN --%>
+                                        <c:if test="${sub.subscription.subState eq 'expired'}">
+                                            <div class="card border p-3 shadow-sm bg-light">
+                                                <div class="row align-items-center">
+                                                    <div class="col-12 col-md-8 mb-3 mb-md-0">
+                                                        <h6 class="fw-bold text-secondary">
+                                                            ${sub.subscription.vehicleTypeId == 1 ? 'Vé Ô Tô' : 'Vé Xe Máy'} - Bãi xe ${sub.siteName}
+                                                            <span class="ms-2 badge bg-danger-subtle text-danger fw-bold">Đã hết hạn</span>
+                                                        </h6>
+                                                        <p class="mb-1 small text-muted">
+                                                            <i class="bi ${sub.subscription.vehicleTypeId == 1 ? 'bi-car-front' : 'bi-bicycle'}"></i>
+                                                            Biển số: ${sub.subscription.licensePlate}
+                                                        </p>
+                                                        <p class="mb-0 small text-muted">
+                                                            <i class="bi bi-clock"></i> Hết hạn: 
+                                                            <fmt:parseDate value="${sub.subscription.endDate}" pattern="yyyy-MM-dd'T'HH:mm" var="parsedDateExp" type="both" />
+                                                            <fmt:formatDate value="${parsedDateExp}" pattern="dd/MM/yyyy" />
+                                                        </p>
+                                                    </div>
+                                                    <div class="col-12 col-md-4 text-md-end">
+                                                        <a href="#" class="btn btn-outline-secondary btn-sm w-md-auto">Mua lại</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </c:if>
 
-                                <div class="row align-items-center">
+                                    </c:forEach>
+                                </c:otherwise>
+                            </c:choose>
 
-                                    <div class="col-12 col-md-8 mb-3 mb-md-0">
-
-                                        <h6 class="fw-bold text-secondary">
-                                            Vé Xe máy - Bãi FPT Hòa Lạc
-                                            <span class="ms-2 badge bg-danger-subtle text-danger fw-bold">
-                                                Đã hết hạn
-                                            </span>
-                                        </h6>
-
-                                        <p class="mb-1 small text-muted">
-                                            <i class="bi bi-bicycle"></i>
-                                            Biển số: 29H1-999.99
-                                        </p>
-
-                                        <p class="mb-0 small text-muted">
-                                            <i class="bi bi-clock"></i>
-                                            Hết hạn: 01/01/2026
-                                        </p>
-                                    </div>
-
-                                    <div class="col-12 col-md-4 text-md-end">
-                                        <button class="btn btn-outline-secondary btn-sm w-md-auto">
-                                            Mua lại
-                                        </button>
-                                    </div>
-
-                                </div>
-                            </div>
+                            <!--                            <div class="card border border-primary p-3 mb-3 shadow-sm"
+                                                             style="border-width: 2px !important;">
+                            
+                                                            <div class="row align-items-center">
+                            
+                                                                 Nội dung 
+                                                                <div class="col-12 col-md-8 mb-3 mb-md-0">
+                            
+                                                                    <h6 class="fw-bold">
+                                                                        Vé Ô tô - Bãi FPT Cầu Giấy
+                                                                        <span class="ms-2 badge bg-success-subtle text-success fw-bold">
+                                                                            Đang hoạt động
+                                                                        </span>
+                                                                    </h6>
+                            
+                                                                    <p class="mb-1 small text-muted">
+                                                                        <i class="bi bi-car-front"></i> Biển số: 30A-123.45
+                                                                    </p>
+                            
+                                                                    <p class="mb-0 small text-muted">
+                                                                        <i class="bi bi-clock"></i>
+                                                                        Hết hạn:
+                                                                        <span class="text-danger fw-bold">
+                                                                            28/02/2026
+                                                                        </span>
+                                                                        (Còn 30 ngày)
+                                                                    </p>
+                                                                </div>
+                            
+                                                                 Button 
+                                                                <div class="col-12 col-md-4 text-md-end">
+                                                                    <button class="btn btn-purple btn-sm w-md-auto">
+                                                                        Gia hạn ngay
+                                                                    </button>
+                                                                </div>
+                            
+                                                            </div>
+                                                        </div>
+                            
+                                                                                    <div class="card border p-3 shadow-sm bg-light">
+                                                        
+                                                                                        <div class="row align-items-center">
+                                                        
+                                                                                            <div class="col-12 col-md-8 mb-3 mb-md-0">
+                                                        
+                                                                                                <h6 class="fw-bold text-secondary">
+                                                                                                    Vé Xe máy - Bãi FPT Hòa Lạc
+                                                                                                    <span class="ms-2 badge bg-danger-subtle text-danger fw-bold">
+                                                                                                        Đã hết hạn
+                                                                                                    </span>
+                                                                                                </h6>
+                                                        
+                                                                                                <p class="mb-1 small text-muted">
+                                                                                                    <i class="bi bi-bicycle"></i>
+                                                                                                    Biển số: 29H1-999.99
+                                                                                                </p>
+                                                        
+                                                                                                <p class="mb-0 small text-muted">
+                                                                                                    <i class="bi bi-clock"></i>
+                                                                                                    Hết hạn: 01/01/2026
+                                                                                                </p>
+                                                                                            </div>
+                                                        
+                                                                                            <div class="col-12 col-md-4 text-md-end">
+                                                                                                <button class="btn btn-outline-secondary btn-sm w-md-auto">
+                                                                                                    Mua lại
+                                                                                                </button>
+                                                                                            </div>
+                                                        
+                                                                                        </div>
+                                                                                    </div>-->
                         </div>
                     </div>
                 </div>

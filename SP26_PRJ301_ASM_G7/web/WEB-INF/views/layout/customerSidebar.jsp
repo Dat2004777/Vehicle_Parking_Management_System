@@ -44,6 +44,10 @@
             0 0 0 4px rgba(255, 255, 255, 1),
             0 0 15px 5px rgba(99, 88, 238, 0.4);
     }
+
+    .list-group-item {
+        background-color: white;
+    }
 </style>
 
 <!--Lấy giá trị để activePage-->
@@ -87,12 +91,12 @@
                ${currentPage == 'history-bookings' ? 'active' : ''}">
                 <i class="bi bi-calendar-event me-2"></i> Lịch sử đặt chỗ
             </a>
-<!--
-            <a href="${pageContext.request.contextPath}/history-transactions"
-               class="list-group-item list-group-item-action sidebar-link
-               ${currentPage == 'history-transactions' ? 'active' : ''}">
-                <i class="bi bi-credit-card me-2"></i> Lịch sử thanh toán
-            </a>-->
+            <!--
+                        <a href="${pageContext.request.contextPath}/history-transactions"
+                           class="list-group-item list-group-item-action sidebar-link
+            ${currentPage == 'history-transactions' ? 'active' : ''}">
+             <i class="bi bi-credit-card me-2"></i> Lịch sử thanh toán
+         </a>-->
 
             <a href="logout"
                class="list-group-item list-group-item-action text-danger">

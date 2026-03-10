@@ -5,6 +5,7 @@
 
 package controller.customer;
 
+import dal.SubscriptionDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -13,7 +14,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import model.Account;
+import model.Customer;
+import model.dto.HistorySubscriptionDTO;
 
 /**
  *
@@ -59,12 +63,17 @@ public class HistorySubscriptionController extends HttpServlet {
     throws ServletException, IOException {
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
-        
-        if(account == null|| account.getRole() != Account.RoleEnum.CUSTOMER){
+        Customer customer = (Customer)  session.getAttribute("customer");
+        if(account == null|| customer == null ||account.getRole() != Account.RoleEnum.CUSTOMER){
             response.sendRedirect(request.getContextPath());
-        }else{
-            request.getRequestDispatcher("/WEB-INF/views/customer/historySubscriptions.jsp").forward(request, response);
+            return;
         }
+        
+        SubscriptionDAO subscriptionDAO = new SubscriptionDAO();
+        List<HistorySubscriptionDTO> historySubscriptions = subscriptionDAO.getAllSubscription(customer.getCustomer_id());
+        request.setAttribute("subscriptions", historySubscriptions);
+        request.getRequestDispatcher("/WEB-INF/views/customer/historySubscriptions.jsp").forward(request, response);
+        
     } 
 
     /** 
