@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import model.Subscription;
 import model.dto.HistorySubscriptionDTO;
 
@@ -361,21 +362,38 @@ public class SubscriptionDAO extends DBContext {
                     s.license_plate,
                     vt.vehicle_type_id AS vehicle_type,
                     ps.site_name,
+                    ps.site_id,
                     s.card_id,
                     s.start_date,
                     s.end_date,
-                    DATEDIFF(day, GETDATE(), s.end_date) AS days_remaining,
+                    DATEDIFF(DAY, GETDATE(), s.end_date) AS days_remaining,
                     s.sub_state,
-                    s.applied_price
+                    pcfg.base_price
                 FROM Subscriptions s
+                
                 JOIN VehicleTypes vt 
                     ON s.vehicle_type_id = vt.vehicle_type_id
+                    AND vt.status = 'active'
+                
                 JOIN ParkingCards pc 
                     ON s.card_id = pc.card_id
+                    AND pc.status = 'active'
+                
                 JOIN ParkingSites ps 
                     ON pc.site_id = ps.site_id
+                    AND ps.status = 'active'
+                
+                CROSS APPLY (
+                    SELECT TOP 1 base_price
+                    FROM PriceConfigs
+                    WHERE site_id = ps.site_id
+                        AND vehicle_type_id = s.vehicle_type_id
+                        AND type = 'monthly'
+                        AND status = 'active'
+                ) pcfg
+                
                 WHERE s.customer_id = ?
-                AND s.status = 'active';
+                AND s.status = 'active'
                 """;
         
         try(PreparedStatement ps = connection.prepareStatement(sql)){
@@ -392,11 +410,12 @@ public class SubscriptionDAO extends DBContext {
                 subscription.setCardId(rs.getString("card_id"));
                 subscription.setEndDate(rs.getTimestamp("end_date").toLocalDateTime());
                 subscription.setSubState(rs.getString("sub_state"));
-                subscription.setAppliedPrice(rs.getLong("applied_price"));
                 HistorySubscriptionDTO historySubscriptionDTO = new HistorySubscriptionDTO();
                 historySubscriptionDTO.setSubscription(subscription);
                 historySubscriptionDTO.setSiteName(rs.getString("site_name"));
+                historySubscriptionDTO.setSiteId(rs.getInt("site_id"));
                 historySubscriptionDTO.setDayRemain(rs.getInt("days_remaining"));
+                historySubscriptionDTO.setBasePrice(rs.getLong("base_price"));
                 list.add(historySubscriptionDTO);
             }
             
@@ -405,6 +424,25 @@ public class SubscriptionDAO extends DBContext {
             System.out.println("Lỗi lấy ra danh sách Subscriptions");
             e.printStackTrace();
             return null;
+        }
+    }
+    
+    public void updateEndDate(int subscriptionId, LocalDateTime newEndDate){
+        String sql = 
+                """
+                UPDATE Subscriptions
+                SET end_date = ?
+                WHERE subscription_id = ?
+                """;
+        
+        try(PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setTimestamp(1, Timestamp.valueOf(newEndDate));
+            ps.setInt(2,subscriptionId);
+            
+            ps.executeUpdate();
+        }catch(Exception e){
+            System.out.println("Lỗi update newEndDate");
+            e.printStackTrace();
         }
     }
 }

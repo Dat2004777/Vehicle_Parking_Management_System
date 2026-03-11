@@ -5,7 +5,9 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<c:set var="isDisabled" value="${requestScope.site.siteState ne 'OPERATING'}"/>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -258,9 +260,9 @@
                                     <span class="input-group-text bg-white border-end-0">
                                         <i class="bi bi-box-arrow-in-right text-primary"></i>
                                     </span>
-                                    <input id="dateIn" name="dateIn" type="date" class="form-control border-start-0 border-end-0 ps-0" required>
+                                    <input id="dateIn" name="dateIn" type="date" class="form-control border-start-0 border-end-0 ps-0" required ${isDisabled ? "disabled" : ""}>
                                     <span class="input-group-text bg-white border-start-0 border-end-0 px-1 text-muted">|</span>
-                                    <input name="timeIn" type="time" class="form-control border-start-0 ps-1" required>
+                                    <input name="timeIn" type="time" class="form-control border-start-0 ps-1" required ${isDisabled ? "disabled" : ""}>
                                 </div>
                             </div>
 
@@ -270,15 +272,15 @@
                                     <span class="input-group-text bg-white border-end-0">
                                         <i class="bi bi-box-arrow-in-left text-danger"></i>
                                     </span>
-                                    <input id="dateOut" name="dateOut" type="date" class="form-control border-start-0 border-end-0 ps-0" required>
+                                    <input id="dateOut" name="dateOut" type="date" class="form-control border-start-0 border-end-0 ps-0" required ${isDisabled ? "disabled" : ""}>
                                     <span class="input-group-text bg-white border-start-0 border-end-0 px-1 text-muted">|</span>
-                                    <input id="timeOut" name="timeOut" type="time" class="form-control border-start-0 ps-1" required>
+                                    <input id="timeOut" name="timeOut" type="time" class="form-control border-start-0 ps-1" required ${isDisabled ? "disabled" : ""}>
                                 </div>
                             </div>
 
                             <div class="mb-4">
                                 <label>Loại xe</label>
-                                <select name="typeVehicle" class="form-select" id="vehicleSelect">
+                                <select name="typeVehicle" class="form-select" id="vehicleSelect" ${isDisabled ? "disabled" : ""}>
 
                                     <c:forEach var="v" items="${vehicles}">
                                         <option value="${v.vehicle.vehicleTypeId}" data-price="${v.basePrice}">

@@ -13,15 +13,19 @@ import model.Subscription;
 public class HistorySubscriptionDTO {
     private Subscription subscription;
     private String siteName;
+    private int siteId;
     private int dayRemain;
+    private long basePrice;
 
     public HistorySubscriptionDTO() {
     }
 
-    public HistorySubscriptionDTO(Subscription subscription, String siteName, int dayRemain) {
+    public HistorySubscriptionDTO(Subscription subscription, String siteName, int siteId, int dayRemain, long basePrice) {
         this.subscription = subscription;
         this.siteName = siteName;
+        this.siteId = siteId;
         this.dayRemain = dayRemain;
+        this.basePrice = basePrice;
     }
 
     public Subscription getSubscription() {
@@ -46,6 +50,22 @@ public class HistorySubscriptionDTO {
 
     public void setDayRemain(int dayRemain) {
         this.dayRemain = dayRemain;
+    }
+
+    public int getSiteId() {
+        return siteId;
+    }
+
+    public void setSiteId(int siteId) {
+        this.siteId = siteId;
+    }
+
+    public long getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(long basePrice) {
+        this.basePrice = basePrice;
     }
     
 }
