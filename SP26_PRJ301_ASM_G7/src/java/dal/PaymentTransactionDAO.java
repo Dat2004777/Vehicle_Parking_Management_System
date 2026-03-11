@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import model.dto.AdminTransactionDTO;
 import model.dto.AdminTransactionHistoryDTO;
+import model.dto.PaymentHistoryDTO;
+import model.dto.TransactionHistoryDTO;
 
 /**
  *
@@ -426,6 +428,198 @@ public class PaymentTransactionDAO extends DBContext {
             }
         } catch (Exception e) {
             System.out.println("Error TransactionHistoryDAO.getAllTransactionHistory: " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * Dành riêng cho Manager: Lấy danh sách giao dịch vé tháng theo bãi xe
+     */
+    public List<AdminTransactionDTO> getSubscriptionsBySiteId(int siteId, String search, String status, String type) {
+        List<AdminTransactionDTO> list = new java.util.ArrayList<>();
+        List<Object> params = new java.util.ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT "
+                + "   CONCAT('TRX-', FORMAT(pt.transaction_id, '000000')) AS transactionCode, "
+                + "   CONCAT(c.last_name, ' ', c.first_name) AS customerName, "
+                + "   s.license_plate AS licensePlate, "
+                + "   v.name AS vehicleType, "
+                + "   s.start_date AS startDate, "
+                + "   s.end_date AS endDate, "
+                + "   pt.total_amount AS totalAmount, "
+                + "   pt.payment_status AS status "
+                + "FROM PaymentTransactions pt "
+                + "JOIN Subscriptions s ON pt.subscription_id = s.subscription_id "
+                + "JOIN Customers c ON s.customer_id = c.customer_id "
+                + "JOIN VehicleTypes v ON s.vehicle_type_id = v.vehicle_type_id "
+                + "JOIN ParkingCards pc ON s.card_id = pc.card_id "
+                + "WHERE pc.site_id = ? AND pt.status = 'active' AND s.status = 'active' "
+        );
+        params.add(siteId);
+
+        // Lọc theo tìm kiếm (Mã GD, Tên khách hàng, Biển số)
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (CONCAT(c.last_name, ' ', c.first_name) LIKE ? OR s.license_plate LIKE ? OR CONCAT('TRX-', FORMAT(pt.transaction_id, '000000')) LIKE ?) ");
+            String searchPattern = "%" + search.trim() + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+            params.add(searchPattern);
+        }
+
+        // Lọc theo trạng thái thanh toán
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND pt.payment_status = ? ");
+            params.add(status);
+        }
+
+        // Lọc theo loại xe
+        if (type != null && !type.trim().isEmpty()) {
+            sql.append(" AND v.name = ? ");
+            params.add(type);
+        }
+
+        sql.append(" ORDER BY pt.payment_date DESC");
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            java.sql.ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                // Đảm bảo khớp với constructor/setter của AdminTransactionDTO mà bạn đang dùng
+                AdminTransactionDTO dto = new AdminTransactionDTO(
+                        rs.getString("transactionCode"),
+                        rs.getString("customerName"),
+                        rs.getString("licensePlate"),
+                        rs.getString("vehicleType"),
+                        rs.getTimestamp("startDate"),
+                        rs.getTimestamp("endDate"),
+                        rs.getLong("totalAmount"),
+                        rs.getString("status")
+                );
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            System.out.println("Error getSubscriptionsBySiteId: " + e.getMessage());
+        }
+        return list;
+    }
+
+    /**
+     * Dành riêng cho Manager: Lấy lịch sử giao dịch theo bãi xe
+     */
+    public List<PaymentHistoryDTO> getTransactionHistoryBySiteId(int siteId, String search, String serviceType, String status) {
+        List<PaymentHistoryDTO> list = new java.util.ArrayList<>();
+        List<Object> parameters = new java.util.ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("""
+            SELECT 
+                CONCAT('#TX-', FORMAT(pt.transaction_id, '00000')) AS transaction_code,
+                pt.payment_date,
+                pt.total_amount,
+                pt.payment_status,
+                
+                -- Xác định Loại dịch vụ gốc
+                CASE 
+                    WHEN pt.subscription_id IS NOT NULL THEN N'Vé tháng'
+                    WHEN pt.booking_id IS NOT NULL THEN N'Đặt trước'
+                    WHEN pt.session_id IS NOT NULL THEN N'Gửi theo giờ'
+                    ELSE N'Khác'
+                END AS base_service_type,
+                
+                -- Lấy tên Khách hàng (Nếu vãng lai thì để Khách vãng lai)
+                COALESCE(
+                    NULLIF(CONCAT(c_sub.last_name, ' ', c_sub.first_name), ' '), 
+                    NULLIF(CONCAT(c_book.last_name, ' ', c_book.first_name), ' '), 
+                    N'Khách vãng lai'
+                ) AS customer_name,
+                
+                -- Lấy loại xe (car/motorbike)
+                COALESCE(v_sub.name, v_book.name, v_sess.name) AS vehicle_type_name
+                
+            FROM PaymentTransactions pt
+            
+            -- Luồng Subscriptions
+            LEFT JOIN Subscriptions s ON pt.subscription_id = s.subscription_id
+            LEFT JOIN Customers c_sub ON s.customer_id = c_sub.customer_id
+            LEFT JOIN VehicleTypes v_sub ON s.vehicle_type_id = v_sub.vehicle_type_id
+            LEFT JOIN ParkingCards pc_sub ON s.card_id = pc_sub.card_id
+            
+            -- Luồng Bookings
+            LEFT JOIN Bookings b ON pt.booking_id = b.booking_id
+            LEFT JOIN Customers c_book ON b.customer_id = c_book.customer_id
+            LEFT JOIN VehicleTypes v_book ON b.vehicle_type_id = v_book.vehicle_type_id
+            LEFT JOIN ParkingCards pc_book ON b.card_id = pc_book.card_id
+            
+            -- Luồng ParkingSessions
+            LEFT JOIN ParkingSessions ps ON pt.session_id = ps.session_id
+            LEFT JOIN VehicleTypes v_sess ON ps.vehicle_type_id = v_sess.vehicle_type_id
+            LEFT JOIN ParkingCards pc_sess ON ps.card_id = pc_sess.card_id
+            
+            WHERE pt.status = 'active'
+              -- ĐIỀU KIỆN QUAN TRỌNG: CHỈ LẤY GIAO DỊCH CỦA SITE NÀY
+              AND (pc_sub.site_id = ? OR pc_book.site_id = ? OR pc_sess.site_id = ?)
+        """);
+
+        parameters.add(siteId);
+        parameters.add(siteId);
+        parameters.add(siteId);
+
+        // Bộ lọc Tìm kiếm
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (CONCAT(c_sub.last_name, ' ', c_sub.first_name) LIKE ? OR CONCAT('#TX-', FORMAT(pt.transaction_id, '00000')) LIKE ?) ");
+            String searchPattern = "%" + search.trim() + "%";
+            parameters.add(searchPattern);
+            parameters.add(searchPattern);
+        }
+
+        // Bộ lọc Trạng thái
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND pt.payment_status = ? ");
+            parameters.add(status);
+        }
+
+        sql.append(" ORDER BY pt.payment_date DESC ");
+
+        try {
+            java.sql.PreparedStatement ps = connection.prepareStatement(sql.toString());
+            for (int i = 0; i < parameters.size(); i++) {
+                ps.setObject(i + 1, parameters.get(i));
+            }
+
+            java.sql.ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String baseType = rs.getString("base_service_type");
+                String vType = rs.getString("vehicle_type_name");
+                String vehicleNameVN = "car".equals(vType) ? "Ô tô" : ("motorbike".equals(vType) ? "Xe máy" : "");
+                String fullServiceType = baseType + (vehicleNameVN.isEmpty() ? "" : " (" + vehicleNameVN + ")");
+
+                // Mặc định phương thức thanh toán
+                String[] methods = {"Tiền mặt", "Momo", "VNPay"};
+                String randomMethod = methods[rs.getInt("total_amount") % 3];
+
+                PaymentHistoryDTO dto = new PaymentHistoryDTO(
+                        rs.getString("transaction_code"),
+                        rs.getString("customer_name"),
+                        fullServiceType,
+                        rs.getLong("total_amount"),
+                        randomMethod,
+                        rs.getTimestamp("payment_date"),
+                        rs.getString("payment_status")
+                );
+
+                // Lọc theo Loại dịch vụ (Lọc bằng Java cho dễ)
+                if (serviceType == null || serviceType.isEmpty()
+                        || ("subscription".equals(serviceType) && "Vé tháng".equals(baseType))
+                        || ("casual".equals(serviceType) && "Gửi theo giờ".equals(baseType))) {
+                    list.add(dto);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error getTransactionHistoryBySiteId: " + e.getMessage());
         }
         return list;
     }

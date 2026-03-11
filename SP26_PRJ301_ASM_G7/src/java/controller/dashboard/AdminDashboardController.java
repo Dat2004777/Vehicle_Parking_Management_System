@@ -14,7 +14,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import model.Employee;
 import model.dto.DashboardDTO;
 import model.dto.SiteDensityDTO;
 import utils.UrlConstants;
@@ -39,6 +41,14 @@ public class AdminDashboardController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        Employee emp = (Employee) request.getSession().getAttribute("admin");
+
+        if (emp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         ValidationUtils validationUtils = new ValidationUtils();
 
         PaymentTransactionDAO paymentTransactionDAO = new PaymentTransactionDAO();
@@ -92,7 +102,7 @@ public class AdminDashboardController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền cập nhật thông tin bãi xe!");
     }
 
 }

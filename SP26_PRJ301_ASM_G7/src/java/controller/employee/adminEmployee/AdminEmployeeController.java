@@ -30,7 +30,14 @@ public class AdminEmployeeController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession httpSession = request.getSession();
+        HttpSession session = request.getSession();
+
+        Employee emp = (Employee) session.getAttribute("admin");
+
+        if (emp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
         String employeeSearch = request.getParameter("employeeSearch");
 

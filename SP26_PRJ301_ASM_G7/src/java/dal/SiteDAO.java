@@ -688,4 +688,31 @@ public class SiteDAO extends DBContext {
             System.out.println("Error siteDAO.setNullManagerIdWhenChangeSiteEmployee: " + e.getMessage());
         }
     }
+
+    /**
+     * Tìm bãi xe mà nhân viên này đang làm quản lý
+     *
+     * @param managerId ID của Employee
+     * @return ParkingSite nếu là manager, ngược lại trả về null
+     */
+    public ParkingSite getSiteByManagerId(int managerId) {
+        String sql = "SELECT * FROM ParkingSites WHERE manager_id = ? AND status = 'active'";
+        try {
+            java.sql.PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, managerId);
+            java.sql.ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                ParkingSite site = new ParkingSite();
+                site.setSiteId(rs.getInt("site_id"));
+                site.setSiteName(rs.getString("site_name"));
+                site.setAddress(rs.getString("address"));
+                // ... (set các thuộc tính khác nếu cần)
+                return site;
+            }
+        } catch (Exception e) {
+            System.out.println("Error SiteDAO.getSiteByManagerId: " + e.getMessage());
+        }
+        return null;
+    }
+    
 }

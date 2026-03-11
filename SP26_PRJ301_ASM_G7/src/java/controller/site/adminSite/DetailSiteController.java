@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import model.Employee;
 import model.ParkingArea;
 import model.ParkingSite;
 import model.PriceConfig;
@@ -44,6 +45,16 @@ public class DetailSiteController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+
+        Employee emp = (Employee) session.getAttribute("admin");
+
+        if (emp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         String siteIdStr = request.getParameter("siteId");
         int validSiteId = ValidationUtils.requireValidInt(siteIdStr, "SiteId không đúng, vui lòng nhập lại");
 
@@ -117,6 +128,17 @@ public class DetailSiteController extends HttpServlet {
 
                 // Ép kiểu Sức chứa (Yêu cầu từ 0 đến 10.000 xe)
                 int capacity = ValidationUtils.requireIntInRange(capacities[i], 0, 10000, "Sức chứa ở dòng " + (i + 1) + " không hợp lệ");
+
+                // ========================================================
+                // THÊM LOGIC KIỂM TRA SỨC CHỨA VÀ SỐ XE ĐANG ĐỖ Ở ĐÂY
+                // ========================================================
+                int parkedCount = areaDAO.countParkedVehicles(validSiteId, vehicleId);
+                if (capacity < parkedCount) {
+                    // Xác định tên loại xe để báo lỗi cho thân thiện
+                    String vehicleName = vehicleId == 1 ? "Ô tô" : "Xe máy";
+                    throw new IllegalArgumentException("Không thể giảm sức chứa " + vehicleName + " xuống " + capacity
+                            + ". Hiện tại đang có " + parkedCount + " " + vehicleName + " nằm trong bãi. Vui lòng đợi xe ra bớt!");
+                }
 
                 // Xử lý giá tiền: Cắt bỏ các chữ 'đ', dấu chấm, phẩy rồi mới validate
                 String cleanHourly = hourlyPrices[i].replaceAll("[^0-9]", "");

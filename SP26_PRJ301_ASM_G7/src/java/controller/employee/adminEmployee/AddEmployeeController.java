@@ -36,6 +36,15 @@ public class AddEmployeeController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+
+        Employee emp = (Employee) session.getAttribute("admin");
+
+        if (emp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         List<ParkingSite> listSites = siteDAO.getAllSites();
 
         request.setAttribute("roles", AdminListEmployeeDTO.Role.values());

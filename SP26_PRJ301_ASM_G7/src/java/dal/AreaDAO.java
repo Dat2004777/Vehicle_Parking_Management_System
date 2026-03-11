@@ -182,4 +182,38 @@ public class AreaDAO extends DBContext {
 
         return new ParkingArea(siteId, siteId, name, vehicleTypeId, totalSlots);
     }
+
+    /**
+     * Đếm số lượng xe đang đỗ thực tế trong bãi theo loại xe
+     *
+     * @param siteId ID của bãi xe
+     * @param vehicleTypeId ID của loại xe (1: Ô tô, 2: Xe máy...)
+     * @return Số lượng xe đang đỗ (session_state = 'parked')
+     */
+    public int countParkedVehicles(int siteId, int vehicleTypeId) {
+        int count = 0;
+        // Kết hợp ParkingSessions và ParkingCards để tìm đúng bãi xe
+        String sql = "SELECT COUNT(ps.session_id) AS total_parked "
+                + "FROM ParkingSessions ps "
+                + "JOIN ParkingCards pc ON ps.card_id = pc.card_id "
+                + "WHERE pc.site_id = ? "
+                + "  AND ps.vehicle_type_id = ? "
+                + "  AND ps.session_state = 'parked' "
+                + "  AND ps.status = 'active'";
+
+        try {
+            java.sql.PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, siteId);
+            ps.setInt(2, vehicleTypeId);
+
+            java.sql.ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt("total_parked");
+            }
+        } catch (Exception e) {
+            System.out.println("Error AreaDAO.countParkedVehicles: " + e.getMessage());
+        }
+        return count;
+    }
+
 }

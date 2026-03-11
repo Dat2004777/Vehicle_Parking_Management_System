@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import model.Employee;
 import model.ParkingArea;
 import model.ParkingSite;
 import model.PriceConfig;
@@ -44,6 +45,16 @@ public class AddSiteController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+
+        Employee emp = (Employee) session.getAttribute("admin");
+
+        if (emp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
         // 1. Khởi tạo DTO và nhét toàn bộ dữ liệu vào
         SiteFormDataDTO formData = new SiteFormDataDTO(
                 ParkingSite.Region.values(),
@@ -136,7 +147,7 @@ public class AddSiteController extends HttpServlet {
             for (PriceConfig priceConfig : priceList) {
                 priceConfig.setSiteId(siteId);
             }
-            
+
             // TODO: Gọi DAO lưu vào ParkingAreas và PriceConfigs bằng vehicleId, capacity, hourlyPrice, monthlyPrice
             priceConfigsDAO.insertPriceConfigs(priceList);
             areaDAO.insertAreas(areaList);

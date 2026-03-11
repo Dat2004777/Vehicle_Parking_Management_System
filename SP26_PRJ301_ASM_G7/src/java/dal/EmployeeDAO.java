@@ -509,4 +509,51 @@ public class EmployeeDAO extends DBContext {
             System.out.println("Error EmployeeDAO.updateEmployee: " + e.getMessage());
         }
     }
+
+    /**
+     * Dành riêng cho Manager: Lấy danh sách nhân viên bảo vệ thuộc bãi xe của
+     * họ
+     */
+    public List<AdminListEmployeeDTO> getEmployeesBySiteId(int siteId, String search) {
+        List<AdminListEmployeeDTO> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT e.employee_id, e.firstname, e.lastname, e.phone, a.username, a.status "
+                + "FROM Employees e "
+                + "JOIN Accounts a ON e.account_id = a.account_id "
+                + "WHERE e.site_id = ? AND a.role = 'staff' AND e.status = 'active'"
+        );
+
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(" AND (e.firstname LIKE ? OR e.lastname LIKE ? OR e.phone LIKE ? OR a.username LIKE ?) ");
+        }
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql.toString());
+            ps.setInt(1, siteId);
+
+            if (search != null && !search.trim().isEmpty()) {
+                String pattern = "%" + search.trim() + "%";
+                ps.setString(2, pattern);
+                ps.setString(3, pattern);
+                ps.setString(4, pattern);
+                ps.setString(5, pattern);
+            }
+
+            java.sql.ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                AdminListEmployeeDTO dto = new AdminListEmployeeDTO();
+                // NẾU TÊN HÀM SETTER CỦA BẠN KHÁC, HÃY ĐỔI LẠI CHO KHỚP VỚI AdminListEmployeeDTO CỦA BẠN NHÉ
+                dto.setEmployeeId(rs.getInt("employee_id"));
+                dto.setFirstName(rs.getString("firstname"));
+                dto.setLastName(rs.getString("lastname"));
+                dto.setPhone(rs.getString("phone"));
+                // Không cần Site Name vì đây là bãi xe của chính họ
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            System.out.println("Error ManagerDAO.getEmployeesBySiteId: " + e.getMessage());
+        }
+        return list;
+    }
 }

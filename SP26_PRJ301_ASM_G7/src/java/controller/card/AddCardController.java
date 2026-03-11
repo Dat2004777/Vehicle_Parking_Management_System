@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.Employee;
 import utils.UrlConstants;
 import utils.ValidationUtils;
 
@@ -33,7 +34,14 @@ public class AddCardController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession httpSession = request.getSession();
+        HttpSession session = request.getSession();
+
+        Employee emp = (Employee) session.getAttribute("admin");
+
+        if (emp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
         String siteIdStr = request.getParameter("siteId");
         String cardQuantityStr = request.getParameter("cardQuantity");
@@ -45,11 +53,11 @@ public class AddCardController extends HttpServlet {
             //add card
             cardDAO.addMultipleCards(validSiteId, cardQuantity);
 
-            httpSession.setAttribute("successMessage", "Thêm " + cardQuantity + " thẻ thành công");
-            response.sendRedirect(httpSession.getAttribute("ctx") + "/site");
+            session.setAttribute("successMessage", "Thêm " + cardQuantity + " thẻ thành công");
+            response.sendRedirect(session.getAttribute("ctx") + "/site");
         } catch (Exception e) {
-            httpSession.setAttribute("errorMessage", "Lỗi khi thêm thẻ ");
-            response.sendRedirect(httpSession.getAttribute("ctx") + "/site/detail?siteId=" + siteIdStr);
+            session.setAttribute("errorMessage", "Lỗi khi thêm thẻ ");
+            response.sendRedirect(session.getAttribute("ctx") + "/site/detail?siteId=" + siteIdStr);
         }
 
     }

@@ -7,6 +7,7 @@ package controller.auth;
 import dal.AccountDAO;
 import dal.CustomerDAO;
 import dal.EmployeeDAO;
+import dal.SiteDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -17,6 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
 import model.Customer;
+import model.Employee;
+import model.ParkingSite;
 import utils.UrlConstants;
 
 /**
@@ -117,21 +120,46 @@ public class LoginController extends HttpServlet {
                     session.setAttribute("admin", empDAO.getById(adminId));
                     session.setAttribute("rolePrefix", UrlConstants.URL_ADMIN);
                     session.setAttribute("ctx", contextPath + UrlConstants.URL_ADMIN);
-                    response.sendRedirect(contextPath + UrlConstants.URL_ADMIN + "/dashboard");
+                    response.sendRedirect(contextPath + UrlConstants.URL_ADMIN);
                     return;
                 case STAFF:
+//                    int staffId = empDAO.getEmployeeId(acc.getAccountId(), "staff");
+//                    session.setAttribute("staff", empDAO.getById(staffId));
+//                    session.setAttribute("rolePrefix", UrlConstants.URL_STAFF);
+//                    session.setAttribute("ctx", contextPath + UrlConstants.URL_STAFF);
+//                    response.sendRedirect(contextPath + UrlConstants.URL_STAFF);
+//                    return;
+//                case MANAGER:
+//                    int managerId = empDAO.getEmployeeId(acc.getAccountId(), "manager");
+//                    session.setAttribute("manager", empDAO.getById(managerId));
+//                    session.setAttribute("rolePrefix", UrlConstants.URL_MANAGER);
+//                    session.setAttribute("ctx", contextPath + UrlConstants.URL_MANAGER);
+//                    response.sendRedirect(contextPath + UrlConstants.URL_MANAGER);
+//                    return;   
                     int staffId = empDAO.getEmployeeId(acc.getAccountId(), "staff");
-                    session.setAttribute("staff", empDAO.getById(staffId));
-                    session.setAttribute("rolePrefix", UrlConstants.URL_STAFF);
-                    session.setAttribute("ctx", contextPath + UrlConstants.URL_STAFF);
-                    response.sendRedirect(contextPath + UrlConstants.URL_STAFF);
-                    return;
-                case MANAGER:
-                    int managerId = empDAO.getEmployeeId(acc.getAccountId(), "manager");
-                    session.setAttribute("manager", empDAO.getById(managerId));
-                    session.setAttribute("rolePrefix", UrlConstants.URL_MANAGER);
-                    session.setAttribute("ctx", contextPath + UrlConstants.URL_MANAGER);
-                    response.sendRedirect(contextPath + UrlConstants.URL_MANAGER);
+                    // Hàm getById của bạn vẫn dùng bình thường ở đây
+                    Employee staffEmp = empDAO.getById(staffId);
+
+                    // ========================================================
+                    // BƯỚC QUYẾT ĐỊNH: ĐEM ĐI HỎI XEM CÓ PHẢI LÀ QUẢN LÝ KHÔNG?
+                    // ========================================================
+                    SiteDAO siteDAO = new SiteDAO();
+                    ParkingSite managedSite = siteDAO.getSiteByManagerId(staffId);
+
+                    if (managedSite != null) {
+                        // NẾU LÀ MANAGER
+                        session.setAttribute("userRole", "manager"); // Đặt role là manager để chốt chặn bảo mật nhận diện
+                        session.setAttribute("userSiteId", managedSite.getSiteId()); // Lấy ID bãi xe từ managedSite
+                        session.setAttribute("rolePrefix", UrlConstants.URL_MANAGER);
+                        session.setAttribute("ctx", contextPath + UrlConstants.URL_MANAGER);
+                        response.sendRedirect(contextPath + UrlConstants.URL_MANAGER);
+                    } else {
+                        // NẾU LÀ NHÂN VIÊN GÁC CỔNG BÌNH THƯỜNG
+                        session.setAttribute("staff", empDAO.getById(staffId));
+                        session.setAttribute("rolePrefix", UrlConstants.URL_STAFF);
+                        session.setAttribute("ctx", contextPath + UrlConstants.URL_STAFF);
+                        response.sendRedirect(contextPath + UrlConstants.URL_STAFF); // Bay về trang nhân viên quẹt thẻ
+                    }
                     return;
                 case CUSTOMER:
                     CustomerDAO customerDAO = new CustomerDAO();

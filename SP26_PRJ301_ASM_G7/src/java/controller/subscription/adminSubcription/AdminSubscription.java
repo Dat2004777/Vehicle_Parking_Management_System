@@ -11,7 +11,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import model.Employee;
 import model.dto.AdminTransactionDTO;
 import utils.UrlConstants;
 
@@ -27,6 +29,16 @@ public class AdminSubscription extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+
+        Employee emp = (Employee) session.getAttribute("admin");
+
+        if (emp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         // 1. Lấy thông tin từ bộ lọc (Giao diện gửi lên qua method GET)
         String search = request.getParameter("search");
         String status = request.getParameter("status");

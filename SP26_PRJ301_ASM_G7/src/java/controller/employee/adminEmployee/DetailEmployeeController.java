@@ -37,6 +37,13 @@ public class DetailEmployeeController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
 
+        Employee emp = (Employee) session.getAttribute("admin");
+
+        if (emp == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         String employeeId = request.getParameter("employeeId");
 
         try {
