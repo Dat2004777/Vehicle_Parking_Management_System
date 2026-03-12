@@ -259,7 +259,9 @@
     </head>
     <body>
 
-        <%@include file="WEB-INF/views/layout/header.jsp" %>
+        <jsp:include page="/WEB-INF/views/layout/header.jsp">
+            <jsp:param name="activePage" value="homePage" />
+        </jsp:include>
 
         <!-- Hero Section -->
         <header class="hero-section">

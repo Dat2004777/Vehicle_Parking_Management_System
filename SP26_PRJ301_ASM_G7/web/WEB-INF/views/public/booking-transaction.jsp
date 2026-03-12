@@ -141,7 +141,7 @@
     <body class="bg-light">
         <!--Header-->
         <%@include file="/WEB-INF/views/layout/header.jsp" %>
-        
+
         <!--Layout-->
         <%@include file="/WEB-INF/views/layout/customer-layout.jsp" %>
         <div class="container py-4">

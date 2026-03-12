@@ -173,7 +173,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-3">
                 <li class="nav-item">
-                    <a class="nav-link active" href="${pageContext.request.contextPath}">Trang chủ</a>
+                    <a class="nav-link ${param.activePage == 'homePage' ? 'active' : ''}" href="${pageContext.request.contextPath}">Trang chủ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="${pageContext.request.contextPath}/sites?action=booking">Đặt chỗ</a>
