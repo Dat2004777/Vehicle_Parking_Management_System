@@ -241,7 +241,7 @@
         <div class="flex-grow-1 overflow-hidden">
             <div class="fw-bold text-dark text-truncate" style="font-size: 0.875rem;">${account.username}</div>
             <div class="text-muted text-truncate" style="font-size: 0.75rem;">${account.role == 'ADMIN' ? 'Quản trị viên' : 
-                                                                                account.role == 'MANAGER' ? 'Quản lí' : 'Nhân viên trực bãi'}</div>
+                                                                                sessionScope.userRole == 'manager' ? 'Quản lý' : 'Nhân viên trực bãi'}</div>
         </div>
         <a href="${pageContext.request.contextPath}/logout" class="logout-btn text-muted ms-auto" aria-label="Đăng xuất"><i class="bi bi-box-arrow-right fs-5"></i></a>
     </div>

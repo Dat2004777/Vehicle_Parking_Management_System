@@ -228,7 +228,7 @@
         <img src="https://ui-avatars.com/api/?name=${account.username}&background=e2e8f0&color=334155" alt="Avatar" class="user-avatar">
         <div class="flex-grow-1 overflow-hidden">
             <div class="fw-bold text-dark text-truncate" style="font-size: 0.875rem;">${account.username}</div>
-            <div class="text-muted text-truncate" style="font-size: 0.75rem;">Quản trị viên cấp cao</div>
+            <div class="text-muted text-truncate" style="font-size: 0.75rem;">Nhân viên trực bãi</div>
         </div>
         <a href="${pageContext.request.contextPath}/logout" class="text-muted ms-auto" aria-label="Đăng xuất"><i class="bi bi-box-arrow-right fs-5"></i></a>
     </div>
