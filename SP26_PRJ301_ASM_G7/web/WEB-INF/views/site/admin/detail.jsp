@@ -533,7 +533,7 @@
                         <i class="bi bi-list"></i>
                     </button>
                     <h1 class="page-title">Chi tiết bãi xe</h1>
-                    <button class="btn btn-delete ms-auto" type="button" id="btnDeleteSite">Xóa bãi xe</button>
+                    <button class="btn btn-delete ms-auto" type="button" id="btnDeleteSite" onclick="confirmDelete()">Xóa bãi xe</button>
                 </div>
             </header>
 
@@ -752,168 +752,255 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
-            // --- Logic đóng mở Sidebar trên điện thoại ---
-            const mobileToggle = document.getElementById('mobileToggle');
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            function toggleMenu() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-                if (sidebar.classList.contains('active')) {
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    document.body.style.overflow = '';
-                }
-            }
-
-            mobileToggle.addEventListener('click', toggleMenu);
-            overlay.addEventListener('click', toggleMenu);
-            // --- Logic Xử lý Ẩn/Hiện Giá Vé và Thêm/Xóa Loại Xe ---
-            const container = document.getElementById('vehicleConfigContainer');
-            const btnAdd = document.getElementById('btnAddVehicle');
-            // 1. Hàm cập nhật lại các tùy chọn (Disable loại xe đã chọn)
-            function updateVehicleOptions() {
-                const selects = document.querySelectorAll('.vehicle-type-select');
-                const selectedValues = [];
-                // Lấy tất cả các ID loại xe đã được chọn
-                selects.forEach(select => {
-                    if (select.value !== "") {
-                        selectedValues.push(select.value);
-                    }
-                });
-                // Duyệt qua từng ô select để disable/enable các option
-                selects.forEach(select => {
-                    const options = select.querySelectorAll('option');
-                    options.forEach(option => {
-                        if (option.value === "")
-                            return; // Bỏ qua dòng "Chọn loại xe"
-
-                        // Nếu loại xe này đã bị chọn ở một ô KHÁC -> Disable nó
-                        if (selectedValues.includes(option.value) && option.value !== select.value) {
-                            option.disabled = true;
-                        } else {
-                            option.disabled = false;
+                        // --- Logic đóng mở Sidebar trên điện thoại ---
+                        const mobileToggle = document.getElementById('mobileToggle');
+                        const sidebar = document.getElementById('sidebar');
+                        const overlay = document.getElementById('sidebarOverlay');
+                        function toggleMenu() {
+                            sidebar.classList.toggle('active');
+                            overlay.classList.toggle('active');
+                            if (sidebar.classList.contains('active')) {
+                                document.body.style.overflow = 'hidden';
+                            } else {
+                                document.body.style.overflow = '';
+                            }
                         }
-                    });
-                });
-                // 2. Ẩn nút "Thêm loại xe" nếu đã thêm hết các loại xe có thể
-                // Lấy tổng số lượng loại xe có trong DB (đếm số option của 1 select bất kỳ, trừ đi dòng placeholder)
-                const totalAvailableVehicles = selects[0].querySelectorAll('option').length - 1;
-                if (selects.length >= totalAvailableVehicles) {
-                    btnAdd.style.display = 'none'; // Ẩn nút thêm
-                } else {
-                    btnAdd.style.display = 'inline-flex'; // Hiện lại nút thêm
-                }
-            }
 
-            // Hàm kiểm tra và hiển thị khu vực Giá vé khi Chọn loại xe
-            function handleSelectChange(event) {
-                if (event.target.classList.contains('vehicle-type-select')) {
-                    const parentBlock = event.target.closest('.vehicle-config-block');
-                    const pricingSection = parentBlock.querySelector('.pricing-section');
-                    // Nếu người dùng đã chọn một giá trị (khác rỗng)
-                    if (event.target.value !== "") {
-                        pricingSection.classList.remove('d-none');
-                    } else {
-                        pricingSection.classList.add('d-none');
-                    }
+                        mobileToggle.addEventListener('click', toggleMenu);
+                        overlay.addEventListener('click', toggleMenu);
+                        // --- Logic Xử lý Ẩn/Hiện Giá Vé và Thêm/Xóa Loại Xe ---
+                        const container = document.getElementById('vehicleConfigContainer');
+                        const btnAdd = document.getElementById('btnAddVehicle');
+                        // 1. Hàm cập nhật lại các tùy chọn (Disable loại xe đã chọn)
+                        function updateVehicleOptions() {
+                            const selects = document.querySelectorAll('.vehicle-type-select');
+                            const selectedValues = [];
+                            // Lấy tất cả các ID loại xe đã được chọn
+                            selects.forEach(select => {
+                                if (select.value !== "") {
+                                    selectedValues.push(select.value);
+                                }
+                            });
+                            // Duyệt qua từng ô select để disable/enable các option
+                            selects.forEach(select => {
+                                const options = select.querySelectorAll('option');
+                                options.forEach(option => {
+                                    if (option.value === "")
+                                        return; // Bỏ qua dòng "Chọn loại xe"
 
-                    // Cập nhật lại dropdown mỗi khi người dùng thay đổi lựa chọn
-                    updateVehicleOptions();
-                }
-            }
+                                    // Nếu loại xe này đã bị chọn ở một ô KHÁC -> Disable nó
+                                    if (selectedValues.includes(option.value) && option.value !== select.value) {
+                                        option.disabled = true;
+                                    } else {
+                                        option.disabled = false;
+                                    }
+                                });
+                            });
+                            // 2. Ẩn nút "Thêm loại xe" nếu đã thêm hết các loại xe có thể
+                            // Lấy tổng số lượng loại xe có trong DB (đếm số option của 1 select bất kỳ, trừ đi dòng placeholder)
+                            const totalAvailableVehicles = selects[0].querySelectorAll('option').length - 1;
+                            if (selects.length >= totalAvailableVehicles) {
+                                btnAdd.style.display = 'none'; // Ẩn nút thêm
+                            } else {
+                                btnAdd.style.display = 'inline-flex'; // Hiện lại nút thêm
+                            }
+                        }
 
-            // Hàm xóa một khối cấu hình
-            function handleRemoveClick(event) {
-                const btnRemove = event.target.closest('.btn-remove-vehicle');
-                if (btnRemove) {
-                    const parentBlock = btnRemove.closest('.vehicle-config-block');
-                    // Kiểm tra, ít nhất phải giữ lại 1 khối cấu hình
-                    if (container.children.length > 1) {
-                        parentBlock.remove();
-                        // Cập nhật lại dropdown (giải phóng loại xe vừa xóa)
+                        // Hàm kiểm tra và hiển thị khu vực Giá vé khi Chọn loại xe
+                        function handleSelectChange(event) {
+                            if (event.target.classList.contains('vehicle-type-select')) {
+                                const parentBlock = event.target.closest('.vehicle-config-block');
+                                const pricingSection = parentBlock.querySelector('.pricing-section');
+                                // Nếu người dùng đã chọn một giá trị (khác rỗng)
+                                if (event.target.value !== "") {
+                                    pricingSection.classList.remove('d-none');
+                                } else {
+                                    pricingSection.classList.add('d-none');
+                                }
+
+                                // Cập nhật lại dropdown mỗi khi người dùng thay đổi lựa chọn
+                                updateVehicleOptions();
+                            }
+                        }
+
+//                                                        // Hàm xóa một khối cấu hình
+//                                                        function handleRemoveClick(event) {
+//                                                            const btnRemove = event.target.closest('.btn-remove-vehicle');
+//                                                            if (btnRemove) {
+//                                                                const parentBlock = btnRemove.closest('.vehicle-config-block');
+//                                                                // Kiểm tra, ít nhất phải giữ lại 1 khối cấu hình
+//                                                                if (container.children.length > 1) {
+//                                                                    parentBlock.remove();
+//                                                                    // Cập nhật lại dropdown (giải phóng loại xe vừa xóa)
+//                                                                    updateVehicleOptions();
+//                                                                } else {
+//                                                                    showToast("Phải có ít nhất một cấu hình loại xe!", false);
+//                                                                }
+//                                                            }
+//                                                        }
+
+// Hàm xóa một khối cấu hình (MỚI)
+                        function handleRemoveClick(event) {
+                            const btnRemove = event.target.closest('.btn-remove-vehicle');
+                            if (btnRemove) {
+                                const parentBlock = btnRemove.closest('.vehicle-config-block');
+
+                                // 1. Kiểm tra: Bãi xe bắt buộc phải có ít nhất 1 khu vực (không được xóa sạch)
+                                if (container.children.length <= 1) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Không thể xóa!',
+                                        text: 'Bãi xe phải có ít nhất một cấu hình loại xe.',
+                                        confirmButtonColor: '#2563eb'
+                                    });
+                                    return; // Dừng lại luôn
+                                }
+
+                                // 2. Hiện Alert hỏi xác nhận
+                                Swal.fire({
+                                    title: 'Gỡ bỏ loại xe này?',
+                                    text: "Khu vực xe và giá vé tương ứng sẽ bị gỡ khỏi bãi đỗ (Sẽ thực sự bị xóa khi bạn ấn 'Cập nhật bãi xe').",
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#dc2626',
+                                    cancelButtonColor: '#64748b',
+                                    confirmButtonText: 'Đồng ý gỡ',
+                                    cancelButtonText: 'Hủy bỏ',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger me-2',
+                                        cancelButton: 'btn btn-secondary'
+                                    },
+                                    buttonsStyling: false
+                                }).then((result) => {
+                                    // 3. Nếu người dùng chọn Đồng ý -> Mới xóa HTML đi
+                                    if (result.isConfirmed) {
+                                        parentBlock.remove(); // Xóa khối HTML
+                                        updateVehicleOptions(); // Cập nhật lại list Dropdown
+                                    }
+                                });
+                            }
+                        }
+
+                        // Gắn sự kiện (Event Delegation) cho container
+                        container.addEventListener('change', handleSelectChange);
+                        container.addEventListener('click', handleRemoveClick);
+                        // Nút Thêm loại xe
+                        btnAdd.addEventListener('click', () => {
+                            // Lấy HTML của khối đầu tiên làm mẫu
+                            const firstBlock = container.querySelector('.vehicle-config-block');
+                            const newBlock = firstBlock.cloneNode(true); // Clone node
+
+                            // Reset các giá trị trong khối mới
+                            const select = newBlock.querySelector('.vehicle-type-select');
+                            select.value = "";
+                            const inputs = newBlock.querySelectorAll('input');
+                            inputs.forEach(input => input.value = "");
+                            // Ẩn lại phần giá vé ở khối mới
+                            const pricingSection = newBlock.querySelector('.pricing-section');
+                            pricingSection.classList.add('d-none');
+                            // Thêm khối mới vào container
+                            container.appendChild(newBlock);
+                            // Cập nhật lại dropdown cho ô vừa thêm
+                            updateVehicleOptions();
+                        });
+
+                        // Chạy cập nhật lần đầu tiên khi trang vừa load xong
                         updateVehicleOptions();
-                    } else {
-                        showToast("Phải có ít nhất một cấu hình loại xe!", false);
-                    }
-                }
-            }
 
-            // Gắn sự kiện (Event Delegation) cho container
-            container.addEventListener('change', handleSelectChange);
-            container.addEventListener('click', handleRemoveClick);
-            // Nút Thêm loại xe
-            btnAdd.addEventListener('click', () => {
-                // Lấy HTML của khối đầu tiên làm mẫu
-                const firstBlock = container.querySelector('.vehicle-config-block');
-                const newBlock = firstBlock.cloneNode(true); // Clone node
+                        document.getElementById('btnAddCards').addEventListener('click', function () {
+                            const quantity = document.getElementById('cardQuantityInput').value;
+                            const siteId = document.getElementById('siteId').value;
 
-                // Reset các giá trị trong khối mới
-                const select = newBlock.querySelector('.vehicle-type-select');
-                select.value = "";
-                const inputs = newBlock.querySelectorAll('input');
-                inputs.forEach(input => input.value = "");
-                // Ẩn lại phần giá vé ở khối mới
-                const pricingSection = newBlock.querySelector('.pricing-section');
-                pricingSection.classList.add('d-none');
-                // Thêm khối mới vào container
-                container.appendChild(newBlock);
-                // Cập nhật lại dropdown cho ô vừa thêm
-                updateVehicleOptions();
-            });
+                            if (!quantity || quantity <= 0) {
+                                showToast("Vui lòng nhập số lượng thẻ hợp lệ!", false);
+                                return;
+                            }
 
-            // Chạy cập nhật lần đầu tiên khi trang vừa load xong
-            updateVehicleOptions();
+                            // Tạo một form ẩn để gửi dữ liệu theo kiểu POST truyền thống (để Servlet dễ nhận)
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = '${ctx}/site/add-card'; // URL Servlet của bạn
 
-            document.getElementById('btnAddCards').addEventListener('click', function () {
-                const quantity = document.getElementById('cardQuantityInput').value;
-                const siteId = document.getElementById('siteId').value;
+                            const inputSiteId = document.createElement('input');
+                            inputSiteId.type = 'hidden';
+                            inputSiteId.name = 'siteId';
+                            inputSiteId.value = siteId;
 
-                if (!quantity || quantity <= 0) {
-                    showToast("Vui lòng nhập số lượng thẻ hợp lệ!", false);
-                    return;
-                }
+                            const inputQty = document.createElement('input');
+                            inputQty.type = 'hidden';
+                            inputQty.name = 'cardQuantity';
+                            inputQty.value = quantity;
 
-                // Tạo một form ẩn để gửi dữ liệu theo kiểu POST truyền thống (để Servlet dễ nhận)
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '${ctx}/site/add-card'; // URL Servlet của bạn
+                            form.appendChild(inputSiteId);
+                            form.appendChild(inputQty);
+                            document.body.appendChild(form);
 
-                const inputSiteId = document.createElement('input');
-                inputSiteId.type = 'hidden';
-                inputSiteId.name = 'siteId';
-                inputSiteId.value = siteId;
+                            form.submit(); // Gửi dữ liệu đi
+                        });
 
-                const inputQty = document.createElement('input');
-                inputQty.type = 'hidden';
-                inputQty.name = 'cardQuantity';
-                inputQty.value = quantity;
-
-                form.appendChild(inputSiteId);
-                form.appendChild(inputQty);
-                document.body.appendChild(form);
-
-                form.submit(); // Gửi dữ liệu đi
-            });
-
-            document.getElementById('btnDeleteSite').addEventListener('click', function () {
-                const siteId = document.getElementById('siteId').value;
-
-                // Tạo một form ẩn để gửi dữ liệu theo kiểu POST truyền thống (để Servlet dễ nhận)
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '${ctx}/site/detail/delete'; // URL Servlet của bạn
-
-                const inputSiteId = document.createElement('input');
-                inputSiteId.type = 'hidden';
-                inputSiteId.name = 'siteId';
-                inputSiteId.value = siteId;
-
-                form.appendChild(inputSiteId);
-                document.body.appendChild(form);
-
-                form.submit(); // Gửi dữ liệu đi
-            });
+//                                                        document.getElementById('btnDeleteSite').addEventListener('click', function () {
+//                                                            const siteId = document.getElementById('siteId').value;
+//
+//                                                            // Tạo một form ẩn để gửi dữ liệu theo kiểu POST truyền thống (để Servlet dễ nhận)
+//                                                            const form = document.createElement('form');
+//                                                            form.method = 'POST';
+//                                                            form.action = '${ctx}/site/detail/delete'; // URL Servlet của bạn
+//
+//                                                            const inputSiteId = document.createElement('input');
+//                                                            inputSiteId.type = 'hidden';
+//                                                            inputSiteId.name = 'siteId';
+//                                                            inputSiteId.value = siteId;
+//
+//                                                            form.appendChild(inputSiteId);
+//                                                            document.body.appendChild(form);
+//
+//                                                            form.submit(); // Gửi dữ liệu đi
+//                                                        });
         </script>
+
+        <script>
+            function confirmDelete() {
+                Swal.fire({
+                    title: 'Bạn có chắc chắn muốn xóa?',
+                    text: "Hành động này không thể hoàn tác! Toàn bộ dữ liệu của bãi xe này sẽ bị xóa bỏ.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626', // Màu đỏ cho nút Xóa
+                    cancelButtonColor: '#64748b', // Màu xám cho nút Hủy
+                    confirmButtonText: 'Vâng, tôi hiểu!',
+                    cancelButtonText: 'Hủy bỏ',
+                    customClass: {
+                        confirmButton: 'btn btn-danger me-2',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    // CHỈ KHI NGƯỜI DÙNG BẤM "VÂNG, HÃY XÓA NÓ!" THÌ MỚI CHẠY CODE BÊN DƯỚI
+                    if (result.isConfirmed) {
+                        // 1. Lấy siteId từ thẻ input hidden
+                        const siteId = document.getElementById('siteId').value;
+
+                        // 2. Tạo form ẩn bằng Javascript
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '${ctx}/site/detail/delete'; // Gửi đến Servlet xóa bãi xe
+
+                        // 3. Tạo input ẩn chứa siteId
+                        const inputSiteId = document.createElement('input');
+                        inputSiteId.type = 'hidden';
+                        inputSiteId.name = 'siteId';
+                        inputSiteId.value = siteId;
+
+                        // 4. Nhét input vào form, nhét form vào body và GỬI ĐI!
+                        form.appendChild(inputSiteId);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            }
+        </script>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </body>
 </html>

@@ -364,7 +364,7 @@
                         <i class="bi bi-list"></i>
                     </button>
                     <h1 class="page-title-header">Cập nhật nhân viên</h1>
-                    <button class="btn btn-delete ms-auto" type="button" id="btnDeleteEmployee">Xóa nhân viên</button>
+                    <button onclick="confirmDeleteEmployee()" class="btn btn-delete ms-auto" type="button">Xóa nhân viên</button>
                 </div>
             </header>
 
@@ -423,58 +423,102 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
         <script>
-            // --- Mobile Sidebar Toggle Logic ---
-            const mobileToggle = document.getElementById('mobileToggle');
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
+                        // --- Mobile Sidebar Toggle Logic ---
+                        const mobileToggle = document.getElementById('mobileToggle');
+                        const sidebar = document.querySelector('.sidebar');
+                        const overlay = document.getElementById('sidebarOverlay');
 
-            function toggleMenu() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-                document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
-            }
+                        function toggleMenu() {
+                            sidebar.classList.toggle('active');
+                            overlay.classList.toggle('active');
+                            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+                        }
 
-            if (mobileToggle)
-                mobileToggle.addEventListener('click', toggleMenu);
-            if (overlay)
-                overlay.addEventListener('click', toggleMenu);
+                        if (mobileToggle)
+                            mobileToggle.addEventListener('click', toggleMenu);
+                        if (overlay)
+                            overlay.addEventListener('click', toggleMenu);
 
-            // --- Logic Ẩn/Hiện mật khẩu ---
-            const togglePasswordIcons = document.querySelectorAll('.toggle-password');
+                        // --- Logic Ẩn/Hiện mật khẩu ---
+                        const togglePasswordIcons = document.querySelectorAll('.toggle-password');
 
-            togglePasswordIcons.forEach(icon => {
-                icon.addEventListener('click', function () {
-                    const input = this.previousElementSibling;
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        this.classList.remove('bi-eye-fill');
-                        this.classList.add('bi-eye-slash-fill');
-                    } else {
-                        input.type = 'password';
-                        this.classList.remove('bi-eye-slash-fill');
-                        this.classList.add('bi-eye-fill');
-                    }
-                });
-            });
+                        togglePasswordIcons.forEach(icon => {
+                            icon.addEventListener('click', function () {
+                                const input = this.previousElementSibling;
+                                if (input.type === 'password') {
+                                    input.type = 'text';
+                                    this.classList.remove('bi-eye-fill');
+                                    this.classList.add('bi-eye-slash-fill');
+                                } else {
+                                    input.type = 'password';
+                                    this.classList.remove('bi-eye-slash-fill');
+                                    this.classList.add('bi-eye-fill');
+                                }
+                            });
+                        });
 
-            document.getElementById('btnDeleteEmployee').addEventListener('click', function () {
-                const employeeId = document.getElementById('employeeId').value;
+//                        document.getElementById('btnDeleteEmployee').addEventListener('click', function () {
+//                            const employeeId = document.getElementById('employeeId').value;
+//
+//                            // Tạo một form ẩn để gửi dữ liệu theo kiểu POST truyền thống (để Servlet dễ nhận)
+//                            const form = document.createElement('form');
+//                            form.method = 'POST';
+//                            form.action = '${ctx}/employee/detail/delete'; // URL Servlet của bạn
+//
+//                            const inputEmployeeId = document.createElement('input');
+//                            inputEmployeeId.type = 'hidden';
+//                            inputEmployeeId.name = 'employeeId';
+//                            inputEmployeeId.value = employeeId;
+//
+//                            form.appendChild(inputEmployeeId);
+//                            document.body.appendChild(form);
+//
+//                            form.submit(); // Gửi dữ liệu đi
+//                        });
 
-                // Tạo một form ẩn để gửi dữ liệu theo kiểu POST truyền thống (để Servlet dễ nhận)
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '${ctx}/employee/detail/delete'; // URL Servlet của bạn
+// --- HÀM XÓA NHÂN VIÊN VỚI SWEETALERT2 ---
+                        function confirmDeleteEmployee() {
+                            Swal.fire({
+                                title: 'Xóa nhân viên này?',
+                                text: "Hành động này sẽ xóa tài khoản nhân viên khỏi hệ thống. Bạn không thể hoàn tác!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#dc2626', // Màu đỏ (Cảnh báo nguy hiểm)
+                                cancelButtonColor: '#64748b', // Màu xám
+                                confirmButtonText: 'Vâng, tôi hiểu!',
+                                cancelButtonText: 'Hủy bỏ',
+                                customClass: {
+                                    confirmButton: 'btn btn-danger me-2',
+                                    cancelButton: 'btn btn-secondary'
+                                },
+                                buttonsStyling: false
+                            }).then((result) => {
+                                // Nếu người dùng ấn "Vâng, xóa ngay!"
+                                if (result.isConfirmed) {
+                                    // 1. Lấy ID nhân viên từ thẻ input hidden trong form
+                                    const employeeId = document.getElementById('employeeId').value;
 
-                const inputEmployeeId = document.createElement('input');
-                inputEmployeeId.type = 'hidden';
-                inputEmployeeId.name = 'employeeId';
-                inputEmployeeId.value = employeeId;
+                                    // 2. Tạo form ẩn để gửi dữ liệu bằng phương thức POST
+                                    const form = document.createElement('form');
+                                    form.method = 'POST';
+                                    form.action = '${ctx}/employee/detail/delete'; // URL gọi xuống Servlet
 
-                form.appendChild(inputEmployeeId);
-                document.body.appendChild(form);
+                                    // 3. Nhét ID vào form
+                                    const inputEmployeeId = document.createElement('input');
+                                    inputEmployeeId.type = 'hidden';
+                                    inputEmployeeId.name = 'employeeId';
+                                    inputEmployeeId.value = employeeId;
 
-                form.submit(); // Gửi dữ liệu đi
-            });
+                                    // 4. Đính form vào trang và Submit
+                                    form.appendChild(inputEmployeeId);
+                                    document.body.appendChild(form);
+                                    form.submit();
+                                }
+                            });
+                        }
         </script>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     </body>
 </html>
