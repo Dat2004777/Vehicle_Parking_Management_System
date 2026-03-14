@@ -127,7 +127,7 @@ public class DetailSiteController extends HttpServlet {
                 int vehicleId = ValidationUtils.requireValidInt(vehicleTypes[i], "Dữ liệu loại xe bị lỗi.");
 
                 // Ép kiểu Sức chứa (Yêu cầu từ 0 đến 10.000 xe)
-                int capacity = ValidationUtils.requireIntInRange(capacities[i], 0, 10000, "Sức chứa ở dòng " + (i + 1) + " không hợp lệ");
+                int capacity = ValidationUtils.requireIntInRange(capacities[i], 1, 10000, "Sức chứa ở dòng " + (i + 1) + " không hợp lệ");
 
                 // ========================================================
                 // THÊM LOGIC KIỂM TRA SỨC CHỨA VÀ SỐ XE ĐANG ĐỖ Ở ĐÂY
@@ -142,10 +142,10 @@ public class DetailSiteController extends HttpServlet {
 
                 // Xử lý giá tiền: Cắt bỏ các chữ 'đ', dấu chấm, phẩy rồi mới validate
                 String cleanHourly = hourlyPrices[i].replaceAll("[^0-9]", "");
-                long hourlyPrice = ValidationUtils.requireLongInRange(cleanHourly, 0, 10000000, "Giá theo giờ ở dòng " + (i + 1) + " không hợp lệ");
+                long hourlyPrice = ValidationUtils.requireLongInRange(cleanHourly, 5000, 10000000, "Giá theo giờ ở dòng " + (i + 1) + " không hợp lệ");
 
                 String cleanMonthly = monthlyPrices[i].replaceAll("[^0-9]", "");
-                long monthlyPrice = ValidationUtils.requireLongInRange(cleanMonthly, 0, 100000000, "Giá theo tháng ở dòng " + (i + 1) + " không hợp lệ");
+                long monthlyPrice = ValidationUtils.requireLongInRange(cleanMonthly, 5000, 100000000, "Giá theo tháng ở dòng " + (i + 1) + " không hợp lệ");
 
                 ParkingArea parkingArea = new ParkingArea(validSiteId, vehicleId, capacity);
                 areaList.add(parkingArea);
