@@ -23,7 +23,7 @@ public class PriceConfigDAO extends DBContext {
                 SELECT v.vehicle_type_id, v.name, pr.base_price
                 FROM VehicleTypes v
                 JOIN PriceConfigs pr ON v.vehicle_type_id = pr.vehicle_type_id
-                WHERE pr.site_id = ? and pr.type = 'hourly' and v.status = 'active'
+                WHERE pr.site_id = ? and pr.type = 'hourly' and v.status = 'active' and pr.status = 'active'
                 """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
