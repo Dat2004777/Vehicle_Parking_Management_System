@@ -190,7 +190,7 @@
                                     <div class="d-flex flex-wrap">
                                         <c:if test="${not empty vehicles}">
                                             <c:forEach var="v" items="${vehicles}">
-                                                <span class="badge-feature">${v.vehicle.vehicleName}</span>
+                                                <span class="badge-feature">${v.vehicle.vehicleName.label}</span>
                                             </c:forEach>
                                         </c:if>
                                     </div>
