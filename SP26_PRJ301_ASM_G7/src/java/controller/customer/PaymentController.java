@@ -18,9 +18,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Account;
 import model.ParkingSite;
 import model.dto.BookingPreviewDTO;
 import model.dto.VehicleBasePriceDTO;
+
 /**
  *
  * @author ADMIN
@@ -66,17 +68,25 @@ public class PaymentController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        Account account = (Account) session.getAttribute("account");
+        if (account == null || account.getRole() != Account.RoleEnum.CUSTOMER) {
+            request.getRequestDispatcher("/404-error.jsp").forward(request, response);
+            return;
+        }
+
         String action = request.getParameter("action");
         String siteId = request.getParameter("siteId");
-        
-        if(action == null || siteId == null || action.isBlank() || siteId.isBlank()){
+
+        if (action == null || siteId == null || action.isBlank() || siteId.isBlank()) {
             response.sendRedirect(request.getContextPath() + "/sites?action=booking");
             return;
         }
-        
+
         SiteDAO siteDAO = new SiteDAO();
         PriceConfigDAO priceConfigDAO = new PriceConfigDAO();
-        
+
         ParkingSite site = new ParkingSite();
         List<VehicleBasePriceDTO> vehicles = new ArrayList<>();
         try {
@@ -85,21 +95,20 @@ public class PaymentController extends HttpServlet {
         } catch (NumberFormatException e) {
             System.out.println(e.toString());
         }
-        
-        HttpSession session = request.getSession();
+
         BookingPreviewDTO bookingPreview = (BookingPreviewDTO) session.getAttribute("bookingPreview");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        
-        LocalDateTime formattedIn  = bookingPreview.getTimeIn();
-        LocalDateTime formattedOut  = bookingPreview.getTimeOut();
-        
+
+        LocalDateTime formattedIn = bookingPreview.getTimeIn();
+        LocalDateTime formattedOut = bookingPreview.getTimeOut();
+
         String inDateTime = formattedIn.format(formatter);
         String outDateTime = formattedOut.format(formatter);
-        
+
         int hours = bookingPreview.getHours();
         long price = bookingPreview.getBasePrice();
         long totalPrice = bookingPreview.getTotalPrice();
-        
+
         request.setAttribute("site", site);
         request.setAttribute("vehicles", vehicles);
         request.setAttribute("inDateTime", inDateTime);
@@ -107,7 +116,7 @@ public class PaymentController extends HttpServlet {
         request.setAttribute("hours", hours);
         request.setAttribute("price", price);
         request.setAttribute("totalPrice", totalPrice);
-        
+
 //        session.removeAttribute("inDateTime");
 //        session.removeAttribute("outDateTime");
 //        session.removeAttribute("hours");

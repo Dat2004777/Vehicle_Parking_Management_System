@@ -73,7 +73,7 @@ public class HistorySubscriptionController extends HttpServlet {
         Account account = (Account) session.getAttribute("account");
         Customer customer = (Customer) session.getAttribute("customer");
         if (account == null || customer == null || account.getRole() != Account.RoleEnum.CUSTOMER) {
-            response.sendRedirect(request.getContextPath());
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 

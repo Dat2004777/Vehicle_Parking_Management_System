@@ -67,7 +67,7 @@ public class ProfileController extends HttpServlet {
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
         if (account == null || account.getRole() != Account.RoleEnum.CUSTOMER) {
-            response.sendRedirect(request.getContextPath());
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 

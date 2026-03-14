@@ -67,7 +67,7 @@ public class HistoryBookingController extends HttpServlet {
         
         
         if(account == null || account.getRole() != Account.RoleEnum.CUSTOMER || customer == null){
-            response.sendRedirect(request.getContextPath());
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         
