@@ -137,7 +137,10 @@
     </head>
     <body>
         <!--Header-->
-        <%@include file="/WEB-INF/views/layout/header.jsp" %>
+        <jsp:include page="/WEB-INF/views/layout/header.jsp">
+            <jsp:param name="activePage" value="buying"/>
+        </jsp:include>
+
 
         <!--Toast Layout-->
         <%@include file="/WEB-INF/views/layout/customer-layout.jsp" %>
@@ -494,8 +497,15 @@
                     return;
                 }
 
-                if (!licensePlate.trim()) {
-                    showToast("error", "Vui lòng nhập biển số xe!");
+                // VALIDATE FORMAT
+                if (!validateLicensePlate(vehicleId, licensePlate)) {
+
+                    if (vehicleId === "1") {
+                        showToast("error", "Biển số ô tô không đúng định dạng! Ví dụ: 30A-12345");
+                    } else {
+                        showToast("error", "Biển số xe máy không đúng định dạng! Ví dụ: 29H1-12345");
+                    }
+
                     return;
                 }
                 // Loading state
@@ -554,6 +564,29 @@
                 }
 
             });
+
+            // Regex giống Java
+            const MOTORBIKE_REGEX = /^[1-9][0-9][A-Z][A-Z0-9]-\d{4,5}$/;
+            const CAR_REGEX = /^[1-9][0-9][A-Z]{1,2}-\d{4,5}$/;
+
+            function normalizePlate(plate) {
+                return plate.toUpperCase().replace(/[\s\.]/g, '');
+            }
+
+            function validateLicensePlate(vehicleId, plate) {
+
+                const normalized = normalizePlate(plate);
+
+                if (vehicleId === "1") { // ô tô
+                    return CAR_REGEX.test(normalized);
+                }
+
+                if (vehicleId === "2") { // xe máy
+                    return MOTORBIKE_REGEX.test(normalized);
+                }
+
+                return false;
+            }
         </script>
     </body>
 </html>

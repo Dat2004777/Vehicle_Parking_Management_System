@@ -140,8 +140,10 @@
     </head>
     <body class="bg-light">
         <!--Header-->
-        <%@include file="/WEB-INF/views/layout/header.jsp" %>
-
+        <jsp:include page="/WEB-INF/views/layout/header.jsp">
+             <jsp:param name="activePage" value="booking"/>
+        </jsp:include>
+        
         <!--Layout-->
         <%@include file="/WEB-INF/views/layout/customer-layout.jsp" %>
         <div class="container py-4">

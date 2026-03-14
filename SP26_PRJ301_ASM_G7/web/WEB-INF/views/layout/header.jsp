@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 <style>
-    
+
     /* --- Header / Navbar --- */
     .navbar {
         padding-top: 1rem;
@@ -153,6 +153,8 @@
     }
 </style>
 
+<c:set var="currentPage" value="${param.activePage}" />
+
 <!-- Header / Navbar -->
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
@@ -173,13 +175,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-3">
                 <li class="nav-item">
-                    <a class="nav-link ${param.activePage == 'homePage' ? 'active' : ''}" href="${pageContext.request.contextPath}">Trang chủ</a>
+                    <a class="nav-link ${currentPage == 'homePage' ? 'active' : ''}" href="${pageContext.request.contextPath}">Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/sites?action=booking">Đặt chỗ</a>
+                    <a class="nav-link ${currentPage == 'booking' ? 'active' : ''}" href="${pageContext.request.contextPath}/sites?action=booking">Đặt chỗ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/sites?action=buying">Mua vé tháng</a>
+                    <a class="nav-link ${currentPage == 'buying' ? 'active' : ''}" href="${pageContext.request.contextPath}/sites?action=buying">Mua vé tháng</a>
                 </li>
             </ul>
             <c:choose>

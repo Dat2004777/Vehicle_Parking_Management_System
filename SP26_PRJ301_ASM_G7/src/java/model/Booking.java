@@ -13,23 +13,23 @@ import java.time.LocalDateTime;
 public class Booking {
     private int bookingId;
     private int customerId;
-    private int cardId;
+    private String cardId;
     private int vehicleTypeId;
     private LocalDateTime timeIn;
     private LocalDateTime timeOut;
-    private int booking_amount;
+    private long bookingAmount;
 
     public Booking() {
     }
 
-    public Booking(int bookingId, int customerId, int cardId, int vehicleTypeId, LocalDateTime timeIn, LocalDateTime timeOut, int booking_amount) {
+    public Booking(int bookingId, int customerId, String cardId, int vehicleTypeId, LocalDateTime timeIn, LocalDateTime timeOut, long bookingAmount) {
         this.bookingId = bookingId;
         this.customerId = customerId;
         this.cardId = cardId;
         this.vehicleTypeId = vehicleTypeId;
         this.timeIn = timeIn;
         this.timeOut = timeOut;
-        this.booking_amount = booking_amount;
+        this.bookingAmount = bookingAmount;
     }
 
     public int getBookingId() {
@@ -40,11 +40,11 @@ public class Booking {
         this.bookingId = bookingId;
     }
 
-    public int getCardId() {
+    public String getCardId() {
         return cardId;
     }
 
-    public void setCardId(int cardId) {
+    public void setCardId(String cardId) {
         this.cardId = cardId;
     }
 
@@ -72,12 +72,12 @@ public class Booking {
         this.timeOut = timeOut;
     }
 
-    public int getBooking_amount() {
-        return booking_amount;
+    public long getBookingAmount() {
+        return bookingAmount;
     }
 
-    public void setBooking_amount(int booking_amount) {
-        this.booking_amount = booking_amount;
+    public void setBookingAmount(long bookingAmount) {
+        this.bookingAmount = bookingAmount;
     }
 
     public int getCustomerId() {

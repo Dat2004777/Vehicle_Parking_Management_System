@@ -25,6 +25,7 @@ import model.ParkingCard;
 import model.PaymentTransaction;
 import model.Subscription;
 import model.dto.BookingPreviewDTO;
+import utils.ValidationUtils;
 
 /**
  *
@@ -138,7 +139,7 @@ public class CustomerPaymentAPI extends HttpServlet {
                 out.print("{\"success\": false, \"message\": \"Đã hết thẻ trống tại bãi này!\"}");
                 return;
             }
-            
+
             BookingDAO bookingDAO = new BookingDAO();
 
             //check tiền trước khi thanh toán
@@ -176,7 +177,6 @@ public class CustomerPaymentAPI extends HttpServlet {
 //                out.print("{\"success\": false, \"message\": \"Đã hết thẻ trống tại bãi này!\"}");
 //                return;
 //            }
-
             if (bookingId == -1) {
                 out.print("{\"success\": false, \"message\": \"Lỗi tạo đơn đặt chỗ!\"}");
                 return;
@@ -193,7 +193,7 @@ public class CustomerPaymentAPI extends HttpServlet {
                 );
 
                 //update booking_state
-                bookingDAO.updateBookingState( bookingId, "accepted");
+                bookingDAO.updateBookingState(bookingId, "accepted");
 
                 // update card
                 cardDAO.updateCard(Integer.parseInt(siteId), card.getCardId(), "assigned");
@@ -242,7 +242,20 @@ public class CustomerPaymentAPI extends HttpServlet {
             return;
         }
 
+        String normalizedPlate = ValidationUtils.cleanLicensePlate(licensePlate);
+        boolean valid = false;
         try {
+            if (Integer.parseInt(vehicleId) == 1) {
+                valid = ValidationUtils.isValidCarPlate(normalizedPlate);
+            } else if (Integer.parseInt(vehicleId) == 2) {
+                valid = ValidationUtils.isValidMotorbikePlate(normalizedPlate);
+            }
+
+            if (!valid) {
+                out.print("{\"success\": false, \"message\": \"Biển số xe không đúng định dạng!\"}");
+                return;
+            }
+
             PriceConfigDAO priceDAO = new PriceConfigDAO();
             SubscriptionDAO subscriptionDAO = new SubscriptionDAO();
             long basePrice = priceDAO.getPriceByVehicleAndSite("monthly", Integer.parseInt(siteId), Integer.parseInt(vehicleId));
@@ -263,12 +276,11 @@ public class CustomerPaymentAPI extends HttpServlet {
                 LocalDateTime temp = startDate.plusMonths(12);
                 endDate = temp.withDayOfMonth(temp.toLocalDate().lengthOfMonth());
             }
-            
+
             //Kiểm tra thẻ xem còn hiệu lực ko(nếu có thì ko được mua)
             boolean checkSubscription = subscriptionDAO.checkSubscription(Integer.parseInt(siteId), licensePlate);
-            System.out.println(checkSubscription);
-            if(checkSubscription){
-                out.print("{\"success\": false, \"message\": \"Thẻ của bạn vẫn còn hiêu lực. Vui lòng chờ hết hạn!\"}");
+            if (checkSubscription) {
+                out.print("{\"success\": false, \"message\": \"Thẻ của xe này vẫn còn hiêu lực. Vui lòng chờ hết hạn!\"}");
                 return;
             }
             //Laays the trong

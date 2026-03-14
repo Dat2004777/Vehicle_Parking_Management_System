@@ -5,7 +5,9 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
+<c:set var="isDisabled" value="${requestScope.site.siteState ne 'OPERATING'}"/>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -105,35 +107,37 @@
                 border-left: 5px solid #0d6efd;
             }
 
+            /* Màu Cam - Cảnh báo (Warning) */
             .badge-warning-custom {
                 background-color: #fff7ed;
                 color: #c2410c;
                 border: 2px solid #ffedd5;
-                padding: 8px 16px;
                 font-weight: 500;
+                display: inline-block;
             }
 
+            /* Màu Xanh lá - Thành công (Success) */
             .badge-success-custom {
                 background-color: #f0fdf4;
                 color: #15803d;
                 border: 2px solid #dcfce7;
-                padding: 8px 16px;
                 font-weight: 500;
             }
 
-            .badge-warning-custom {
+            /* Màu Xanh dương hoặc Xám - Thông tin (Info/Secondary) 
+               (Tôi sửa lại class bị trùng của bạn thành 'info') */
+            .badge-info-custom {
                 background-color: #f1f5f9;
-                color: #c5d90e;
+                color: #475569;
                 border: 2px solid #e2e8f0;
-                padding: 8px 16px;
                 font-weight: 500;
             }
 
+            /* Màu Đỏ - Nguy hiểm/Lỗi (Danger) */
             .badge-danger-custom {
-                background-color:#FFFBE6;
-                color: #D48806;
-                border: 1px solid #dcfce7;
-                padding: 8px 16px;
+                background-color: #fef2f2;
+                color: #b91c1c;
+                border: 2px solid #fee2e2;
                 font-weight: 500;
             }
 
@@ -158,7 +162,10 @@
     </head>
     <body class="bg-light">
         <!--Header-->
-        <%@include file="/WEB-INF/views/layout/header.jsp" %>
+        <jsp:include page="/WEB-INF/views/layout/header.jsp">
+            <jsp:param name="activePage" value="${param.action}"/>
+        </jsp:include>
+
 
         <div class="container py-4">
             <nav aria-label="breadcrumb" class="mb-3">
@@ -258,9 +265,9 @@
                                     <span class="input-group-text bg-white border-end-0">
                                         <i class="bi bi-box-arrow-in-right text-primary"></i>
                                     </span>
-                                    <input id="dateIn" name="dateIn" type="date" class="form-control border-start-0 border-end-0 ps-0" required>
+                                    <input id="dateIn" name="dateIn" type="date" class="form-control border-start-0 border-end-0 ps-0" required ${isDisabled ? "disabled" : ""}>
                                     <span class="input-group-text bg-white border-start-0 border-end-0 px-1 text-muted">|</span>
-                                    <input name="timeIn" type="time" class="form-control border-start-0 ps-1" required>
+                                    <input name="timeIn" type="time" class="form-control border-start-0 ps-1" required ${isDisabled ? "disabled" : ""}>
                                 </div>
                             </div>
 
@@ -270,15 +277,15 @@
                                     <span class="input-group-text bg-white border-end-0">
                                         <i class="bi bi-box-arrow-in-left text-danger"></i>
                                     </span>
-                                    <input id="dateOut" name="dateOut" type="date" class="form-control border-start-0 border-end-0 ps-0" required>
+                                    <input id="dateOut" name="dateOut" type="date" class="form-control border-start-0 border-end-0 ps-0" required ${isDisabled ? "disabled" : ""}>
                                     <span class="input-group-text bg-white border-start-0 border-end-0 px-1 text-muted">|</span>
-                                    <input id="timeOut" name="timeOut" type="time" class="form-control border-start-0 ps-1" required>
+                                    <input id="timeOut" name="timeOut" type="time" class="form-control border-start-0 ps-1" required ${isDisabled ? "disabled" : ""}>
                                 </div>
                             </div>
 
                             <div class="mb-4">
                                 <label>Loại xe</label>
-                                <select name="typeVehicle" class="form-select" id="vehicleSelect">
+                                <select name="typeVehicle" class="form-select" id="vehicleSelect" ${isDisabled ? "disabled" : ""}>
 
                                     <c:forEach var="v" items="${vehicles}">
                                         <option value="${v.vehicle.vehicleTypeId}" data-price="${v.basePrice}">

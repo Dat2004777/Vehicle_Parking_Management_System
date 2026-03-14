@@ -215,8 +215,10 @@
         </style>
     </head>
     <body>
-        <!--Footer-->
-        <%@include file="/WEB-INF/views/layout/header.jsp" %>
+        <!--Header-->
+        <jsp:include page="/WEB-INF/views/layout/header.jsp">
+             <jsp:param name="activePage" value="${param.action}"/>
+        </jsp:include>
 
         <div class="bg-light py-4 border-bottom">
             <div class="container">
@@ -270,9 +272,9 @@
                                 <select name="vehicleType" class="form-select border-0 shadow-none small fw-medium" onchange="this.form.submit()">
                                     <option value="">Loại xe: Tất cả</option>
                                     <c:forEach var="vehicle" items="${vehicles}">
-                                            <option value="${vehicle.vehicleTypeId}" ${param.vehicleType == vehicle.vehicleTypeId ? 'selected' : ''}>
-                                                ${vehicle.vehicleName.label} 
-                                            </option>
+                                        <option value="${vehicle.vehicleTypeId}" ${param.vehicleType == vehicle.vehicleTypeId ? 'selected' : ''}>
+                                            ${vehicle.vehicleName.label} 
+                                        </option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -407,10 +409,10 @@
         <!-- Bootstrap JS Bundle -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            function goToSiteDetail(siteId) {
-                window.location.href =
-                        '${pageContext.request.contextPath}/sites/site-detail?action=${param.action}&siteId=' + siteId;
-            }
+                                                                function goToSiteDetail(siteId) {
+                                                                    window.location.href =
+                                                                            '${pageContext.request.contextPath}/sites/site-detail?action=${param.action}&siteId=' + siteId;
+                                                                }
         </script>
     </body>
 </html>

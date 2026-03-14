@@ -16,16 +16,15 @@ import utils.RandomCardId;
  */
 public class AccountDAO extends DBContext {
 
-    public Account checkAccount(String username, String password) {
+    public Account getAccountByUserName(String username) {
         String sql
                 = """
                 SELECT account_id,username,password,role
                 FROM Accounts
-                WHERE username = ? and password = ? and status = 'active'
+                WHERE username = ? and status = 'active'
                 """;
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
-            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 int account_id = rs.getInt("account_id");
@@ -142,6 +141,49 @@ public class AccountDAO extends DBContext {
             ps.executeUpdate();
         } catch (Exception e) {
             System.out.println("Error AccountDAO.updateUsername: " + e.getMessage());
+        }
+    }
+    
+    public boolean changePassword(int accountId, String newPass){
+        String sql =
+                """
+                UPDATE Accounts
+                SET password = ?
+                WHERE account_id = ?
+                """;
+        
+        try(PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setString(1,newPass);
+            ps.setInt(2,accountId);
+             
+            int row = ps.executeUpdate();
+            return row > 0;
+        }catch(Exception e){
+            System.out.println("Lỗi cập thay đổi password của Account");
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public String getPasswordHash(String username){
+        String sql =
+                """
+                SELECT password FROM Accounts WHERE username = ?
+                """;
+        
+        try(PreparedStatement ps = connection.prepareStatement(sql)){
+            ps.setString(1,username);
+            ResultSet rs = ps.executeQuery();
+            
+            if(rs.next()){
+                return rs.getString("password");
+            }else{
+                return "";
+            }
+        }catch(Exception e){
+            System.out.println("Lỗi lấy pass");
+            e.printStackTrace();
+            return "";
         }
     }
 }

@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Account;
+import utils.HashPasswordUtils;
 import utils.ValidationUtils;
 
 /**
@@ -179,7 +180,8 @@ public class SignupController extends HttpServlet {
                     .forward(request, response);
             return;
         }
-
+        
+        String hashedPass = HashPasswordUtils.hashPassword(password);
         // ===== ĐĂNG KÝ THÀNH CÔNG =====
         int acc_id = accDAO.insertAccount(username, password, "customer");
         customerDAO.insertCustomer(firstname, lastname, phone, email, 1000000, acc_id);
