@@ -22,7 +22,7 @@ public class CustomerDAO extends DBContext {
         String sql
                 = """
                 INSERT INTO Customers(first_name,last_name,phone,email,wallet_amount,account_id)
-                VALUES(?,?,?,?,?)
+                VALUES(?,?,?,?,?,?)
                 """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
