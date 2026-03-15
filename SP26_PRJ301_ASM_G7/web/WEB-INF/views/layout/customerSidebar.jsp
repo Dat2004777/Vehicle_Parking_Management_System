@@ -79,10 +79,10 @@
         <form action="deposit" method="POST" id="depositForm">
             <div class="mb-3">
                 <label>Nhập số tiền muốn nạp</label>
-                <input type="number" id="amountInput" name="amount" class="form-control" min="10000" step="10000" placeholder="VD: 50000" required>
+                <input type="number" id="amountInput" name="amount" class="form-control" min="10000" placeholder="VD: 50000" required>
             </div>
 
-            <button type="button" class="btn btn-info" onclick="generateQR()">Tạo mã QR Chuyển khoản</button>
+            <button type="button" class="btn btn-purple" onclick="generateQR()">Tạo mã QR Chuyển khoản</button>
 
             <div id="qrSection" class="mt-4 text-center d-none">
                 <p class="text-muted">Vui lòng quét mã dưới đây bằng App ngân hàng. Hệ thống sẽ tự động ghi nhận (Giả lập).</p>

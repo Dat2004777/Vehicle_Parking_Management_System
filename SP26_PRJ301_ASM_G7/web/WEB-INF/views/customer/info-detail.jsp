@@ -270,6 +270,14 @@
         </script>
 
         <script>
+            // 1. NGĂN CHẶN NHẤN ENTER ĐỂ SUBMIT FORM
+            document.getElementById('amountInput').addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Phanh gấp! Không cho form gửi đi
+                    generateQR(); // Tiện tay gọi luôn hàm gen QR (UX cực mượt cho người dùng)
+                }
+            });
+
             function generateQR() {
                 const amount = document.getElementById('amountInput').value;
                 if (amount >= 10000) {
@@ -280,8 +288,8 @@
                     const accountNo = "0000309047777";
                     const accountName = "NGUYEN THANH DAT";
 
-                    const qrUrl = "https://img.vietqr.io/image/" + bankId + "-" + accountNo + "-compact.png?amount=" + amount + "&addInfo=NapTienGuiXe" + ${sessionScope.customer.customerId} +"&accountName=" + accountName;
-                            document.getElementById('qrImage').src = qrUrl;
+                    const qrUrl = "https://img.vietqr.io/image/" + bankId + "-" + accountNo + "-compact.png?amount=" + amount + "&addInfo=NapTienGuiXe" + ${sessionScope.customer.customerId} + "&accountName=" + accountName;
+                    document.getElementById('qrImage').src = qrUrl;
                     document.getElementById('qrSection').classList.remove('d-none');
                 } else {
                     showToast("error", "Vui lòng nhập số tiền hợp lệ (>10.000đ)");
