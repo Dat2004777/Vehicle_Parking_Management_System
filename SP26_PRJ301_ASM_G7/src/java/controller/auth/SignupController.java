@@ -183,7 +183,7 @@ public class SignupController extends HttpServlet {
         
         String hashedPass = HashPasswordUtils.hashPassword(password);
         // ===== ĐĂNG KÝ THÀNH CÔNG =====
-        int acc_id = accDAO.insertAccount(username, password, "customer");
+        int acc_id = accDAO.insertAccount(username, hashedPass, "customer");
         customerDAO.insertCustomer(firstname, lastname, phone, email, 0, acc_id);
 
         response.sendRedirect(request.getContextPath() + "/signup?success=true");
