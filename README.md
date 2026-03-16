@@ -59,7 +59,6 @@
 ---
 
 ## 📁 Folder Structure
-```text
 src/
 ├── main/
 │   ├── java/ (Controller, DAO, Model, Filter)
@@ -68,3 +67,8 @@ src/
 │   │   │   ├── tags/ (Custom Toast Tags)
 │   │   │   └── views/ (JSP Pages)
 │   │   └── assets/ (CSS, JS, Images)
+
+
+<div align="center">
+<i>© 2026 3I Team - PRJ301 SP26</i>
+</div>
