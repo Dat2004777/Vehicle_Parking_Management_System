@@ -230,7 +230,7 @@ INSERT INTO Accounts (username, password, role) VALUES
 INSERT INTO Employees (account_id, firstname, lastname, phone, site_id) VALUES 
 (1, N'Quản', N'Nguyễn', '0901111111', NULL),
 (2, N'Bảo', N'Lê', '0902222222', 1),
-(3, N'Vy', N'Trần', '0903333333', 2);
+(3, N'Vy', N'Trần', '0903333333', 2),
 (4, N'Thành Đạt', N'Nguyễn', '0904444444', 2);
 
 UPDATE ParkingSites SET manager_id = 1 WHERE site_id = 1; 
