@@ -30,6 +30,7 @@ Hệ thống được phát triển và duy trì bởi các thành viên nhóm 7
 ---
 
 ## 🚀 Key Features
+- [x] **Account:** Admin - admin, staff3 - 123, staff2 - 123, customer1 - 123.
 - [x] **Check-in/out:** Quy trình kiểm soát thẻ RFID và biển số xe thời gian thực.
 - [x] **Smart Toast:** Hệ thống thông báo trượt (Toast) tích hợp thanh Progress bar.
 - [x] **Subscription:** Quản lý và gia hạn vé tháng linh hoạt.
