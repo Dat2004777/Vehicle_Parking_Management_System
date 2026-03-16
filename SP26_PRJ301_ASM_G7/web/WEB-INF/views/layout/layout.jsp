@@ -1,5 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<%@ taglib prefix="my" tagdir="/WEB-INF/tags" %>
 <link href="${pageContext.request.contextPath}/assets/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -132,8 +132,12 @@
     </div>
 </div>
 
+<%@taglib prefix="my" tagdir="/WEB-INF/tags" %>
+<%-- Gọi taglib để nó in ra HTML và hàm showToast() --%>
+<my:toast type="${type}" message="${message}" />
+
 <script src="${pageContext.request.contextPath}/assets/js/bootstrap.bundle.min.js"></script>
-<script>
+<!--<script>
     // Khai báo sẵn các phần tử DOM để tăng hiệu năng (không phải tìm lại mỗi lần gọi hàm)
     const toastEl = document.getElementById('systemToast');
     const toastIcon = document.getElementById('toastIcon');
@@ -181,7 +185,7 @@
         toastText.innerHTML = message;
         bsToastInstance.show();
     }
-</script>
+</script>-->
 
 
 <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
