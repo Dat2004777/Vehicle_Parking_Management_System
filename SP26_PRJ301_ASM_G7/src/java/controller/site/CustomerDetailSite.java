@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Account;
 import model.ParkingSite;
 import model.dto.BookingPreviewDTO;
 import model.dto.VehicleBasePriceDTO;
@@ -71,6 +72,16 @@ public class CustomerDetailSite extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        Account acc = (Account) session.getAttribute("account");
+
+        // ADMIN / STAFF / MANAGER không được vào trang public
+        if (acc != null && acc.getRole() != Account.RoleEnum.CUSTOMER) {
+            String rolePrefix = (String) session.getAttribute("rolePrefix");
+            response.sendRedirect(request.getContextPath() + rolePrefix);
+            return;
+        }
 
         String action = request.getParameter("action");
         if (action == null || action.isBlank()) {
@@ -191,7 +202,7 @@ public class CustomerDetailSite extends HttpServlet {
             return;
         } else {
             String vehicleId = request.getParameter("typeVehicle");
-    
+
             PriceConfigDAO priceConfigDAO = new PriceConfigDAO();
             try {
                 long basePrice = priceConfigDAO.getPriceByVehicleAndSite("hourly", Integer.parseInt(siteId), Integer.parseInt(vehicleId));
