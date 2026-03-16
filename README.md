@@ -24,8 +24,8 @@ Hệ thống được phát triển và duy trì bởi các thành viên nhóm 7
 | Avatar | Full Name | Role | Profile |
 | :---: | :--- | :--- | :--- |
 | <img src="https://github.com/Dat2004777.png" width="40"> | **Nguyen Thanh Dat** | Leader / Backend | [@Dat2004777](https://github.com/Dat2004777) |
-| <img src="https://github.com/hiakira.png" width="40"> | **Nguyen Nhat Minh** | Fullstack / UI-UX | [@hiakira](https://github.com/hiakira) |
-| <img src="https://github.com/MinhHieu.png" width="40"> | **Nguyen Minh Hieu** | Backend / Database | [@MinhHieu](https://github.com/MinhHieu) |
+| <img src="https://github.com/minhcamon.png" width="40"> | **Nguyen Nhat Minh** | Fullstack / UI-UX | [@minhcamon](https://github.com/minhcamon) |
+| <img src="https://github.com/hieudaykhongsau.png" width="40"> | **Nguyen Minh Hieu** | Backend / Database | [@hieudaykhongsau](https://github.com/hieudaykhongsau) |
 
 ---
 
