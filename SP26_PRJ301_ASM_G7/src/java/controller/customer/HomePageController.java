@@ -11,6 +11,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import model.Account;
+import utils.UrlConstants;
 
 /**
  *
@@ -57,7 +60,25 @@ public class HomePageController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("homePage.jsp").forward(request, response);
+        HttpSession session = request.getSession();
+        Account acc = (Account) session.getAttribute("account");
+        String contextPath = request.getContextPath();
+
+        if (acc == null) {
+            request.getRequestDispatcher("/homePage.jsp")
+                    .forward(request, response);
+            return;
+        }
+
+        if (acc.getRole() == Account.RoleEnum.CUSTOMER) {
+            request.getRequestDispatcher("/homePage.jsp")
+                    .forward(request, response);
+            return;
+        }
+
+        String rolePrefix = (String) session.getAttribute("rolePrefix");
+
+        response.sendRedirect(request.getContextPath() + rolePrefix);
     }
 
     /**

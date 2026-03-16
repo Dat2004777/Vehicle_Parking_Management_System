@@ -71,10 +71,11 @@ public class PaymentController extends HttpServlet {
 
         HttpSession session = request.getSession();
         Account account = (Account) session.getAttribute("account");
-        if (account == null || account.getRole() != Account.RoleEnum.CUSTOMER) {
-            request.getRequestDispatcher("/404-error.jsp").forward(request, response);
+        if (account == null || account.getRole() != Account.RoleEnum.CUSTOMER){ 
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        
 
         String action = request.getParameter("action");
         String siteId = request.getParameter("siteId");
