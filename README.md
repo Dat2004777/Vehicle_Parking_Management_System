@@ -1,2 +1,8 @@
-# SP26_PRJ301_ASM_G7
-PRJ301 ASM made by G7
+# PRJ301_ASM_G7
+
+ Contributed By
+* Nguyen Thanh Dat
+
+* Nguyen Nhat Minh
+
+* Nguyen Minh Hieu

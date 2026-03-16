@@ -1,0 +1,30 @@
+SP26_PRJ301_ASM_G7/web/WEB-INF/ConnectDB.properties
+
+# --- NetBeans Build Artifacts (Rác sinh ra khi chạy code) ---
+/SP26_PRJ301_ASM_G7/build/
+/SP26_PRJ301_ASM_G7/dist/
+/nbbuild/
+/nbdist/
+
+# --- NetBeans User Specific (Cực kỳ quan trọng để tránh conflict) ---
+# Đừng chỉ ignore file properties, hãy ignore cả thư mục private
+# Vì nó chứa thông tin máy cá nhân: vị trí cửa sổ, file đang mở...
+nbproject/private/
+SP26_PRJ301_ASM_G7/nbproject/private/private.properties
+SP26_PRJ301_ASM_G7/nbproject/private/private.xml
+
+# --- Compiled Files (Phòng hờ) ---
+*.class
+*.log
+
+# --- OS System Files (Rác của hệ điều hành - rất hay gây conflict) ---
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+/SP26_PRJ301_ASM_G7/nbproject/private/
+SP26_PRJ301_ASM_G7/database/ConnectDB.properties
+SP26_PRJ301_ASM_G7/web/WEB-INF/ConnectDB.properties
+SP26_PRJ301_ASM_G7/nbproject/build-impl.xml
+SP26_PRJ301_ASM_G7/nbproject/genfiles.properties
+SP26_PRJ301_ASM_G7/nbproject/project.xml
