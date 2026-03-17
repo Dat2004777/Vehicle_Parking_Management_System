@@ -27,7 +27,7 @@
 > [!IMPORTANT]
 > Sử dụng các tài khoản dưới đây để kiểm tra hệ thống:
 > - **Admin:** `admin` / `admin`
-> - **Staff:** `staff2` (hoặc `staff3`) / `123`
+> - **Staff/ Manager:** `staff2` (hoặc `staff3`) / `123`
 > - **Customer:** `customer1` / `123`
 
 ---
@@ -36,7 +36,7 @@
 
 | Avatar | Full Name | Role | Profile |
 | :---: | :--- | :--- | :--- |
-| <img src="https://github.com/Dat2004777.png" width="40" style="border-radius:50%"> | **Nguyen Thanh Dat** | Leader / Backend | [@Dat2004777](https://github.com/Dat2004777) |
+| <img src="https://github.com/Dat2004777.png" width="40" style="border-radius:50%"> | **Nguyen Thanh Dat** | Leader / Fullstack | [@Dat2004777](https://github.com/Dat2004777) |
 | <img src="https://github.com/minhcamon.png" width="40" style="border-radius:50%"> | **Nguyen Nhat Minh** | Fullstack / UI-UX | [@minhcamon](https://github.com/minhcamon) |
 | <img src="https://github.com/hieudaykhongsau.png" width="40" style="border-radius:50%"> | **Nguyen Minh Hieu** | Backend / Database | [@hieudaykhongsau](https://github.com/hieudaykhongsau) |
 
