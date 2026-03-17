@@ -293,6 +293,9 @@
                 .sidebar {
                     transform: translateX(-100%);
                 }
+                .sidebar.active {
+                    transform: translateX(0);
+                }
                 .main-content {
                     margin-left: 0;
                 }
