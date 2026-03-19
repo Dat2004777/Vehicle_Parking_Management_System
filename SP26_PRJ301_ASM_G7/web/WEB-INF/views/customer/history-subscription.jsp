@@ -118,6 +118,10 @@
                                                                 <i class="bi ${sub.subscription.vehicleTypeId == 1 ? 'bi-car-front' : 'bi-bicycle'}"></i> 
                                                                 Biển số: ${sub.subscription.licensePlate}
                                                             </p>
+                                                            <p class="mb-1 small text-muted">
+                                                                <i class="bi bi-postcard-fill"></i>
+                                                                Mã thẻ: ${sub.subscription.cardId}
+                                                            </p>
                                                             <p class="mb-0 small text-muted">
                                                                 <i class="bi bi-clock"></i> Hết hạn:
                                                                 <span class="text-danger fw-bold">
@@ -315,7 +319,7 @@
                 </div>
             </div>
         </div>
-         <!--Footer-->
+        <!--Footer-->
         <%@ include file="/WEB-INF/views/layout/footer.jsp" %>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
@@ -441,7 +445,7 @@
                         // đóng modal
                         const modal = bootstrap.Modal.getInstance(document.getElementById("renewModal"));
                         modal.hide();
-                        
+
                         showToast("error", data.message || "Gia hạn thất bại!");
 
                         btn.disabled = false;

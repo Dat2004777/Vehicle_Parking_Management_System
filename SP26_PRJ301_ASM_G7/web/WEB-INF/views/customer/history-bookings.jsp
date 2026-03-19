@@ -153,6 +153,7 @@
                                                                  data-site="${h.siteName}"
                                                                  data-time="${h.booking.timeIn}"
                                                                  data-amount="${h.booking.bookingAmount}"
+                                                                 data-card="${h.booking.cardId}"
                                                                  data-state="${h.state eq 'upcoming' ? 'Sắp tới' : 'Hoàn thành'}"
                                                                  data-bs-toggle="modal"
                                                                  data-bs-target="#bookingDetailModal">
@@ -194,7 +195,10 @@
                                 <span class="detail-label">Mã Booking</span>
                                 <span class="detail-value fw-bold" id="mBookingId"></span>
                             </div>
-
+                            <div class="detail-row">
+                                <span class="detail-label">Mã thẻ</span>
+                                <span class="detail-value" id="mCardId"></span>
+                            </div>
                             <div class="detail-row">
                                 <span class="detail-label">Bãi xe</span>
                                 <span class="detail-value" id="mSite"></span>
@@ -225,24 +229,25 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             document.querySelectorAll(".btn-detail").forEach(btn => {
-
                 btn.addEventListener("click", function () {
+                    // Lấy và hiển thị Mã Booking
+                    document.getElementById("mBookingId").innerText = "BK-" + this.dataset.id;
 
-                    document.getElementById("mBookingId").innerText =
-                            "BK-" + this.dataset.id;
+                    // Lấy và hiển thị Bãi xe
+                    document.getElementById("mSite").innerText = this.dataset.site;
 
-                    document.getElementById("mSite").innerText =
-                            this.dataset.site;
+                    // --- DÒNG MỚI THÊM: Lấy và hiển thị Mã thẻ ---
+                    document.getElementById("mCardId").innerText = this.dataset.card;
 
-                    document.getElementById("mTime").innerText =
-                            formatTime(this.dataset.time);
+                    // Lấy và hiển thị Thời gian (đã qua hàm format)
+                    document.getElementById("mTime").innerText = formatTime(this.dataset.time);
 
-                    document.getElementById("mAmount").innerText =
-                            formatVND(this.dataset.amount);
+                    // Lấy và hiển thị Số tiền (đã qua hàm format)
+                    document.getElementById("mAmount").innerText = formatVND(this.dataset.amount);
 
+                    // Xử lý Badge trạng thái
                     let badge = document.getElementById("mStateBadge");
                     let state = this.dataset.state;
-
                     badge.innerText = state;
 
                     if (state === "Hoàn thành") {
