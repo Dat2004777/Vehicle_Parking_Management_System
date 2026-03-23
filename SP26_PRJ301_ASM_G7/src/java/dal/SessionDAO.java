@@ -118,7 +118,91 @@ public class SessionDAO extends DBContext {
         }
         return list;
     }
+    
+    // 1. Hàm đếm tổng số bản ghi (Phục vụ việc tính số trang)
+    public int getTotalLogsCount(int siteId, String state) {
+        StringBuilder sql = new StringBuilder("""
+                SELECT COUNT(*) 
+                FROM ParkingSessions s
+                JOIN ParkingCards c ON s.card_id = c.card_id
+                WHERE c.site_id = ? AND s.status = 'active'
+                """);
 
+        boolean hasStateFilter = state != null && !state.trim().isEmpty();
+        if (hasStateFilter) {
+            sql.append(" AND s.session_state = ? ");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            ps.setInt(1, siteId);
+            if (hasStateFilter) {
+                ps.setString(2, state.trim());
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    // 2. Hàm lấy dữ liệu phân trang thay thế cho getRecentLogs cũ
+    public List<ParkingSession> getLogsByPage(int siteId, int page, int pageSize, String state) {
+        List<ParkingSession> list = new ArrayList<>();
+        int offset = (page - 1) * pageSize; // Công thức bỏ qua số dòng của trang trước
+
+        StringBuilder sql = new StringBuilder("""
+                SELECT s.session_id, s.card_id, c.site_id, s.license_plate,
+                       s.entry_time, s.exit_time, s.session_state, s.status
+                FROM ParkingSessions s
+                JOIN ParkingCards c ON s.card_id = c.card_id
+                WHERE c.site_id = ? AND s.status = 'active'
+                """);
+
+        boolean hasStateFilter = state != null && !state.trim().isEmpty();
+        if (hasStateFilter) {
+            sql.append(" AND s.session_state = ? ");
+        }
+
+        // Bắt buộc phải có ORDER BY trước khi dùng OFFSET
+        sql.append(" ORDER BY s.entry_time DESC ");
+        
+        // Cú pháp phân trang của SQL Server
+        sql.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            ps.setInt(1, siteId);
+            
+            int paramIndex = 2; // Dùng biến đếm để set parameter linh hoạt
+            if (hasStateFilter) {
+                ps.setString(paramIndex++, state.trim());
+            }
+            
+            ps.setInt(paramIndex++, offset); // Tham số cho OFFSET
+            ps.setInt(paramIndex, pageSize); // Tham số cho FETCH NEXT
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ParkingSession session = new ParkingSession();
+                    session.setSessionId(rs.getInt("session_id"));
+                    session.setCardId(rs.getString("card_id"));
+                    session.setLicensePlate(rs.getString("license_plate"));
+                    session.setEntryTime(rs.getObject("entry_time", java.time.LocalDateTime.class));
+                    session.setExitTime(rs.getObject("exit_time", java.time.LocalDateTime.class));
+                    session.setSessionState(rs.getString("session_state"));
+                    session.setStatus(rs.getString("status"));
+                    list.add(session);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
     // ==========================================================
     // 1. CÁC HÀM XỬ LÝ NGHIỆP VỤ CHECK-IN / CHECK-OUT
     // ==========================================================

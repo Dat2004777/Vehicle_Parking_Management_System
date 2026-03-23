@@ -95,8 +95,8 @@
                     </div>
                     <a href="${ctx}/dashboard" class="btn btn-outline-secondary fw-bold">Quay lại</a>
                 </div>
-                
-                
+
+
 
                 <div class="card shadow-sm border-0 history-card">
 
@@ -124,74 +124,113 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="log" items="${recentLogs}">
-                                    <c:choose>
-                                        <c:when test="${log.sessionState == 'parked' || log.sessionState == 'PARKED' || log.sessionState == 'ACTIVE'}">
-                                            <c:set var="actionName" value="Xe vào bãi" />
-                                            <c:set var="actionBadge" value="badge-soft-success" /> 
-                                            <c:set var="icon" value="bi-arrow-down-circle" />
-                                            <c:set var="statusText" value="Đang đỗ" />
-                                            <c:set var="statusBadge" value="badge-soft-warning" /> 
-                                        </c:when>
+                                <c:choose>
+                                    <%-- TRƯỜNG HỢP CÓ DỮ LIỆU --%>
+                                    <c:when test="${not empty recentLogs}">
+                                        <c:forEach var="log" items="${recentLogs}">
+                                            <c:choose>
+                                                <c:when test="${log.sessionState == 'parked' || log.sessionState == 'PARKED' || log.sessionState == 'ACTIVE'}">
+                                                    <c:set var="actionName" value="Xe vào bãi" />
+                                                    <c:set var="actionBadge" value="badge-soft-success" /> 
+                                                    <c:set var="icon" value="bi-arrow-down-circle" />
+                                                    <c:set var="statusText" value="Đang đỗ" />
+                                                    <c:set var="statusBadge" value="badge-soft-warning" /> 
+                                                </c:when>
 
-                                        <c:when test="${log.sessionState == 'completed' || log.sessionState == 'COMPLETED'}">
-                                            <c:set var="actionName" value="Xe ra bãi" />
-                                            <c:set var="actionBadge" value="badge-soft-warning" /> 
-                                            <c:set var="icon" value="bi-arrow-up-circle" />
-                                            <c:set var="statusText" value="Đã hoàn tất" />
-                                            <c:set var="statusBadge" value="badge-soft-success" /> 
-                                        </c:when>
+                                                <c:when test="${log.sessionState == 'completed' || log.sessionState == 'COMPLETED'}">
+                                                    <c:set var="actionName" value="Xe ra bãi" />
+                                                    <c:set var="actionBadge" value="badge-soft-warning" /> 
+                                                    <c:set var="icon" value="bi-arrow-up-circle" />
+                                                    <c:set var="statusText" value="Đã hoàn tất" />
+                                                    <c:set var="statusBadge" value="badge-soft-success" /> 
+                                                </c:when>
 
-                                        <c:otherwise>
-                                            <c:set var="actionName" value="Lỗi Dữ liệu" />
-                                            <c:set var="actionBadge" value="badge-soft-danger" /> 
-                                            <c:set var="icon" value="bi-exclamation-octagon" />
-                                            <c:set var="statusText" value="Lỗi hệ thống" />
-                                            <c:set var="statusBadge" value="badge-soft-danger" />
-                                        </c:otherwise>
-                                    </c:choose>
+                                                <c:otherwise>
+                                                    <c:set var="actionName" value="Lỗi Dữ liệu" />
+                                                    <c:set var="actionBadge" value="badge-soft-danger" /> 
+                                                    <c:set var="icon" value="bi-exclamation-octagon" />
+                                                    <c:set var="statusText" value="Lỗi hệ thống" />
+                                                    <c:set var="statusBadge" value="badge-soft-danger" />
+                                                </c:otherwise>
+                                            </c:choose>
 
-                                    <tr>
-                                        <td class="ps-3 ps-md-4">
-                                            <span class="fw-bold text-dark fs-6 text-uppercase">${log.licensePlate}</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-primary-subtle text-primary font-monospace fw-medium" style="font-size: 0.8rem; padding: 5px 8px;">
-                                                <i class="bi bi-credit-card me-1"></i>${log.cardId}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="${actionBadge} d-inline-block">
-                                                <i class="bi ${icon} me-1"></i> ${actionName}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="text-muted"><i class="bi bi-clock me-1"></i> ${log.formattedTime}</span>
-                                        </td>
-                                        <td>
-                                            <span class="${statusBadge} d-inline-block">${statusText}</span>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
+                                            <tr>
+                                                <td class="ps-3 ps-md-4">
+                                                    <span class="fw-bold text-dark fs-6 text-uppercase">${log.licensePlate}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary-subtle text-primary font-monospace fw-medium" style="font-size: 0.8rem; padding: 5px 8px;">
+                                                        <i class="bi bi-credit-card me-1"></i>${log.cardId}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="${actionBadge} d-inline-block">
+                                                        <i class="bi ${icon} me-1"></i> ${actionName}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-muted"><i class="bi bi-clock me-1"></i> ${log.formattedTime}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="${statusBadge} d-inline-block">${statusText}</span>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </c:when>
 
-                                <c:if test="${empty recentLogs}">
-                                    <tr>
-                                        <td colspan="6" class="text-center py-5 text-muted" style="height: 300px; vertical-align: middle;">
-                                            <i class="bi bi-inbox fs-1 d-block mb-2 text-light"></i>
-                                            <span>Không tìm thấy lịch sử ra vào nào.</span>
-                                        </td>
-                                    </tr>
-                                </c:if>
+                                    <%-- TRƯỜNG HỢP KHÔNG CÓ DỮ LIỆU --%>
+                                    <c:otherwise>
+                                        <tr>
+                                            <td colspan="5" class="text-center py-5 text-muted" style="height: 300px; vertical-align: middle;">
+                                                <i class="bi bi-inbox fs-1 d-block mb-2 text-light"></i>
+                                                <span>Không tìm thấy lịch sử ra vào nào.</span>
+                                            </td>
+                                        </tr>
+                                    </c:otherwise>
+                                </c:choose>
                             </tbody>
                         </table>
                     </div>
 
+                    <%-- KHU VỰC CHỨA PHÂN TRANG (PAGINATION) --%>
+                    <%-- Chỉ hiện thanh phân trang nếu có nhiều hơn 1 trang --%>
+                    <c:if test="${totalPages > 1}">
+                        <div class="d-flex justify-content-center bg-white border-top py-3">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination pagination-sm mb-0">
+
+                                    <%-- Nút "Trang trước" --%>
+                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                        <a class="page-link" href="?page=${currentPage - 1}&state=${param.state}" tabindex="-1">
+                                            <i class="bi bi-chevron-left"></i> Trước
+                                        </a>
+                                    </li>
+
+                                    <%-- Danh sách các số trang --%>
+                                    <c:forEach begin="1" end="${totalPages}" var="i">
+                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                            <a class="page-link" href="?page=${i}&state=${param.state}">${i}</a>
+                                        </li>
+                                    </c:forEach>
+
+                                    <%-- Nút "Trang sau" --%>
+                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="?page=${currentPage + 1}&state=${param.state}">
+                                            Sau <i class="bi bi-chevron-right"></i>
+                                        </a>
+                                    </li>
+
+                                </ul>
+                            </nav>
+                        </div>
+                    </c:if>
+
                     <div class="history-card-footer py-2 px-3 px-md-4 d-flex justify-content-between align-items-center">
                         <span class="text-muted fw-medium" style="font-size: 0.85rem;">
-                            Đã tải <strong class="text-dark">${recentLogs != null ? recentLogs.size() : 0}</strong> bản ghi
+                            Trang <strong class="text-dark">${currentPage}</strong> / ${totalPages == 0 ? 1 : totalPages}
                         </span>
                         <span class="text-muted" style="font-size: 0.8rem;">
-                            <i class="bi bi-info-circle me-1"></i> Cuộn để xem thêm
+                            <i class="bi bi-info-circle me-1"></i> Hiển thị tối đa 10 bản ghi mỗi trang
                         </span>
                     </div>
 

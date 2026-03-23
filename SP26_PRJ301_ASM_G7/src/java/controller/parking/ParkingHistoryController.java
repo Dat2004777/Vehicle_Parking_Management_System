@@ -25,56 +25,73 @@ import utils.UrlConstants;
  */
 @WebServlet(name = "HistoryController", urlPatterns = {UrlConstants.URL_STAFF + "/parking/history"})
 public class ParkingHistoryController extends HttpServlet {
+
     private SessionDAO sessionDAO = new SessionDAO();
 
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        String state = request.getParameter("state");
+
         Employee emp = (Employee) request.getSession().getAttribute("staff");
-        
         if (emp == null) {
-            response.sendRedirect("/login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
-        List<RecentActivityDTO> recentLogs = getRecentActivities(emp.getSiteId(), 20, state);
+
+        String state = request.getParameter("state");
+
+        // --- BẮT ĐẦU LOGIC PHÂN TRANG ---
+        int pageSize = 2; // Số dòng trên 1 trang (bạn có thể đổi thành 15 hoặc 20)
+        int page = 1;      // Mặc định là trang 1
+
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+                if (page < 1) {
+                    page = 1; // Chống người dùng nhập ?page=-5
+                }
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        // 1. Tính tổng số trang
+        int totalRecords = sessionDAO.getTotalLogsCount(emp.getSiteId(), state);
+        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
+
+        // Đảm bảo page không vượt quá totalPages nếu người dùng nhập linh tinh
+        if (page > totalPages && totalPages > 0) {
+            page = totalPages;
+        }
+
+        // 2. Lấy danh sách DTO theo trang
+        List<RecentActivityDTO> recentLogs = getRecentActivitiesByPage(emp.getSiteId(), page, pageSize, state);
+        // --- KẾT THÚC LOGIC PHÂN TRANG ---
+
+        // Đẩy dữ liệu sang JSP
         request.setAttribute("recentLogs", recentLogs);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("state", state); // Truyền ngược state lại JSP để giữ filter khi chuyển trang
+
         request.getRequestDispatcher("/WEB-INF/views/parking/history.jsp").forward(request, response);
     }
 
-    /**
-     * Hàm lấy nhật ký từ Database và biến đổi thành DTO hiển thị (Chuẩn Clean
-     * Architecture)
-     */
-    private List<RecentActivityDTO> getRecentActivities(int siteId, int limit, String state) {
-        List<ParkingSession> rawLogs = sessionDAO.getRecentLogs(siteId, limit, state);
+    // Cập nhật lại hàm này để gọi hàm getLogsByPage mới trong DAO
+    private List<RecentActivityDTO> getRecentActivitiesByPage(int siteId, int page, int pageSize, String state) {
+        List<ParkingSession> rawLogs = sessionDAO.getLogsByPage(siteId, page, pageSize, state);
         List<RecentActivityDTO> dtoList = new ArrayList<>();
-
-        // CẬP NHẬT: Thêm định dạng Ngày/Tháng/Năm (dd/MM/yyyy)
-        // Dùng HH:mm (24h) thường chuyên nghiệp hơn cho bãi xe, nếu thích AM/PM thì dùng hh:mm a
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
         for (ParkingSession session : rawLogs) {
             String formattedTime = "--/--/---- --:--";
-
-            // Lấy thời gian tùy thuộc vào việc xe đang đỗ hay đã ra
             if ("parked".equalsIgnoreCase(session.getSessionState()) && session.getEntryTime() != null) {
                 formattedTime = session.getEntryTime().format(timeFormatter);
             } else if ("completed".equalsIgnoreCase(session.getSessionState()) && session.getExitTime() != null) {
                 formattedTime = session.getExitTime().format(timeFormatter);
             }
 
-            // DTO giờ đây cực kỳ mỏng nhẹ, Controller không còn chứa code Giao diện (CSS) nữa
             dtoList.add(new RecentActivityDTO(
                     session.getLicensePlate(),
                     formattedTime,
