@@ -54,7 +54,7 @@ public class AddSiteController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
-        
+
         // 1. Khởi tạo DTO và nhét toàn bộ dữ liệu vào
         SiteFormDataDTO formData = new SiteFormDataDTO(
                 ParkingSite.Region.values(),

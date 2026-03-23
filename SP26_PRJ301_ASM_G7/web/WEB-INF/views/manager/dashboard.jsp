@@ -184,6 +184,9 @@
                 .sidebar {
                     transform: translateX(-100%);
                 }
+                .sidebar.active {
+                    transform: translateX(0);
+                }
                 .main-content {
                     margin-left: 0;
                 }
@@ -336,7 +339,7 @@
                     sidebar.classList.toggle('active');
                 if (overlay)
                     overlay.classList.toggle('active');
-                document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+                document.body.style.overflow = sidebar?.classList.contains('active') ? 'hidden' : '';
             }
 
             if (mobileToggle)

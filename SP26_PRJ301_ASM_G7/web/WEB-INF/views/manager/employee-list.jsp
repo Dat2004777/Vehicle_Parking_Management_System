@@ -170,6 +170,9 @@
                 .sidebar {
                     transform: translateX(-100%);
                 }
+                .sidebar.active {
+                    transform: translateX(0);
+                }
                 .main-content {
                     margin-left: 0;
                 }
@@ -224,27 +227,27 @@
                             </tr>
                         </thead>
                         <tbody>
-                        <c:forEach items="${listEmployees}" var="emp">
-                            <tr>
-                                <td>
-                                    <div class="emp-info">
-                                        <div class="avatar-circle">${emp.lastName.substring(0,1)}${emp.firstName.substring(0,1)}</div>
-                                        <div>
-                                            <span class="emp-name">${emp.lastName} ${emp.firstName}</span>
+                            <c:forEach items="${listEmployees}" var="emp">
+                                <tr>
+                                    <td>
+                                        <div class="emp-info">
+                                            <div class="avatar-circle">${emp.lastName.substring(0,1)}${emp.firstName.substring(0,1)}</div>
+                                            <div>
+                                                <span class="emp-name">${emp.lastName} ${emp.firstName}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="fw-medium">${emp.phone}</td>
-                            </tr>
-                        </c:forEach>
-                        <c:if test="${empty listEmployees}">
-                            <tr>
-                                <td colspan="4" class="text-center py-5 text-muted">
-                                    <i class="bi bi-people fs-2 d-block mb-2"></i>
-                                    Không tìm thấy nhân viên nào phù hợp.
-                                </td>
-                            </tr>
-                        </c:if>
+                                    </td>
+                                    <td class="fw-medium">${emp.phone}</td>
+                                </tr>
+                            </c:forEach>
+                            <c:if test="${empty listEmployees}">
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        <i class="bi bi-people fs-2 d-block mb-2"></i>
+                                        Không tìm thấy nhân viên nào phù hợp.
+                                    </td>
+                                </tr>
+                            </c:if>
                         </tbody>
                     </table>
                 </div>
